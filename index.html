@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>觀音禪寺線上靈籤</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
+
+    <style>
+        /* ...(其他 CSS 保持不變)... */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { width: 100%; max-width: 500px; text-align: center; }
+        #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
+        header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        header p { font-size: 1rem; color: #6c584c; margin-bottom: 2rem; }
+        #date-display { font-size: 0.95rem; color: #8a6c4c; margin-top: -1.5rem; margin-bottom: 1rem; }
+        #bazi-display { display: flex; justify-content: space-around; padding: 1rem 0; border-top: 1px solid #ddd8cf; border-bottom: 1px solid #ddd8cf; margin-bottom: 2rem; }
+        .bazi-column { display: flex; flex-direction: column; align-items: center; }
+        .char-gan, .char-zhi { font-size: 1.8rem; font-weight: 600; line-height: 1.2; color: #3d2c1d; }
+        .pillar-name { font-size: 1.1rem; color: #9c897a; margin-top: 0.4rem; }
+        #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
+        #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
+        #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
+        #poem-content { font-size: 1.3rem; line-height: 2.2; color: #3d2c1d; white-space: pre-wrap; }
+        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #analysis-section { margin-top: 2.5rem; width: 100%; }
+        #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
+        #question-input::placeholder { color: #b08968; opacity: 0.8; }
+        #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
+        
+        #analysis-button { font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #fff; background-color: #8a6c4c; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #analysis-button:hover { background-color: #6c584c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+
+        /* --- MODIFICATION START --- */
+        #analysis-button:disabled {
+            background-color: #b0a395; /* Lighter, disabled color */
+            cursor: wait; /* Show waiting cursor */
+            transform: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #ai-analysis-result {
+            background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px;
+            padding: 1.5rem 2rem; margin-top: 1.5rem; text-align: left;
+            line-height: 1.8; font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); color: #3d2c1d;
+        }
+
+        /* New style for paragraphs within the result box */
+        #ai-analysis-result p {
+            margin-bottom: 1.2rem;
+        }
+        #ai-analysis-result p:last-child {
+            margin-bottom: 0;
+        }
+        /* --- MODIFICATION END --- */
+
+        footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="觀音聖像" id="header-image">
+            <h1>觀音禪寺線上靈籤</h1>
+            <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
+            <p id="date-display"></p>
+            <div id="bazi-display"></div>
+        </header>
+        
+        <main>
+            <div id="poem-card">
+                <h2 id="poem-title"></h2>
+                <p id="poem-content"></p>
+            </div>
+            <button id="draw-button">誠心抽一籤</button>
+            <div id="analysis-section">
+                <textarea id="question-input" placeholder="請在此輸入您想問的問題..."></textarea>
+                <button id="analysis-button">開始綜合解析</button>
+                <div id="ai-analysis-result" style="display: none;"></div> 
+            </div>
+        </main>
+        
+        <footer>
+            <p>© 2025 - 僅供參考，心誠則靈</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const poems = [
+          // ... (所有籤詩資料保持不變) ...
+          { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" }, { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "" }, { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "" }, { "id": 3, "title": "第三籤 甲辰", "poem": "勸君把定心莫虛，天註姻緣自有餘。\n和合重重常吉慶，時來終遇得明珠。", "interpretation": "" }, { "id": 4, "title": "第四籤 甲午", "poem": "風恬浪靜可行舟，恰是中秋月一輪。\n凡事不須多憂慮，福祿自有慶家門。", "interpretation": "" }, { "id": 5, "title": "第五籤 甲申", "poem": "只恐前途命有變，勸君作急可宜先。\n且守長江無大事，命逢太白守身邊。", "interpretation": "" }, { "id": 6, "title": "第六籤 甲戌", "poem": "風雲致雨落洋洋，天災時氣必有傷。\n命內此事難和合，更逢一足出外鄉。", "interpretation": "" }, { "id": 7, "title": "第七籤 乙丑", "poem": "雲開月出正分明，不須進退問前程。\n婚姻皆由天註定，和合清吉萬事成。", "interpretation": "" }, { "id": 8, "title": "第八籤 乙卯", "poem": "禾稻看看結成完，此事必定兩相全。\n回到家中寬心坐，妻兒鼓舞樂團圓。", "interpretation": "" }, { "id": 9, "title": "第九籤 乙巳", "poem": "龍虎相隨在深山，君爾何須背後看。\n不知此去相愛愉，他日與我卻無干。", "interpretation": "" }, { "id": 10, "title": "第十籤 乙未", "poem": "花開結子一半枯，可惜今年汝虛度。\n漸漸日落西山去，勸君不用向前途。", "interpretation": "" }, { "id": 11, "title": "第十一籤 乙酉", "poem": "靈雞漸漸見分明，凡事且看子丑寅。\n雲開月出照天下，郎君即便見太平。", "interpretation": "" }, { "id": 12, "title": "第十二籤 乙亥", "poem": "長江風浪漸漸靜，于今得進可安寧。\n必有貴人相扶助，凶事脫出見太平。", "interpretation": "" }, { "id": 13, "title": "第十三籤 丙子", "poem": "命中正逢羅孛關，用盡心機總未安。\n作福問神難得過，恰是行舟上高灘。", "interpretation": "" }, { "id": 14, "title": "第十四籤 丙寅", "poem": "財中漸漸見分明，花開花謝結子成。\n寬心且看月中桂，郎君即便見太平。", "interpretation": "" }, { "id": 15, "title": "第十五籤 丙辰", "poem": "八十原來是太公，看看晚景遇文王。\n目下緊事休相問，勸君且守待運通。", "interpretation": "" }, { "id": 16, "title": "第十六籤 丙午", "poem": "不須作福不須求，用盡心機總未休。\n陽世不知陰世事，官法如爐不自由。", "interpretation": "" }, { "id": 17, "title": "第十七籤 丙申", "poem": "舊恨重重未改為，家中禍患不臨身。\n須當謹防宜作福，龍蛇交會得和合。", "interpretation": "" }, { "id": 18, "title": "第十八籤 丙戌", "poem": "君問中間此言因，看看祿馬拱前程。\n若得貴人多得利，和合自有兩分明。", "interpretation": "" }, { "id": 19, "title": "第十九籤 丁丑", "poem": "富貴由命天註定，心高必然誤君期。\n不然且回依舊路，雲開月出自分明。", "interpretation": "" }, { "id": 20, "title": "第二十籤 丁卯", "poem": "前途功名未得意，只恐命內有交加。\n兩家必定防損失，勸君且退莫咨嗟。", "interpretation": "" }, { "id": 21, "title": "第二十一籤 丁巳", "poem": "十方佛法有靈通，大難禍患不相同。\n紅日當空常照耀，還有貴人到家堂。", "interpretation": "" }, { "id": 22, "title": "第二十二籤 丁未", "poem": "太公家業八十成，月出光輝四海明。\n命內自然逢大吉，茅屋中間百事亨。", "interpretation": "" }, { "id": 23, "title": "第二十三籤 丁酉", "poem": "月出光輝四海明，前途祿位見太平。\n浮雲掃退終無事，可保禍患不臨身。", "interpretation": "" }, { "id": 24, "title": "第二十四籤 丁亥", "poem": "不須忙碌更憂愁，自有時來福祿周。\n月出惟有十六日，光輝依舊照乾坤。", "interpretation": "" }, { "id": 25, "title": "第二十五籤 戊子", "poem": "總是前途莫心勞，求神問聖枉是多。\n但看雞犬日過後，不須作福事如何。", "interpretation": "" }, { "id": 26, "title": "第二十六籤 戊寅", "poem": "選出牡丹第一枝，勸君折取莫遲疑。\n世間若問相知處，萬事逢春正及時。", "interpretation": "" }, { "id": 27, "title": "第二十七籤 戊辰", "poem": "君爾寬心且自由，門庭清吉家無憂。\n財寶自然終吉利，凡事無傷不用求。", "interpretation": "" }, { "id": 28, "title": "第二十八籤 戊午", "poem": "于今莫作此當時，虎落平陽被犬欺。\n世間凡事何難定，千山萬水也遲疑。", "interpretation": "" }, { "id": 29, "title": "第二十九籤 戊申", "poem": "枯木可惜未逢春，如今反在暗中藏。\n寬心且守風霜退，還君依舊作乾坤。", "interpretation": "" }, { "id": 30, "title": "第三十籤 戊戌", "poem": "漸漸看此月中和，過後須防未得高。\n改變顏色前途去，凡事必定見重勞。", "interpretation": "" }, { "id": 31, "title": "第三十一籤 己丑", "poem": "綠柳蒼蒼正當時，任君此去作乾坤。\n花果結實無殘謝，福祿自有慶家門。", "interpretation": "" }, { "id": 32, "title": "第三十二籤 己卯", "poem": "龍虎相交在門前，此事必定兩相連。\n黃金忽然變成鐵，何用作福問神仙。", "interpretation": "" }, { "id": 33, "title": "第三十三籤 己巳", "poem": "木有根荄水有源，君當自此究其原。\n莫隨道路人閒話，訟則終凶是至言。", "interpretation": "" }, { "id": 34, "title": "第三十四籤 己未", "poem": "危險高山行過盡，莫嫌此路有重重。\n若見蘭桂漸漸發，長蛇反轉變成龍。", "interpretation": "" }, { "id": 35, "title": "第三十五籤 己酉", "poem": "此事何須用心機，前途變怪自然知。\n看看此去得和合，漸漸脫出見太平。", "interpretation": "" }, { "id": 36, "title": "第三十六籤 己亥", "poem": "福如東海壽如山，君爾何須嘆苦難。\n命內自然逢大吉，祈保分明自平安。", "interpretation": "" }, { "id": 37, "title": "第三十七籤 庚子", "poem": "運逢得意身顯變，君爾身中皆有益。\n一向前途無難事，決意之中保清吉。", "interpretation": "" }, { "id": 38, "title": "第三十八籤 庚寅", "poem": "名顯有意在中央，不須祈禱心自安。\n看看早晚日過後，即時得意在其間。", "interpretation": "" }, { "id": 39, "title": "第三十九籤 庚辰", "poem": "意中若問神仙路，勸爾且退望高樓。\n寬心且守寬心坐，必然遇得貴人扶。", "interpretation": "" }, { "id": 40, "title": "第四十籤 庚午", "poem": "平生富貴成祿位，君家門戶定光輝。\n此中必定無損失，夫妻百歲喜相隨。", "interpretation": "" }, { "id": 41, "title": "第四十一籤 庚申", "poem": "無限好事君須記，恰如認賊作為子。\n莫貪眼下有些甜，可慮他時還受苦。", "interpretation": "" }, { "id": 42, "title": "第四十二籤 庚戌", "poem": "一重江水一重山，誰知此去路又難。\n任他改求終不過，是非終久未得安。", "interpretation": "" }, { "id": 43, "title": "第四十三籤 辛丑", "poem": "一年作事急如飛，君爾寬心莫遲疑。\n貴人還在千里外，音信月中漸漸知。", "interpretation": "" }, { "id": 44, "title": "第四十四籤 辛卯", "poem": "客到前途多得利，君爾何故兩相疑。\n雖是中間防進退，月出光輝得運時。", "interpretation": "" }, { "id": 45, "title": "第四十五籤 辛巳", "poem": "花開今已結成果，富貴榮華終到老。\n君子小人相會合，萬事清吉莫煩惱。", "interpretation": "" }, { "id": 46, "title": "第四十六籤 辛未", "poem": "功名得意與君顯，前途富貴喜安然。\n若遇一輪明月照，十五團圓光滿天。", "interpretation": "" }, { "id": 47, "title": "第四十七籤 辛酉", "poem": "君爾何須問聖跡，自己心中皆有益。\n于今且看月中旬，凶事脫出化成吉。", "interpretation": "" }, { "id": 48, "title": "第四十八籤 辛亥", "poem": "陽世作事未和同，雲遮月色正朦朧。\n心中意欲前途去，只恐前途運未通。", "interpretation": "" }, { "id": 49, "title": "第四十九籤 壬子", "poem": "言語雖多不可從，風雲靜處未行龍。\n暗中終得明消息，君爾何須問重重。", "interpretation": "" }, { "id": 50, "title": "第五十籤 壬寅", "poem": "佛前發誓無異心，且看前途得好音。\n此物原來本是鐵，也能變化得成金。", "interpretation": "" }, { "id": 51, "title": "第五十一籤 壬辰", "poem": "東西南北不堪行，前途此事正可當。\n勸君把定莫煩惱，家門自有保安康。", "interpretation": "" }, { "id": 52, "title": "第五十二籤 壬午", "poem": "孤燈寂寂夜沉沉，萬事清吉萬事成。\n若逢陰中有善果，燒得好香達神明。", "interpretation": "" }, { "id": 53, "title": "第五十三籤 壬申", "poem": "看君來問心中事，積善之家慶有餘。\n運亨財子雙雙至，指日喜氣溢門閭。", "interpretation": "" }, { "id": 54, "title": "第五十四籤 壬戌", "poem": "孤蹤寂寞路逕難，退身保命漸漸寬。\n更有一翻春色轉，桑榆晚景見平安。", "interpretation": "" }, { "id": 55, "title": "第五十五籤 癸丑", "poem": "須知進退總虛言，看看發暗未必全。\n珠玉深藏還未變，心中但得枉徒然。", "interpretation": "" }, { "id": 56, "title": "第五十六籤 癸卯", "poem": "病中若得苦心勞，到底完全總未遭。\n去後不須回頭問，心中事務盡消磨。", "interpretation": "" }, { "id": 57, "title": "第五十七籤 癸巳", "poem": "勸君把定心莫虛，前途清吉得運時。\n到底中間無大事，又遇神仙守安居。", "interpretation": "" }, { "id": 58, "title": "第五十八籤 癸未", "poem": "蛇身意欲變成龍，只恐命內運未通。\n久病且作寬心坐，言語雖多不可從。", "interpretation": "" }, { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "" }, { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，當官分理便有益。", "interpretation": "" }
+        ];
+
+        // --- ELEMENTS ---
+        const poemCard = document.getElementById('poem-card');
+        const poemTitleEl = document.getElementById('poem-title');
+        const poemContentEl = document.getElementById('poem-content');
+        const drawButton = document.getElementById('draw-button');
+        const dateDisplayEl = document.getElementById('date-display');
+        const baziDisplayEl = document.getElementById('bazi-display');
+        const questionInput = document.getElementById('question-input');
+        const analysisButton = document.getElementById('analysis-button');
+        const aiResultEl = document.getElementById('ai-analysis-result');
+        
+        let currentPoem = {};
+        let currentBazi = {};
+        let isTyping = false; // Flag to prevent multiple typewriter effects at once
+
+        // --- FUNCTIONS ---
+        function displayPoem(id) {
+            const poem = poems.find(p => p.id === id);
+            if (poem) {
+                poemTitleEl.textContent = poem.title;
+                poemContentEl.textContent = poem.poem;
+                currentPoem = { title: poem.title, text: poem.poem };
+            }
+        }
+
+        function drawLot() {
+            if (isTyping) return; // Prevent drawing a new lot while AI is typing
+            drawButton.disabled = true; poemCard.classList.add('drawing');
+            let shuffleCount = 0; const shuffleInterval = setInterval(() => {
+                const randomId = Math.floor(Math.random() * 60) + 1; displayPoem(randomId);
+                shuffleCount++; if (shuffleCount > 10) {
+                    clearInterval(shuffleInterval); const finalId = Math.floor(Math.random() * 60) + 1;
+                    displayPoem(finalId); drawButton.disabled = false; poemCard.classList.remove('drawing');
+                }
+            }, 100);
+        }
+
+        // --- MODIFICATION START ---
+        // New Typewriter Effect Function
+        async function typewriterEffect(element, paragraphs) {
+            isTyping = true;
+            element.innerHTML = ''; // Clear previous content
+            for (const pText of paragraphs) {
+                const pElement = document.createElement('p');
+                element.appendChild(pElement);
+                for (let i = 0; i < pText.length; i++) {
+                    pElement.innerHTML += pText.charAt(i);
+                    await new Promise(resolve => setTimeout(resolve, 35)); // Adjust typing speed here (in ms)
+                }
+                await new Promise(resolve => setTimeout(resolve, 300)); // Pause between paragraphs
+            }
+            isTyping = false;
+        }
+
+        async function getAIAnalysis() {
+            if (isTyping) return; // Prevent starting a new analysis while typing
+
+            const question = questionInput.value.trim();
+            if (!question) { alert("請先輸入您想問的問題。"); return; }
+            if (!currentPoem.title) { alert("請先誠心抽一籤。"); return; }
+
+            aiResultEl.style.display = 'block';
+            aiResultEl.innerHTML = `<p>正在為您綜合解析，請稍候...</p>`; // More descriptive loading message
+            analysisButton.disabled = true;
+
+            const payload = { question: question, poemTitle: currentPoem.title, poemText: currentPoem.text, bazi: currentBazi };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) { throw new Error(`伺服器錯誤: ${response.status}`); }
+
+                const data = await response.json();
+                const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
+                
+                await typewriterEffect(aiResultEl, paragraphs);
+
+            } catch (error) {
+                console.error("AI解析時發生錯誤:", error);
+                aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請稍後再試。請確認後端伺服器是否已成功運行。</p>`;
+            } finally {
+                analysisButton.disabled = false;
+            }
+        }
+        // --- MODIFICATION END ---
+
+        // --- EVENT LISTENERS ---
+        drawButton.addEventListener('click', drawLot);
+        analysisButton.addEventListener('click', getAIAnalysis);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ...(DOMContentLoaded logic remains the same)...
+            displayPoem(0);
+            try {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth() + 1;
+                const day = today.getDate();
+                const lunar = Lunar.fromDate(today); 
+                const gregorianStr = `${year}年 ${month}月 ${day}日`;
+                const lunarStr = `農曆 ${lunar.getYearInGanZhi()}(${lunar.getYearShengXiao()})年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`;
+                dateDisplayEl.textContent = `今天是：${gregorianStr}（${lunarStr}）`;
+                const yearPillar = lunar.getYearInGanZhi();
+                const monthPillar = lunar.getMonthInGanZhi();
+                const dayPillar = lunar.getDayInGanZhi();
+                const hourPillar = lunar.getTimeInGanZhi();
+                currentBazi = { year: yearPillar, month: monthPillar, day: dayPillar, hour: hourPillar };
+                const yearHTML = `<div class="bazi-column"><div class="char-gan">${yearPillar.charAt(0)}</div><div class="char-zhi">${yearPillar.charAt(1)}</div><div class="pillar-name">年</div></div>`;
+                const monthHTML = `<div class="bazi-column"><div class="char-gan">${monthPillar.charAt(0)}</div><div class="char-zhi">${monthPillar.charAt(1)}</div><div class="pillar-name">月</div></div>`;
+                const dayHTML = `<div class="bazi-column"><div class="char-gan">${dayPillar.charAt(0)}</div><div class="char-zhi">${dayPillar.charAt(1)}</div><div class="pillar-name">日</div></div>`;
+                const hourHTML = `<div class="bazi-column"><div class="char-gan">${hourPillar.charAt(0)}</div><div class="char-zhi">${hourPillar.charAt(1)}</div><div class="pillar-name">時</div></div>`;
+                baziDisplayEl.innerHTML = yearHTML + monthHTML + dayHTML + hourHTML;
+            } catch (error) {
+                console.error("無法載入農曆日期:", error);
+                dateDisplayEl.textContent = "無法載入農曆日期";
+            }
+        });
+    </script>
+</body>
+</html>
