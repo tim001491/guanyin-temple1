@@ -1,0 +1,8 @@
+[build]
+  publish = "." 
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # 【重要】告訴 Netlify 需要安裝哪些套件
+  included_files = ["node_modules/@google/generative-ai/**"]
