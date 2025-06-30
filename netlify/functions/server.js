@@ -31,25 +31,24 @@ const hexagrams = {
     "71": "山天大畜", "72": "山澤損", "73": "山火賁", "74": "山雷頤", "75": "山風蠱", "76": "山水蒙", "77": "艮為山", "78": "山地剝",
     "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
 };
-function getPlumBlossomHexagrams(bazi) {
-    const { year, month, day, hour } = bazi;
-    const yearNum = parseInt(year.match(/\d+/g) ? year.match(/\d+/g)[0] : "1");
-    const monthNum = parseInt(month);
-    const dayNum = parseInt(day);
-    const hourNum = parseInt(hour.match(/\d+/g) ? hour.match(/\d+/g)[0] : "1");
-    const upperNum = (yearNum + monthNum + dayNum) % 8 || 8;
-    const lowerNum = (yearNum + monthNum + dayNum + hourNum) % 8 || 8;
-    const movingLine = (yearNum + monthNum + dayNum + hourNum) % 6 || 6;
+
+// --- 【修改】根據數字起卦的函式 ---
+function getHexagramByNumbers(numbers) {
+    const { num1, num2, movingLine } = numbers;
+    // 將使用者輸入的數字取餘數，對應到八卦。若為8的倍數則取8。
+    const upperNum = parseInt(num1) % 8 || 8;
+    const lowerNum = parseInt(num2) % 8 || 8;
     const mainHexagramKey = `${upperNum}${lowerNum}`;
     return {
         main: {
-            name: hexagrams[mainHexagramKey],
+            name: hexagrams[mainHexagramKey] || "未知卦象",
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: movingLine
+        movingLine: parseInt(movingLine)
     };
 }
+
 
 // 初始化 Google AI 客戶端
 let model;
@@ -67,26 +66,24 @@ router.post('/analyze', async (req, res) => {
         return res.status(503).json({ error: "AI 服務未配置，請檢查伺服器環境變數。" });
     }
     try {
-        // ========== 【釜底抽薪的修正】 ==========
-        // 建立一個變數來儲存真正解析後的 body
         let parsedBody = req.body;
-
-        // 檢查收到的 body 是否為 Buffer 格式
         if (req.body instanceof Buffer) {
-            // 如果是，就將它轉為字串，再解析成 JSON 物件
             parsedBody = JSON.parse(req.body.toString());
         }
-        // =======================================
 
-        // 從解析後的 parsedBody 中獲取資料，而不是直接從 req.body
-        const { question, poemTitle, poemText, bazi } = parsedBody;
+        // 修改這裡：從 bazi 改為接收 numbers
+        const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        if (!question || !poemTitle || !poemText || !bazi) {
+        // 修改驗證邏輯
+        if (!question || !poemTitle || !poemText || !numbers) {
             console.error("請求資料不完整:", parsedBody);
-            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(parsedBody)}` });
+            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers)。收到的資料為: ${JSON.stringify(parsedBody)}` });
         }
         
-        const hexagramsInfo = getPlumBlossomHexagrams(bazi);
+        // 使用新的函式來算卦
+        const hexagramsInfo = getHexagramByNumbers(numbers);
+        
+        // 【重要】更新傳送給 AI 的 prompt
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
@@ -94,24 +91,23 @@ router.post('/analyze', async (req, res) => {
 # 背景資料
 一位信眾前來求籤，以下是祂求得的所有資訊：
 1.  **所問之事**: "${question}"
-2.  **求籤時間四柱 (僅供參考)**:
-    - 年: ${bazi.year}, 月: ${bazi.month}, 日: ${bazi.day}, 時: ${bazi.hour}
-3.  **依此時間推算的梅花易數卦象**:
+2.  **依此數字推算的梅花易數卦象**:
+    - **起卦數字**: 上卦 ${numbers.num1}，下卦 ${numbers.num2}
     - **本卦**: **${hexagramsInfo.main.name}** (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
     - **動爻**: 第 **${hexagramsInfo.movingLine}** 爻
-4.  **所抽籤詩**:
+3.  **所抽籤詩**:
     - **標題**: ${poemTitle}
     - **內容**: "${poemText}"
 
 # 任務指令
 請根據以上所有資訊，為這位信眾提供一次綜合性的解析。你的解析需要包含以下幾個層次：
-1.  **時間卦象分析**:
+1.  **數字卦象分析**:
     - 簡要說明「**${hexagramsInfo.main.name}**」這個 **本卦** 的基本涵義。
-    - 根據第 **${hexagramsInfo.movingLine}** **動爻** 的位置，分析此卦象在此時空中的「**變動趨勢**」，並說明它如何與所問之事對應。
+    - 根據第 **${hexagramsInfo.movingLine}** **動爻** 的位置，分析此卦象的「**變動趨勢**」，並說明它如何與所問之事對應。
 2.  **籤詩核心寓意**:
     - 深入解讀「**${poemTitle}**」這首籤詩的字面與內在含義。籤詩中的關鍵詞（例如：龍、虎、風、雲、月、舟等）代表了什麼象徵意義？
 3.  **綜合解析與建議**:
-    - 將「**時間卦象的變動趨勢**」與「**籤詩的核心寓意**」結合，針對信眾提出的「**${question}**」這個具體問題，給出綜合性的回答。
+    - 將「**卦象的變動趨勢**」與「**籤詩的核心寓意**」結合，針對信眾提出的「**${question}**」這個具體問題，給出綜合性的回答。
     - 指出目前情況的「**機遇**」與「**挑戰**」，以及需要特別留意的地方。
     - 提出 1 至 3 條具體的、可行的行動建議或心態調整方向。請用條列式分點說明，不要將所有建議連在一起。
     - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
