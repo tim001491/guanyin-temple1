@@ -11,7 +11,6 @@ dotenv.config();
 // --- Express 應用程式設定 ---
 const app = express();
 app.use(cors());
-// 這個中介軟體仍然需要，以應對某些情況
 app.use(express.json());
 
 // --- 梅花易數計算模組 (保持不變) ---
@@ -32,12 +31,16 @@ const hexagrams = {
     "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
 };
 
-// --- 【修改】根據數字起卦的函式 ---
+// --- 【修改】根據三組數字起卦的函式 ---
 function getHexagramByNumbers(numbers) {
-    const { num1, num2, movingLine } = numbers;
-    // 將使用者輸入的數字取餘數，對應到八卦。若為8的倍數則取8。
+    const { num1, num2, num3 } = numbers;
+    // 上卦由第一組數字決定
     const upperNum = parseInt(num1) % 8 || 8;
+    // 下卦由第二組數字決定
     const lowerNum = parseInt(num2) % 8 || 8;
+    // 動爻由三組數字總和決定
+    const movingLine = (parseInt(num1) + parseInt(num2) + parseInt(num3)) % 6 || 6;
+    
     const mainHexagramKey = `${upperNum}${lowerNum}`;
     return {
         main: {
@@ -45,7 +48,7 @@ function getHexagramByNumbers(numbers) {
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: parseInt(movingLine)
+        movingLine: movingLine
     };
 }
 
@@ -73,44 +76,42 @@ router.post('/analyze', async (req, res) => {
 
         const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        if (!question || !poemTitle || !poemText || !numbers) {
+        if (!question || !poemTitle || !poemText || !numbers || !numbers.num1 || !numbers.num2 || !numbers.num3) {
             console.error("請求資料不完整:", parsedBody);
             return res.status(400).json({ error: `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers)。收到的資料為: ${JSON.stringify(parsedBody)}` });
         }
         
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
-        // 【重要】更新傳送給 AI 的 prompt 以調整格式
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
 
 # 背景資料
 一位信眾前來求籤，以下是祂求得的所有資訊：
-1.  所問之事: "${question}"
-2.  依此數字推算的梅花易數卦象:
-    - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}
-    - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
-    - 動爻: 第 ${hexagramsInfo.movingLine} 爻
-3.  所抽籤詩:
-    - 標題: ${poemTitle}
-    - 內容: "${poemText}"
+1. 所問之事: "${question}"
+2. 依此數字推算的梅花易數卦象:
+   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.num3}
+   - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
+   - 動爻: 第 ${hexagramsInfo.movingLine} 爻
+3. 所抽籤詩:
+   - 標題: ${poemTitle}
+   - 內容: "${poemText}"
 
 # 任務指令
 請根據以上所有資訊，為這位信眾提供一次綜合性的解析。你的解析需要包含以下幾個層次，且在最終輸出中，請不要使用任何星號 '*' 來產生粗體格式。
+1. 數字卦象分析:
+   - 簡要說明「${hexagramsInfo.main.name}」這個本卦的基本涵義。
+   - 根據第 ${hexagramsInfo.movingLine} 動爻的位置，分析此卦象的「變動趨勢」，並說明它如何與所問之事對應。
+2. 籤詩核心寓意:
+   - 深入解讀「${poemTitle}」這首籤詩的字面與內在含義。籤詩中的關鍵詞（例如：龍、虎、風、雲、月、舟等）代表了什麼象徵意義？
+3. 綜合解析與建議:
+   - 將「卦象的變動趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
+   - 請將「機遇」、「挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】，例如：【機遇】。標題下方為該項目的詳細說明。
+   - 提出具體的行動建議或心態調整方向，並嚴格使用「一、」、「二、」、「三、」的格式進行條列式說明，標號後方加上一個冒號「：」。
+   - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
 
-1.  數字卦象分析:
-    - 簡要說明「${hexagramsInfo.main.name}」這個本卦的基本涵義。
-    - 根據第 ${hexagramsInfo.movingLine} 動爻的位置，分析此卦象的「變動趨勢」，並說明它如何與所問之事對應。
-2.  籤詩核心寓意:
-    - 深入解讀「${poemTitle}」這首籤詩的字面與內在含義。籤詩中的關鍵詞（例如：龍、虎、風、雲、月、舟等）代表了什麼象徵意義？
-3.  綜合解析與建議:
-    - 將「卦象的變動趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
-    - 請將「機遇」、「挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】，例如：【機遇】。標題下方為該項目的詳細說明。
-    - 提出具體的行動建議或心態調整方向，並嚴格使用「一、」、「二、」、「三、」的格式，數字要分開，進行條列式分段落說明，標號後方加上一個冒號「：」。
-    - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
-
-請確保整體排版條理分明，文筆流暢優美。
+請確保整體排版條理分明，文筆流暢優美，且各個主要段落之間僅以單一換行分隔，不要產生過多不必要的空白行。
 `;
         const result = await model.generateContent(prompt);
         const response = await result.response;
