@@ -10,7 +10,7 @@ dotenv.config();
 
 // --- Express 應用程式設定 ---
 const app = express();
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 
 // --- 梅花易數計算模組 (保持不變) ---
@@ -31,16 +31,11 @@ const hexagrams = {
     "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
 };
 
-// --- 【修改】根據三組數字起卦的函式 ---
-// 修改此函式以接收 `movingLine` 作為第三個數字的鍵名。
+// --- 起卦函式 (保持不變) ---
 function getHexagramByNumbers(numbers) {
-    // 從 numbers 物件中解構出 num1, num2, 和 movingLine
     const { num1, num2, movingLine } = numbers;
-    // 上卦由第一組數字決定
     const upperNum = parseInt(num1) % 8 || 8;
-    // 下卦由第二組數字決定
     const lowerNum = parseInt(num2) % 8 || 8;
-    // 動爻由三組數字總和決定
     const finalMovingLine = (parseInt(num1) + parseInt(num2) + parseInt(movingLine)) % 6 || 6;
     
     const mainHexagramKey = `${upperNum}${lowerNum}`;
@@ -50,47 +45,56 @@ function getHexagramByNumbers(numbers) {
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: finalMovingLine // 回傳計算後得到的 1-6 的動爻
+        movingLine: finalMovingLine
     };
 }
 
-
-// 初始化 Google AI 客戶端
+// --- 初始化 Google AI 客戶端 ---
 let model;
 if (process.env.GOOGLE_API_KEY) {
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log("偵測到 GOOGLE_API_KEY，正在初始化 AI 模型...");
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        console.log("AI 模型初始化成功。");
+    } catch (e) {
+        console.error("AI 模型初始化失敗:", e);
+    }
 } else {
-    console.warn("警告：未提供 GOOGLE_API_KEY。AI 功能將無法使用。");
+    console.warn("警告：未在環境變數中提供 GOOGLE_API_KEY。AI 功能將無法使用。");
 }
 
+// --- API 路由設定 ---
 const router = express.Router();
 
 router.post('/analyze', async (req, res) => {
+    console.log("收到 /analyze 請求。");
+
     if (!model) {
-        return res.status(503).json({ error: "AI 服務未配置，請檢查伺服器環境變數。" });
+        console.error("錯誤：AI 模型未被初始化。");
+        return res.status(503).json({ error: "AI 服務未配置或初始化失敗，請檢查伺服器環境變數。" });
     }
     try {
         let parsedBody = req.body;
-        // 處理 serverless 環境中可能為 buffer 的 body
         if (req.body instanceof Buffer) {
             parsedBody = JSON.parse(req.body.toString());
         }
+        
+        console.log("收到的請求內容:", JSON.stringify(parsedBody, null, 2));
 
         const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        // --- 【修改】更新驗證邏輯 ---
-        // 檢查 numbers 物件以及其下的 num1, num2, 和 movingLine 是否存在。
         if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.movingLine === undefined) {
-            console.error("請求資料不完整:", parsedBody);
-            // 提供更清晰的錯誤訊息
-            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers 物件需包含 num1, num2, movingLine)。收到的資料為: ${JSON.stringify(parsedBody)}` });
+            const errorMessage = `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers 物件需包含 num1, num2, movingLine)。收到的資料為: ${JSON.stringify(parsedBody)}`;
+            console.error(errorMessage);
+            return res.status(400).json({ error: errorMessage });
         }
         
+        console.log("正在根據數字計算卦象...");
         const hexagramsInfo = getHexagramByNumbers(numbers);
+        console.log("卦象計算結果:", hexagramsInfo);
         
-        // --- 【修改】更新 Prompt 模板 ---
-        // 將模板中的 `numbers.num3` 替換為 `numbers.movingLine`
+        // 【修改】更新 AI 提示詞中的條列格式指令
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
@@ -116,25 +120,30 @@ router.post('/analyze', async (req, res) => {
 3. 綜合解析與建議:
    - 將「卦象的變動趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
    - 請將「機遇」、「挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】，例如：【機遇】。標題下方為該項目的詳細說明。
-   - 提出具體的行動建議或心態調整方向，並嚴格使用「一、」、「二、」、「三、」的格式進行條列式說明，標號後方加上一個冒號「：」。
+   - 提出具體的行動建議或心態調整方向，並嚴格使用條列式說明。每個條列項目前方需加上「一、」、「二、」、「三、」等編號，且每個條列項目都必須自成一個段落（即每個編號後就換行）。
    - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
 
 請確保整體排版條理分明，文筆流暢優美，且各個主要段落之間僅以單一換行分隔，不要產生過多不必要的空白行。
 `;
+        
+        console.log("正在生成 AI 解析內容...");
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const analysisResult = response.text();
+        console.log("AI 解析內容生成完畢。");
+
         res.json({ 
             analysis: analysisResult,
             hexagram: hexagramsInfo 
         });
     } catch (error) {
-        console.error("後端函式處理時發生錯誤:", error);
-        res.status(500).json({ error: "AI 服務發生錯誤，請稍後再試。" });
+        console.error("在 /analyze 路由處理時發生嚴重錯誤:", error);
+        res.status(500).json({ error: "AI 服務在處理您的請求時發生內部錯誤，請稍後再試。" });
     }
 });
 
-app.use('/.netlify/functions/server', router); // 在 Netlify/Vercel 等環境中，路徑通常需要前綴
-app.use('/api', router); // 保持本地開發的相容性
+const basePath = '/.netlify/functions/server';
+app.use(basePath, router);
+app.use('/', router);
 
 module.exports.handler = serverless(app);
