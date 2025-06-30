@@ -143,8 +143,11 @@ app.post('/api/analyze', async (req, res) => {
         const response = await result.response;
         const analysisResult = response.text();
 
-        // 4. 將解析結果以 JSON 格式回傳給前端
-        res.json({ analysis: analysisResult });
+        // 4. 將解析結果與卦象資訊一併以 JSON 格式回傳給前端
+        res.json({ 
+            analysis: analysisResult,
+            hexagram: hexagramsInfo 
+        });
 
     } catch (error) {
         console.error("Google AI API 呼叫失敗:", error);
