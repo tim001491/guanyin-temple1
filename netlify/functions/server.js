@@ -32,14 +32,16 @@ const hexagrams = {
 };
 
 // --- 【修改】根據三組數字起卦的函式 ---
+// 修改此函式以接收 `movingLine` 作為第三個數字的鍵名。
 function getHexagramByNumbers(numbers) {
-    const { num1, num2, num3 } = numbers;
+    // 從 numbers 物件中解構出 num1, num2, 和 movingLine
+    const { num1, num2, movingLine } = numbers;
     // 上卦由第一組數字決定
     const upperNum = parseInt(num1) % 8 || 8;
     // 下卦由第二組數字決定
     const lowerNum = parseInt(num2) % 8 || 8;
     // 動爻由三組數字總和決定
-    const movingLine = (parseInt(num1) + parseInt(num2) + parseInt(num3)) % 6 || 6;
+    const finalMovingLine = (parseInt(num1) + parseInt(num2) + parseInt(movingLine)) % 6 || 6;
     
     const mainHexagramKey = `${upperNum}${lowerNum}`;
     return {
@@ -48,7 +50,7 @@ function getHexagramByNumbers(numbers) {
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: movingLine
+        movingLine: finalMovingLine // 回傳計算後得到的 1-6 的動爻
     };
 }
 
@@ -70,19 +72,25 @@ router.post('/analyze', async (req, res) => {
     }
     try {
         let parsedBody = req.body;
+        // 處理 serverless 環境中可能為 buffer 的 body
         if (req.body instanceof Buffer) {
             parsedBody = JSON.parse(req.body.toString());
         }
 
         const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        if (!question || !poemTitle || !poemText || !numbers || !numbers.num1 || !numbers.num2 || !numbers.num3) {
+        // --- 【修改】更新驗證邏輯 ---
+        // 檢查 numbers 物件以及其下的 num1, num2, 和 movingLine 是否存在。
+        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.movingLine === undefined) {
             console.error("請求資料不完整:", parsedBody);
-            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers)。收到的資料為: ${JSON.stringify(parsedBody)}` });
+            // 提供更清晰的錯誤訊息
+            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers 物件需包含 num1, num2, movingLine)。收到的資料為: ${JSON.stringify(parsedBody)}` });
         }
         
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
+        // --- 【修改】更新 Prompt 模板 ---
+        // 將模板中的 `numbers.num3` 替換為 `numbers.movingLine`
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
@@ -91,7 +99,7 @@ router.post('/analyze', async (req, res) => {
 一位信眾前來求籤，以下是祂求得的所有資訊：
 1. 所問之事: "${question}"
 2. 依此數字推算的梅花易數卦象:
-   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.num3}
+   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.movingLine}
    - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
    - 動爻: 第 ${hexagramsInfo.movingLine} 爻
 3. 所抽籤詩:
@@ -126,6 +134,7 @@ router.post('/analyze', async (req, res) => {
     }
 });
 
-app.use('/api', router);
+app.use('/.netlify/functions/server', router); // 在 Netlify/Vercel 等環境中，路徑通常需要前綴
+app.use('/api', router); // 保持本地開發的相容性
 
 module.exports.handler = serverless(app);
