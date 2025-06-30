@@ -23,7 +23,6 @@
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #analysis-section { margin-top: 2.5rem; width: 100%; }
         
-        /* 數字輸入框的樣式 */
         #number-input-section { margin-bottom: 1.5rem; }
         #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
         #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
@@ -85,22 +84,20 @@
         </header>
         
         <main>
-            <!-- 【修改】將初始內容改為顯示「籤頭」籤詩 -->
             <div id="poem-card">
-                <h2 id="poem-title">籤頭</h2>
-                <p id="poem-content">籤頭百事良，添油大吉昌。
-萬般皆如意，富貴福壽長。</p>
+                <h2 id="poem-title"></h2>
+                <p id="poem-content"></p>
             </div>
             <button id="draw-button">誠心抽一籤</button>
             
             <div id="analysis-section">
                 
                 <div id="number-input-section">
-                    <p>請隨心輸入兩組數字以生成卦象，及一組數字為動爻。</p>
+                    <p>請隨心輸入三組數字以生成卦象。</p>
                     <div id="number-input-container">
                         <input type="number" id="num1-input" class="number-input" placeholder="第一組數字">
                         <input type="number" id="num2-input" class="number-input" placeholder="第二組數字">
-                        <input type="number" id="moving-line-input" class="number-input" placeholder="動爻數字">
+                        <input type="number" id="num3-input" class="number-input" placeholder="第三組數字">
                     </div>
                 </div>
 
@@ -122,7 +119,6 @@
 
     <script>
         // --- DATA ---
-        // 【修改】為「籤頭」加上 id: 0，方便查找
         const poems = [
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
@@ -209,7 +205,6 @@
         function displayPoem(id) {
             poemContentEl.removeAttribute('style');
 
-            // 【修改】修正查找邏輯，使其能正確處理 id 為 0 的「籤頭」
             const poem = poems.find(p => p.id === id);
             if (poem) {
                 poemTitleEl.textContent = poem.title;
@@ -248,9 +243,16 @@
             for (const pText of paragraphs) {
                 const pElement = document.createElement('p');
                 element.appendChild(pElement);
-                for (let i = 0; i < pText.length; i++) {
-                    pElement.innerHTML += pText.charAt(i);
-                    await new Promise(resolve => setTimeout(resolve, 35));
+                const lines = pText.split('\n');
+                for(let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    for (let j = 0; j < line.length; j++) {
+                        pElement.innerHTML += line.charAt(j);
+                        await new Promise(resolve => setTimeout(resolve, 35));
+                    }
+                    if (i < lines.length - 1) {
+                       pElement.innerHTML += '<br>';
+                    }
                 }
                 await new Promise(resolve => setTimeout(resolve, 300));
             }
@@ -262,9 +264,10 @@
 
             const num1 = parseInt(num1Input.value);
             const num2 = parseInt(num2Input.value);
-            const movingLine = parseInt(movingLineInput.value);
+            // 【修正】將第三個輸入框的值命名為 num3
+            const num3 = parseInt(movingLineInput.value);
 
-            if (isNaN(num1) || isNaN(num2) || isNaN(movingLine)) {
+            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
                 showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
                 return;
             }
@@ -275,7 +278,6 @@
                 return; 
             }
             
-            // 【修改】更新判斷條件，防止在顯示「籤頭」時進行解析
             if (!currentPoem.title || currentPoem.title === '籤頭') { 
                 showCustomAlert("請先誠心抽一籤。"); 
                 return; 
@@ -286,6 +288,7 @@
             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
             analysisButton.disabled = true;
 
+            // 【修正】將 payload 中的屬性名稱修正為 num3
             const payload = { 
                 question: question, 
                 poemTitle: currentPoem.title, 
@@ -293,7 +296,7 @@
                 numbers: {
                     num1: num1,
                     num2: num2,
-                    movingLine: movingLine
+                    num3: num3 
                 }
             };
             
@@ -306,8 +309,15 @@
 
                 if (!response.ok) { 
                     const errorText = await response.text();
-                    const errorData = JSON.parse(errorText || '{}');
-                    throw new Error(`伺服器錯誤: ${response.status} - ${errorData.error || '未知錯誤'}`);
+                    // 嘗試解析 JSON，如果失敗則直接顯示文字
+                    let errorJson = {};
+                    try {
+                        errorJson = JSON.parse(errorText);
+                    } catch (e) {
+                        console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
+                    }
+                    const errorMessage = errorJson.error || errorText || '未知錯誤';
+                    throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
                 }
 
                 const data = await response.json();
@@ -315,13 +325,13 @@
                 const hex = data.hexagram;
                 if(hex && hex.main && hex.main.upper && hex.main.lower) {
                      hexagramWrapper.innerHTML = `
-                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #b08968;">數字卦象</h3>
-                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.upper.symbol}</div>
-                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.lower.symbol}</div>
-                         <p style="text-align: center; margin-top: 0.75rem; font-size: 1.2rem;">
-                             ${hex.main.name} (動爻：${hex.movingLine})
-                         </p>
-                     `;
+                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #b08968;">數字卦象</h3>
+                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.upper.symbol}</div>
+                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.lower.symbol}</div>
+                        <p style="text-align: center; margin-top: 0.75rem; font-size: 1.2rem;">
+                            ${hex.main.name} (動爻：${hex.movingLine})
+                        </p>
+                    `;
                 }
 
                 const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
@@ -344,7 +354,6 @@
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 【修改】頁面載入時，主動呼叫 displayPoem(0) 來設定初始狀態
             displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
