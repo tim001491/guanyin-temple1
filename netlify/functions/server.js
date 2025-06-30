@@ -10,10 +10,10 @@ dotenv.config();
 
 // --- Express 應用程式設定 ---
 const app = express();
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
-// --- 梅花易數計算模組 (保持不變) ---
+// --- 梅花易數計算模組 ---
 const trigrams = {
     1: { name: "乾", symbol: "☰", element: "金" }, 2: { name: "兌", symbol: "☱", element: "金" },
     3: { name: "離", symbol: "☲", element: "火" }, 4: { name: "震", symbol: "☳", element: "木" },
@@ -31,12 +31,15 @@ const hexagrams = {
     "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
 };
 
-// --- 起卦函式 (保持不變) ---
+// --- 起卦函式 ---
 function getHexagramByNumbers(numbers) {
-    const { num1, num2, movingLine } = numbers;
+    const { num1, num2, num3 } = numbers;
+    // 上卦由第一組數字決定
     const upperNum = parseInt(num1) % 8 || 8;
+    // 下卦由第二組數字決定
     const lowerNum = parseInt(num2) % 8 || 8;
-    const finalMovingLine = (parseInt(num1) + parseInt(num2) + parseInt(movingLine)) % 6 || 6;
+    // 動爻由三組數字總和決定
+    const movingLine = (parseInt(num1) + parseInt(num2) + parseInt(num3)) % 6 || 6;
     
     const mainHexagramKey = `${upperNum}${lowerNum}`;
     return {
@@ -45,14 +48,13 @@ function getHexagramByNumbers(numbers) {
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: finalMovingLine
+        movingLine: movingLine
     };
 }
 
 // --- 初始化 Google AI 客戶端 ---
 let model;
 if (process.env.GOOGLE_API_KEY) {
-    console.log("偵測到 GOOGLE_API_KEY，正在初始化 AI 模型...");
     try {
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
         model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -68,8 +70,6 @@ if (process.env.GOOGLE_API_KEY) {
 const router = express.Router();
 
 router.post('/analyze', async (req, res) => {
-    console.log("收到 /analyze 請求。");
-
     if (!model) {
         console.error("錯誤：AI 模型未被初始化。");
         return res.status(503).json({ error: "AI 服務未配置或初始化失敗，請檢查伺服器環境變數。" });
@@ -80,21 +80,16 @@ router.post('/analyze', async (req, res) => {
             parsedBody = JSON.parse(req.body.toString());
         }
         
-        console.log("收到的請求內容:", JSON.stringify(parsedBody, null, 2));
-
         const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.movingLine === undefined) {
-            const errorMessage = `請求資料不完整，缺少必要欄位 (question, poemTitle, poemText, numbers 物件需包含 num1, num2, movingLine)。收到的資料為: ${JSON.stringify(parsedBody)}`;
+        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.num3 === undefined) {
+            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(parsedBody)}`;
             console.error(errorMessage);
             return res.status(400).json({ error: errorMessage });
         }
         
-        console.log("正在根據數字計算卦象...");
         const hexagramsInfo = getHexagramByNumbers(numbers);
-        console.log("卦象計算結果:", hexagramsInfo);
         
-        // 【修改】更新 AI 提示詞中的條列格式指令
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
@@ -103,7 +98,7 @@ router.post('/analyze', async (req, res) => {
 一位信眾前來求籤，以下是祂求得的所有資訊：
 1. 所問之事: "${question}"
 2. 依此數字推算的梅花易數卦象:
-   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.movingLine}
+   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.num3}
    - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
    - 動爻: 第 ${hexagramsInfo.movingLine} 爻
 3. 所抽籤詩:
@@ -126,11 +121,9 @@ router.post('/analyze', async (req, res) => {
 請確保整體排版條理分明，文筆流暢優美，且各個主要段落之間僅以單一換行分隔，不要產生過多不必要的空白行。
 `;
         
-        console.log("正在生成 AI 解析內容...");
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const analysisResult = response.text();
-        console.log("AI 解析內容生成完畢。");
 
         res.json({ 
             analysis: analysisResult,
@@ -142,8 +135,7 @@ router.post('/analyze', async (req, res) => {
     }
 });
 
-const basePath = '/.netlify/functions/server';
-app.use(basePath, router);
-app.use('/', router);
+// 【修正】將路由正確掛載到 /api 路徑下
+app.use('/api', router);
 
 module.exports.handler = serverless(app);
