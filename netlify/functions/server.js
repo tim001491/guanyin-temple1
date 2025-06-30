@@ -8,10 +8,20 @@ const serverless = require('serverless-http'); // 引入 serverless-http
 // 載入 .env 檔案中的環境變數
 dotenv.config();
 
-// --- Express 應用程式設定 (保持不變) ---
+// --- Express 應用程式設定 ---
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ----- 【偵錯程式碼已加入】 -----
+// 這個中介軟體 (middleware) 會在收到任何請求時，
+// 於 Netlify 的函式日誌中印出請求的詳細路徑資訊。
+app.use((req, res, next) => {
+  console.log(`[請求偵測器] Method: ${req.method}, Path: ${req.path}, OriginalURL: ${req.originalUrl}`);
+  // next() 會將請求繼續往下傳遞給後面的路由
+  next();
+});
+// ------------------------------------------
 
 // --- 梅花易數計算模組 (保持不變) ---
 const trigrams = {
@@ -123,4 +133,3 @@ app.use('/', router);
 
 // **關鍵改動**：導出符合 Netlify 格式的 handler
 module.exports.handler = serverless(app);
-
