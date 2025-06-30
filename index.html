@@ -85,7 +85,6 @@
         </header>
         
         <main>
-            <!-- 【修改】預設顯示提示文字，改善初始體驗 -->
             <div id="poem-card">
                 <h2 id="poem-title">心誠則靈</h2>
                 <p id="poem-content" style="font-size: 1.1rem; line-height: 1.9; color: #6c584c;">
@@ -207,7 +206,6 @@
 
         // --- FUNCTIONS ---
         function displayPoem(id) {
-            // 【修改】當顯示籤詩時，移除提示文字可能帶有的行內樣式，以恢復 CSS 中定義的預設樣式
             poemContentEl.removeAttribute('style');
 
             const poem = poems.find(p => p.id === id);
@@ -274,6 +272,8 @@
                 showCustomAlert("請先輸入您想問的問題。"); 
                 return; 
             }
+            
+            // 【修改】移除多餘的檢查條件
             if (!currentPoem.title) { 
                 showCustomAlert("請先誠心抽一籤。"); 
                 return; 
@@ -296,7 +296,6 @@
             };
             
             try {
-                // 前端 fetch 請求的路徑。在 Netlify 上，重寫規則會將 /api/* 指向後端函數。
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -343,9 +342,6 @@
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 【修改】頁面載入時，卡片中已由 HTML 提供預設提示文字，此處不需再用 JS 初始化。
-            
-            // 綁定事件
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
         });
