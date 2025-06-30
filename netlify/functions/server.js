@@ -13,12 +13,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ----- 【偵錯程式碼已加入】 -----
-// 這個中介軟體 (middleware) 會在收到任何請求時，
-// 於 Netlify 的函式日誌中印出請求的詳細路徑資訊。
+// ----- 【偵錯程式碼】(您可以保留或刪除) -----
 app.use((req, res, next) => {
   console.log(`[請求偵測器] Method: ${req.method}, Path: ${req.path}, OriginalURL: ${req.originalUrl}`);
-  // next() 會將請求繼續往下傳遞給後面的路由
   next();
 });
 // ------------------------------------------
@@ -127,9 +124,11 @@ router.post('/analyze', async (req, res) => {
     }
 });
 
-// **最終關鍵修正**：將 router 掛載到 Express 應用程式的根路徑
-// 這是因為 Netlify 在將請求轉發給函式時，已經幫我們處理了路徑
-app.use('/', router);
+// ==========【最終修正】==========
+// 將 router 掛載到 /api 路徑下。
+// 這樣當 Netlify 將 /api/analyze 的請求轉發過來時，
+// Express 就知道要用這個 router 來處理。
+app.use('/api', router);
 
 // **關鍵改動**：導出符合 Netlify 格式的 handler
 module.exports.handler = serverless(app);
