@@ -85,11 +85,11 @@
         </header>
         
         <main>
+            <!-- 【修改】將初始內容改為顯示「籤頭」籤詩 -->
             <div id="poem-card">
-                <h2 id="poem-title">心誠則靈</h2>
-                <p id="poem-content" style="font-size: 1.1rem; line-height: 1.9; color: #6c584c;">
-                    請靜心默念您所求之事，<br>然後按下方的「誠心抽一籤」按鈕。
-                </p>
+                <h2 id="poem-title">籤頭</h2>
+                <p id="poem-content">籤頭百事良，添油大吉昌。
+萬般皆如意，富貴福壽長。</p>
             </div>
             <button id="draw-button">誠心抽一籤</button>
             
@@ -122,8 +122,9 @@
 
     <script>
         // --- DATA ---
+        // 【修改】為「籤頭」加上 id: 0，方便查找
         const poems = [
-            { "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
+            { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
             { "id": 3, "title": "第三籤 甲辰", "poem": "勸君把定心莫虛，天註姻緣自有餘。\n和合重重常吉慶，時來終遇得明珠。", "interpretation": "中吉。堅定心志，必有善果，姻緣天定，時來運轉。" },
@@ -208,6 +209,7 @@
         function displayPoem(id) {
             poemContentEl.removeAttribute('style');
 
+            // 【修改】修正查找邏輯，使其能正確處理 id 為 0 的「籤頭」
             const poem = poems.find(p => p.id === id);
             if (poem) {
                 poemTitleEl.textContent = poem.title;
@@ -273,7 +275,8 @@
                 return; 
             }
             
-            if (!currentPoem.title) { 
+            // 【修改】更新判斷條件，防止在顯示「籤頭」時進行解析
+            if (!currentPoem.title || currentPoem.title === '籤頭') { 
                 showCustomAlert("請先誠心抽一籤。"); 
                 return; 
             }
@@ -341,9 +344,11 @@
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 【修改】頁面載入時，主動呼叫 displayPoem(0) 來設定初始狀態
+            displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
         });
     </script>
 </body>
-</html>
+</ht
