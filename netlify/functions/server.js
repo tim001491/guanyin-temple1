@@ -3,7 +3,7 @@ const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const serverless = require('serverless-http'); // 引入 serverless-http
+const serverless = require('serverless-http');
 
 // 載入 .env 檔案中的環境變數
 dotenv.config();
@@ -11,18 +11,8 @@ dotenv.config();
 // --- Express 應用程式設定 ---
 const app = express();
 app.use(cors());
-// 這個中介軟體至關重要，它會解析傳入請求的 JSON body
-app.use(express.json()); 
-
-// ----- 【增強版偵錯程式碼】 -----
-// 這個中介軟體會印出所有請求的詳細資訊，包含最重要的 req.body
-app.use((req, res, next) => {
-  console.log(`[請求偵測器] Method: ${req.method}, Path: ${req.path}`);
-  // 將收到的 body 轉為字串後印出，方便我們查看內容
-  console.log(`[請求偵測器] Body: ${JSON.stringify(req.body)}`);
-  next();
-});
-// ------------------------------------------
+// 這個中介軟體仍然需要，以應對某些情況
+app.use(express.json());
 
 // --- 梅花易數計算模組 (保持不變) ---
 const trigrams = {
@@ -70,20 +60,32 @@ if (process.env.GOOGLE_API_KEY) {
     console.warn("警告：未提供 GOOGLE_API_KEY。AI 功能將無法使用。");
 }
 
-// 為了讓 API 路由在 Netlify 上正常運作，我們需要建立一個 router
 const router = express.Router();
 
-// 將原有的 app.post 改為 router.post
 router.post('/analyze', async (req, res) => {
     if (!model) {
         return res.status(503).json({ error: "AI 服務未配置，請檢查伺服器環境變數。" });
     }
     try {
-        const { question, poemTitle, poemText, bazi } = req.body;
-        if (!question || !poemTitle || !poemText || !bazi) {
-            // 這個檢查現在非常重要，它告訴我們是否收到了完整的資料
-            return res.status(400).json({ error: "請求資料不完整，缺少 question, poemTitle, poemText 或 bazi。" });
+        // ========== 【釜底抽薪的修正】 ==========
+        // 建立一個變數來儲存真正解析後的 body
+        let parsedBody = req.body;
+
+        // 檢查收到的 body 是否為 Buffer 格式
+        if (req.body instanceof Buffer) {
+            // 如果是，就將它轉為字串，再解析成 JSON 物件
+            parsedBody = JSON.parse(req.body.toString());
         }
+        // =======================================
+
+        // 從解析後的 parsedBody 中獲取資料，而不是直接從 req.body
+        const { question, poemTitle, poemText, bazi } = parsedBody;
+
+        if (!question || !poemTitle || !poemText || !bazi) {
+            console.error("請求資料不完整:", parsedBody);
+            return res.status(400).json({ error: `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(parsedBody)}` });
+        }
+        
         const hexagramsInfo = getPlumBlossomHexagrams(bazi);
         const prompt = `
 # 角色設定
@@ -124,16 +126,11 @@ router.post('/analyze', async (req, res) => {
             hexagram: hexagramsInfo 
         });
     } catch (error) {
-        console.error("Google AI API 呼叫失敗:", error);
+        console.error("後端函式處理時發生錯誤:", error);
         res.status(500).json({ error: "AI 服務發生錯誤，請稍後再試。" });
     }
 });
 
-// ==========【最終修正】==========
-// 將 router 掛載到 /api 路徑下。
-// 這樣當 Netlify 將 /api/analyze 的請求轉發過來時，
-// Express 就知道要用這個 router 來處理。
 app.use('/api', router);
 
-// **關鍵改動**：導出符合 Netlify 格式的 handler
 module.exports.handler = serverless(app);
