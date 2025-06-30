@@ -156,14 +156,6 @@
             color: #fff;
             border-color: #8a6c4c;
         }
-        #qr-code-image {
-            max-width: 180px;
-            height: auto;
-            margin: 0 auto;
-            border: 4px solid #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
          #modal-close-button {
             position: absolute;
             top: 15px;
@@ -174,6 +166,53 @@
             color: #9c897a;
             cursor: pointer;
         }
+        
+        .payment-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ddd8cf;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .payment-tab {
+            flex: 1;
+            padding: 12px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #8a6c4c;
+            background-color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .payment-tab:not(:last-child) {
+            border-right: 1px solid #ddd8cf;
+        }
+        .payment-tab.active {
+            background-color: #a58362;
+            color: #fff;
+        }
+        
+        .qr-code-container {
+            min-height: 188px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .qr-code-image {
+            max-width: 180px;
+            height: auto;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none; 
+        }
+        .qr-code-image.active {
+            display: block; 
+        }
+
     </style>
 </head>
 <body>
@@ -225,13 +264,25 @@
             <button id="modal-close-button">&times;</button>
             <h2>隨喜功德，廣種福田</h2>
             <p>您的每一份善意，都是護持本寺的重要力量。感謝您的發心！</p>
+            
             <div class="donation-amounts">
                 <button class="amount-button" data-amount="50">$50</button>
                 <button class="amount-button" data-amount="100">$100</button>
                 <button class="amount-button" data-amount="300">$300</button>
                 <button class="amount-button" data-amount="">自訂</button>
             </div>
-            <img id="qr-code-image" src="https://placehold.co/200x200/ffffff/3d2c1d?text=模擬付款QR+Code" alt="付款QR Code">
+            
+            <div class="payment-tabs">
+                <button class="payment-tab active" data-target="line-pay-qr">LINE Pay</button>
+                <button class="payment-tab" data-target="jkopay-qr">街口支付</button>
+                <button class="payment-tab" data-target="bank-transfer-qr">銀行轉帳</button>
+            </div>
+            
+            <div class="qr-code-container">
+                <img id="line-pay-qr" class="qr-code-image active" src="https://placehold.co/200x200/00c300/ffffff?text=LINE+Pay" alt="LINE Pay QR Code">
+                <img id="jkopay-qr" class="qr-code-image" src="https://placehold.co/200x200/e55c2d/ffffff?text=街口支付" alt="街口支付 QR Code">
+                <img id="bank-transfer-qr" class="qr-code-image" src="https://placehold.co/200x200/5e81ac/ffffff?text=銀行轉帳資訊" alt="銀行轉帳資訊">
+            </div>
         </div>
     </div>
 
@@ -315,6 +366,11 @@
         const num1Input = document.getElementById('num1-input');
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
+        
+        const donationButton = document.getElementById('donation-button');
+        const donationModal = document.getElementById('donation-modal');
+        const modalCloseButton = document.getElementById('modal-close-button');
+        const amountButtons = document.querySelectorAll('.amount-button');
         
         let currentPoem = {};
         let isTyping = false; 
@@ -438,7 +494,7 @@
                 
                 const hex = data.hexagram;
                 if(hex && hex.main && hex.main.upper && hex.main.lower) {
-                     hexagramWrapper.innerHTML = `
+                       hexagramWrapper.innerHTML = `
                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #b08968;">數字卦象</h3>
                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.upper.symbol}</div>
                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600;">${hex.main.lower.symbol}</div>
@@ -471,6 +527,19 @@
             displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
+            
+            donationButton.addEventListener('click', () => {
+                donationModal.classList.add('visible');
+            });
+            modalCloseButton.addEventListener('click', () => {
+                donationModal.classList.remove('visible');
+            });
+            amountButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    amountButtons.forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                });
+            });
         });
     </script>
 </body>
