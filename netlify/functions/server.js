@@ -117,9 +117,9 @@ router.post('/analyze', async (req, res) => {
     }
 });
 
-// **關鍵修正**：將 router 掛載到 Netlify 的 API 路徑上
-// Netlify 會自動處理前綴，我們只需要提供相對於函式的路徑即可
-app.use('/api', router);
+// **最終關鍵修正**：將 router 掛載到 Express 應用程式的根路徑
+// 這是因為 Netlify 在將請求轉發給函式時，已經幫我們處理了路徑
+app.use('/', router);
 
 // **關鍵改動**：導出符合 Netlify 格式的 handler
 module.exports.handler = serverless(app);
