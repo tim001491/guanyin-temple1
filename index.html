@@ -60,18 +60,120 @@
             background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; 
             padding: 1.5rem 2rem; margin-top: 1.5rem; text-align: left; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: none; /* 預設隱藏 */
+            display: none;
         }
         #hexagram-display-wrapper {
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid #eee9e4;
         }
-        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #3d2c1d; }
-        #ai-analysis-result p { margin-bottom: 1.2rem; }
-        #ai-analysis-result p:last-child { margin-bottom: 0; }
+        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #3d2c1d; white-space: pre-wrap; }
         
         footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
+        
+        /* --- 【新】捐款功能樣式 --- */
+        #donation-button {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #8a6c4c;
+            background-color: transparent;
+            border: 2px solid #a58362;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+        #donation-button:hover {
+            background-color: #a58362;
+            color: #fff;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #f4f1ea;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h2 {
+            font-size: 1.8rem;
+            color: #8a6c4c;
+            margin-bottom: 1rem;
+        }
+        .modal-content p {
+            color: #6c584c;
+            margin-bottom: 1.5rem;
+        }
+        .donation-amounts {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .amount-button {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: #fff;
+            border: 1px solid #ddd8cf;
+            color: #8a6c4c;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .amount-button:hover, .amount-button.selected {
+            background-color: #8a6c4c;
+            color: #fff;
+            border-color: #8a6c4c;
+        }
+        #qr-code-image {
+            max-width: 180px;
+            height: auto;
+            margin: 0 auto;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+         #modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: #9c897a;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -114,8 +216,25 @@
         
         <footer>
             <p>© 2025 - 僅供參考，心誠則靈</p>
+            <button id="donation-button">隨喜功德</button>
         </footer>
     </div>
+
+    <div id="donation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modal-close-button">&times;</button>
+            <h2>隨喜功德，廣種福田</h2>
+            <p>您的每一份善意，都是護持本寺的重要力量。感謝您的發心！</p>
+            <div class="donation-amounts">
+                <button class="amount-button" data-amount="50">$50</button>
+                <button class="amount-button" data-amount="100">$100</button>
+                <button class="amount-button" data-amount="300">$300</button>
+                <button class="amount-button" data-amount="">自訂</button>
+            </div>
+            <img id="qr-code-image" src="https://placehold.co/200x200/ffffff/3d2c1d?text=模擬付款QR+Code" alt="付款QR Code">
+        </div>
+    </div>
+
 
     <script>
         const poems = [
@@ -193,7 +312,6 @@
         const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
         const aiResultEl = document.getElementById('ai-analysis-result');
         
-        // --- 【修正】確保獲取正確的 ID ---
         const num1Input = document.getElementById('num1-input');
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
@@ -204,7 +322,6 @@
         // --- FUNCTIONS ---
         function displayPoem(id) {
             poemContentEl.removeAttribute('style');
-
             const poem = poems.find(p => p.id === id);
             if (poem) {
                 poemTitleEl.textContent = poem.title;
@@ -251,7 +368,7 @@
                         await new Promise(resolve => setTimeout(resolve, 35));
                     }
                     if (i < lines.length - 1) {
-                       pElement.innerHTML += '<br>';
+                        pElement.innerHTML += '<br>';
                     }
                 }
                 await new Promise(resolve => setTimeout(resolve, 300));
@@ -262,7 +379,6 @@
         async function getAIAnalysis() {
             if (isTyping) return;
 
-            // --- 【修正】從正確的元素 ID 獲取值 ---
             const num1 = parseInt(num1Input.value);
             const num2 = parseInt(num2Input.value);
             const num3 = parseInt(num3Input.value);
@@ -288,7 +404,6 @@
             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
             analysisButton.disabled = true;
 
-            // 【修正】將 payload 中的屬性名稱修正為 num3
             const payload = { 
                 question: question, 
                 poemTitle: currentPoem.title, 
