@@ -11,11 +11,15 @@ dotenv.config();
 // --- Express 應用程式設定 ---
 const app = express();
 app.use(cors());
-app.use(express.json());
+// 這個中介軟體至關重要，它會解析傳入請求的 JSON body
+app.use(express.json()); 
 
-// ----- 【偵錯程式碼】(您可以保留或刪除) -----
+// ----- 【增強版偵錯程式碼】 -----
+// 這個中介軟體會印出所有請求的詳細資訊，包含最重要的 req.body
 app.use((req, res, next) => {
-  console.log(`[請求偵測器] Method: ${req.method}, Path: ${req.path}, OriginalURL: ${req.originalUrl}`);
+  console.log(`[請求偵測器] Method: ${req.method}, Path: ${req.path}`);
+  // 將收到的 body 轉為字串後印出，方便我們查看內容
+  console.log(`[請求偵測器] Body: ${JSON.stringify(req.body)}`);
   next();
 });
 // ------------------------------------------
@@ -77,6 +81,7 @@ router.post('/analyze', async (req, res) => {
     try {
         const { question, poemTitle, poemText, bazi } = req.body;
         if (!question || !poemTitle || !poemText || !bazi) {
+            // 這個檢查現在非常重要，它告訴我們是否收到了完整的資料
             return res.status(400).json({ error: "請求資料不完整，缺少 question, poemTitle, poemText 或 bazi。" });
         }
         const hexagramsInfo = getPlumBlossomHexagrams(bazi);
