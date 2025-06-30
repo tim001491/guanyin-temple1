@@ -118,7 +118,6 @@
     </div>
 
     <script>
-        // --- DATA ---
         const poems = [
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
@@ -194,9 +193,10 @@
         const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
         const aiResultEl = document.getElementById('ai-analysis-result');
         
+        // --- 【修正】確保獲取正確的 ID ---
         const num1Input = document.getElementById('num1-input');
         const num2Input = document.getElementById('num2-input');
-        const movingLineInput = document.getElementById('moving-line-input');
+        const num3Input = document.getElementById('num3-input');
         
         let currentPoem = {};
         let isTyping = false; 
@@ -262,10 +262,10 @@
         async function getAIAnalysis() {
             if (isTyping) return;
 
+            // --- 【修正】從正確的元素 ID 獲取值 ---
             const num1 = parseInt(num1Input.value);
             const num2 = parseInt(num2Input.value);
-            // 【修正】將第三個輸入框的值命名為 num3
-            const num3 = parseInt(movingLineInput.value);
+            const num3 = parseInt(num3Input.value);
 
             if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
                 showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
@@ -309,7 +309,6 @@
 
                 if (!response.ok) { 
                     const errorText = await response.text();
-                    // 嘗試解析 JSON，如果失敗則直接顯示文字
                     let errorJson = {};
                     try {
                         errorJson = JSON.parse(errorText);
