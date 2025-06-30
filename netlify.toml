@@ -1,8 +1,18 @@
+# Netlify 建置與函式設定
+
 [build]
-  publish = "." 
+  publish = "."
   functions = "netlify/functions"
 
+# --- 這是您新增的部分，請保留 ---
+# 確保函式能正確打包 Google AI 套件
 [functions]
   node_bundler = "esbuild"
-  # 【重要】告訴 Netlify 需要安裝哪些套件
   included_files = ["node_modules/@google/generative-ai/**"]
+
+# --- 這是修復 404 錯誤最關鍵的部分，請務必加上 ---
+# 設定重寫規則，將前端的 API 請求導向到後端函式
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server/:splat"
+  status = 200
