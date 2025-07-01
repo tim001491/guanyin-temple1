@@ -133,12 +133,23 @@ router.post('/analyze', async (req, res) => {
     }
 
     try {
-        const { question, poemTitle, poemText, numbers } = req.body;
+        // 【修正】針對無伺服器環境的請求主體進行更穩健的處理
+        let body = req.body;
+        // 在某些 serverless 環境中，body 可能會是 string 格式，需要手動解析
+        if (typeof body === 'string') {
+            try {
+                body = JSON.parse(body);
+            } catch (e) {
+                console.error("無法解析請求主體為 JSON:", body);
+                return res.status(400).json({ error: "請求格式錯誤。" });
+            }
+        }
 
-        // 【修正】修正驗證邏輯，確保數字 0 能被正確處理
+        const { question, poemTitle, poemText, numbers } = body;
+
         // 使用 '== null' 可以同時檢查 undefined 和 null，但允許 0 作為有效值
         if (!question || !poemTitle || !poemText || !numbers || numbers.num1 == null || numbers.num2 == null || numbers.num3 == null) {
-            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(req.body)}`;
+            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(body)}`;
             console.error(errorMessage);
             return res.status(400).json({ error: "請求資料不完整，缺少必要欄位。" });
         }
