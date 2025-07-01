@@ -31,24 +31,9 @@ const hexagrams = {
     "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
 };
 
-// 【新增】定義經卦中每一爻變動後的結果
-// 爻的位置：1=初爻(下), 2=中爻, 3=上爻
-const trigramChanges = {
-    1: { 1: 5, 2: 3, 3: 2 }, // 乾(1) -> 巽(5), 離(3), 兌(2)
-    2: { 1: 7, 2: 8, 3: 1 }, // 兌(2) -> 艮(7), 坤(8), 乾(1)
-    3: { 1: 4, 2: 1, 3: 8 }, // 離(3) -> 震(4), 乾(1), 坤(8)
-    4: { 1: 8, 2: 2, 3: 3 }, // 震(4) -> 坤(8), 兌(2), 離(3)
-    5: { 1: 1, 2: 4, 3: 7 }, // 巽(5) -> 乾(1), 震(4), 艮(7)
-    6: { 1: 2, 2: 8, 3: 5 }, // 坎(6) -> 兌(2), 坤(8), 巽(5)
-    7: { 1: 3, 2: 5, 3: 8 }, // 艮(7) -> 離(3), 巽(5), 坤(8)
-    8: { 1: 4, 2: 6, 3: 7 }  // 坤(8) -> 震(4), 坎(6), 艮(7)
-};
-
 // --- 起卦函式 ---
-// 【更新】加入變卦計算
 function getHexagramByNumbers(numbers) {
     const { num1, num2, num3 } = numbers;
-    
     // 上卦由第一組數字決定
     const upperNum = parseInt(num1) % 8 || 8;
     // 下卦由第二組數字決定
@@ -56,35 +41,14 @@ function getHexagramByNumbers(numbers) {
     // 動爻由三組數字總和決定
     const movingLine = (parseInt(num1) + parseInt(num2) + parseInt(num3)) % 6 || 6;
     
-    // 計算本卦
     const mainHexagramKey = `${upperNum}${lowerNum}`;
-
-    // 計算變卦
-    let changedUpperNum = upperNum;
-    let changedLowerNum = lowerNum;
-
-    if (movingLine >= 1 && movingLine <= 3) { // 動爻在下卦
-        const lineInTrigram = movingLine;
-        changedLowerNum = trigramChanges[lowerNum][lineInTrigram];
-    } else { // 動爻在上卦
-        const lineInTrigram = movingLine - 3;
-        changedUpperNum = trigramChanges[upperNum][lineInTrigram];
-    }
-    
-    const changedHexagramKey = `${changedUpperNum}${changedLowerNum}`;
-
     return {
         main: {
             name: hexagrams[mainHexagramKey] || "未知卦象",
             upper: trigrams[upperNum],
             lower: trigrams[lowerNum]
         },
-        movingLine: movingLine,
-        changed: { // 新增變卦資訊
-            name: hexagrams[changedHexagramKey] || "未知卦象",
-            upper: trigrams[changedUpperNum],
-            lower: trigrams[changedLowerNum]
-        }
+        movingLine: movingLine
     };
 }
 
@@ -126,7 +90,6 @@ router.post('/analyze', async (req, res) => {
         
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
-        // 【更新】Prompt 加入變卦資訊，並指導 AI 進行解析
         const prompt = `
 # 角色設定
 你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
@@ -138,18 +101,19 @@ router.post('/analyze', async (req, res) => {
    - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.num3}
    - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
    - 動爻: 第 ${hexagramsInfo.movingLine} 爻
-   - 變卦 (之卦): ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol}，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol})
+3. 所抽籤詩:
+   - 標題: ${poemTitle}
+   - 內容: "${poemText}"
 
 # 任務指令
 請根據以上所有資訊，為這位信眾提供一次綜合性的解析。你的解析需要包含以下幾個層次，且在最終輸出中，請不要使用任何星號 '*' 來產生粗體格式。
 1. 數字卦象分析:
-   - 簡要說明「${hexagramsInfo.main.name}」這個本卦的基本涵義，它代表了當前的狀況或問題的本質。
-   - 說明「${hexagramsInfo.changed.name}」這個變卦的涵義。
-   - 根據第 ${hexagramsInfo.movingLine} 爻的變動，解析從本卦轉變為變卦的過程，這象徵著事情未來的發展趨勢或最終結果。
+   - 簡要說明「${hexagramsInfo.main.name}」這個本卦的基本涵義。
+   - 根據第 ${hexagramsInfo.movingLine} 動爻的位置，分析此卦象的「變動趨勢」，並說明它如何與所問之事對應。
 2. 籤詩核心寓意:
    - 深入解讀「${poemTitle}」這首籤詩的字面與內在含義。籤詩中的關鍵詞（例如：龍、虎、風、雲、月、舟等）代表了什麼象徵意義？
 3. 綜合解析與建議:
-   - 將「卦象的轉變趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
+   - 將「卦象的變動趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
    - 請將「機遇」、「挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】，例如：【機遇】。標題下方為該項目的詳細說明。
    - 提出具體的行動建議或心態調整方向，並嚴格使用條列式說明。每個條列項目前方需加上「一、」、「二、」、「三、」等編號，且每個條列項目都必須自成一個段落（即每個編號後就換行）。
    - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
