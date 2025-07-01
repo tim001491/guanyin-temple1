@@ -82,7 +82,7 @@ function getHexagramByNumbers(numbers) {
     const changedLowerNum = findTrigramNum(changedLowerLines);
     
     let changedHexagramInfo = null;
-    if (changedUpperNum && changedLowerNum) {
+    if (changedUpperNum != null && changedLowerNum != null) {
         const changedHexagramKey = `${changedUpperNum}${changedLowerNum}`;
         changedHexagramInfo = {
             name: hexagrams[changedHexagramKey] || "未知卦象",
@@ -135,12 +135,22 @@ router.post('/analyze', async (req, res) => {
     try {
         const { question, poemTitle, poemText, numbers } = req.body;
 
-        if (!question || !poemTitle || !poemText || !numbers || !numbers.num1 || !numbers.num2 || !numbers.num3) {
+        // 【修正】修正驗證邏輯，確保數字 0 能被正確處理
+        // 使用 '== null' 可以同時檢查 undefined 和 null，但允許 0 作為有效值
+        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 == null || numbers.num2 == null || numbers.num3 == null) {
+            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(req.body)}`;
+            console.error(errorMessage);
             return res.status(400).json({ error: "請求資料不完整，缺少必要欄位。" });
         }
         
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
+        // 檢查變卦是否成功計算
+        if (!hexagramsInfo.changed) {
+            console.error("變卦計算失敗，收到的卦象資訊:", hexagramsInfo);
+            return res.status(500).json({ error: "伺服器內部錯誤：無法計算變卦。" });
+        }
+
         // 【升級】將變卦資訊加入 Prompt
         const prompt = `
 # 角色設定
