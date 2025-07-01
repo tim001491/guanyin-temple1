@@ -1,459 +1,177 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>觀音禪寺線上靈籤</title>
+// 引入必要的套件
+const express = require('express');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const serverless = require('serverless-http');
+
+// 載入 .env 檔案中的環境變數
+dotenv.config();
+
+// --- Express 應用程式設定 ---
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// --- 梅花易數計算模組 ---
+const trigrams = {
+    1: { name: "乾", symbol: "☰", element: "金" }, 2: { name: "兌", symbol: "☱", element: "金" },
+    3: { name: "離", symbol: "☲", element: "火" }, 4: { name: "震", symbol: "☳", element: "木" },
+    5: { name: "巽", symbol: "☴", element: "木" }, 6: { name: "坎", symbol: "☵", element: "水" },
+    7: { name: "艮", symbol: "☶", element: "土" }, 8: { name: "坤", symbol: "☷", element: "土" }
+};
+const hexagrams = {
+    "11": "乾為天", "12": "天澤履", "13": "天火同人", "14": "天雷無妄", "15": "天風姤", "16": "天水訟", "17": "天山遁", "18": "天地否",
+    "21": "澤天夬", "22": "兌為澤", "23": "澤火革", "24": "澤雷隨", "25": "澤風大過", "26": "澤水困", "27": "澤山咸", "28": "澤地萃",
+    "31": "火天大有", "32": "火澤睽", "33": "離為火", "34": "火雷噬嗑", "35": "火風鼎", "36": "火水未濟", "37": "火山旅", "38": "火地晉",
+    "41": "雷天大壯", "42": "雷澤歸妹", "43": "雷火豐", "44": "震為雷", "45": "雷風恆", "46": "雷水解", "47": "雷山小過", "48": "雷地豫",
+    "51": "風天小畜", "52": "風澤中孚", "53": "風火家人", "54": "風雷益", "55": "巽為風", "56": "風水渙", "57": "風山漸", "58": "風地觀",
+    "61": "水天需", "62": "水澤節", "63": "水火既濟", "64": "水雷屯", "65": "水風井", "66": "坎為水", "67": "水山蹇", "68": "水地比",
+    "71": "山天大畜", "72": "山澤損", "73": "山火賁", "74": "山雷頤", "75": "山風蠱", "76": "山水蒙", "77": "艮為山", "78": "山地剝",
+    "81": "地天泰", "82": "地澤臨", "83": "地火明夷", "84": "地雷復", "85": "地風升", "86": "地水師", "87": "地山謙", "88": "坤為地"
+};
+
+// 【新增】定義經卦中每一爻變動後的結果
+// 爻的位置：1=初爻(下), 2=中爻, 3=上爻
+const trigramChanges = {
+    1: { 1: 5, 2: 3, 3: 2 }, // 乾(1) -> 巽(5), 離(3), 兌(2)
+    2: { 1: 7, 2: 8, 3: 1 }, // 兌(2) -> 艮(7), 坤(8), 乾(1)
+    3: { 1: 4, 2: 1, 3: 8 }, // 離(3) -> 震(4), 乾(1), 坤(8)
+    4: { 1: 8, 2: 2, 3: 3 }, // 震(4) -> 坤(8), 兌(2), 離(3)
+    5: { 1: 1, 2: 4, 3: 7 }, // 巽(5) -> 乾(1), 震(4), 艮(7)
+    6: { 1: 2, 2: 8, 3: 5 }, // 坎(6) -> 兌(2), 坤(8), 巽(5)
+    7: { 1: 3, 2: 5, 3: 8 }, // 艮(7) -> 離(3), 巽(5), 坤(8)
+    8: { 1: 4, 2: 6, 3: 7 }  // 坤(8) -> 震(4), 坎(6), 艮(7)
+};
+
+// --- 起卦函式 ---
+// 【更新】加入變卦計算
+function getHexagramByNumbers(numbers) {
+    const { num1, num2, num3 } = numbers;
     
-    <style>
-        /* 您的所有優美 CSS 樣式都將保留 */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { width: 100%; max-width: 500px; text-align: center; }
-        #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
-        header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        header p { font-size: 1rem; color: #6c584c; margin-bottom: 2rem; }
-        #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
-        #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
-        #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
-        #poem-content { font-size: 1.3rem; line-height: 2.2; color: #3d2c1d; white-space: pre-wrap; }
-        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #analysis-section { margin-top: 2.5rem; width: 100%; }
-        
-        #number-input-section { margin-bottom: 1.5rem; }
-        #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
-        #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
-        .number-input { 
-            font-family: 'Noto Serif TC', serif; 
-            font-size: 1rem; 
-            width: 32%; 
-            padding: 0.75rem; 
-            border: 1px solid #ddd8cf; 
-            border-radius: 8px; 
-            background-color: #fff; 
-            color: #3d2c1d; 
-            text-align: center; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-            appearance: none;
-            -moz-appearance: textfield;
+    // 上卦由第一組數字決定
+    const upperNum = parseInt(num1) % 8 || 8;
+    // 下卦由第二組數字決定
+    const lowerNum = parseInt(num2) % 8 || 8;
+    // 動爻由三組數字總和決定
+    const movingLine = (parseInt(num1) + parseInt(num2) + parseInt(num3)) % 6 || 6;
+    
+    // 計算本卦
+    const mainHexagramKey = `${upperNum}${lowerNum}`;
+
+    // 計算變卦
+    let changedUpperNum = upperNum;
+    let changedLowerNum = lowerNum;
+
+    if (movingLine >= 1 && movingLine <= 3) { // 動爻在下卦
+        const lineInTrigram = movingLine;
+        changedLowerNum = trigramChanges[lowerNum][lineInTrigram];
+    } else { // 動爻在上卦
+        const lineInTrigram = movingLine - 3;
+        changedUpperNum = trigramChanges[upperNum][lineInTrigram];
+    }
+    
+    const changedHexagramKey = `${changedUpperNum}${changedLowerNum}`;
+
+    return {
+        main: {
+            name: hexagrams[mainHexagramKey] || "未知卦象",
+            upper: trigrams[upperNum],
+            lower: trigrams[lowerNum]
+        },
+        movingLine: movingLine,
+        changed: { // 新增變卦資訊
+            name: hexagrams[changedHexagramKey] || "未知卦象",
+            upper: trigrams[changedUpperNum],
+            lower: trigrams[changedLowerNum]
         }
-        .number-input:focus {
-             outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2);
-        }
-        .number-input::-webkit-outer-spin-button,
-        .number-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+    };
+}
 
-        #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
-        #question-input::placeholder { color: #b08968; opacity: 0.8; }
-        #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
-        #analysis-button { font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #fff; background-color: #8a6c4c; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #analysis-button:hover { background-color: #6c584c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        #analysis-button:disabled { background-color: #b0a395; cursor: wait; transform: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        #result-wrapper {
-            background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; 
-            padding: 1.5rem 2rem; margin-top: 1.5rem; text-align: left; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: none;
-        }
-        #hexagram-display-wrapper {
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eee9e4;
-        }
-        /* 【新增】變卦顯示樣式 */
-        .hexagram-comparison { display: flex; justify-content: space-around; align-items: center; text-align: center; }
-        .hexagram-unit h4 { font-size: 1.1rem; color: #8a6c4c; margin-bottom: 0.5rem; }
-        .hexagram-unit .symbol { font-size: 2.5rem; font-weight: 600; line-height: 1.1; }
-        .hexagram-unit .name { font-size: 1.1rem; margin-top: 0.5rem; }
-        .hexagram-arrow { font-size: 2rem; color: #b08968; }
-        .hexagram-arrow p { font-size: 0.9rem; margin-top: -5px; }
+// --- 初始化 Google AI 客戶端 ---
+let model;
+if (process.env.GOOGLE_API_KEY) {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        console.log("AI 模型初始化成功。");
+    } catch (e) {
+        console.error("AI 模型初始化失敗:", e);
+    }
+} else {
+    console.warn("警告：未在環境變數中提供 GOOGLE_API_KEY。AI 功能將無法使用。");
+}
 
-        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #3d2c1d; white-space: pre-wrap; }
-        
-        footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
-        
-        /* --- 捐款功能樣式 --- */
-        #donation-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 2px solid #a58362; padding: 8px 20px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; margin-top: 1.5rem; }
-        #donation-button:hover { background-color: #a58362; color: #fff; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content { background-color: #f4f1ea; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; position: relative; transform: scale(0.95); transition: transform 0.3s ease; }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-content h2 { font-size: 1.8rem; color: #8a6c4c; margin-bottom: 1rem; }
-        .modal-content p { color: #6c584c; margin-bottom: 1.5rem; }
-        .donation-amounts { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; }
-        .amount-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; background-color: #fff; border: 1px solid #ddd8cf; color: #8a6c4c; padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-        .amount-button:hover, .amount-button.selected { background-color: #8a6c4c; color: #fff; border-color: #8a6c4c; }
-        #modal-close-button { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
-        .payment-tabs { display: flex; justify-content: center; margin-bottom: 1.5rem; border: 1px solid #ddd8cf; border-radius: 8px; overflow: hidden; }
-        .payment-tab { flex: 1; padding: 12px; font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: #fff; border: none; cursor: pointer; transition: background-color 0.2s ease; }
-        .payment-tab:not(:last-child) { border-right: 1px solid #ddd8cf; }
-        .payment-tab.active { background-color: #a58362; color: #fff; }
-        .qr-code-container { min-height: 188px; display: flex; justify-content: center; align-items: center; }
-        .qr-code-image { max-width: 180px; height: auto; border: 4px solid #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; }
-        .qr-code-image.active { display: block; }
-    </style>
-</head>
-<body>
+// --- API 路由設定 ---
+const router = express.Router();
 
-    <div class="container">
-        <header>
-            <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
-            <h1>觀音禪寺線上靈籤</h1>
-            <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
-        </header>
-        
-        <main>
-            <div id="poem-card">
-                <h2 id="poem-title"></h2>
-                <p id="poem-content"></p>
-            </div>
-            <button id="draw-button">誠心抽一籤</button>
-            
-            <div id="analysis-section">
-                
-                <div id="number-input-section">
-                    <p>請隨心輸入三組數字以生成卦象。</p>
-                    <div id="number-input-container">
-                        <input type="number" id="num1-input" class="number-input" placeholder="第一組數字">
-                        <input type="number" id="num2-input" class="number-input" placeholder="第二組數字">
-                        <input type="number" id="num3-input" class="number-input" placeholder="第三組數字">
-                    </div>
-                </div>
-
-                <textarea id="question-input" placeholder="請在此輸入您想問的具體問題..."></textarea>
-                <button id="analysis-button">開始綜合解析</button>
-                
-                <div id="result-wrapper">
-                    <div id="hexagram-display-wrapper"></div>
-                    <div id="ai-analysis-result"></div> 
-                </div>
-
-            </div>
-        </main>
-        
-        <footer>
-            <p>© 2025 - 僅供參考，心誠則靈</p>
-            <button id="donation-button">隨喜功德</button>
-        </footer>
-    </div>
-
-    <div id="donation-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="modal-close-button">&times;</button>
-            <h2>隨喜功德，廣種福田</h2>
-            <p>您的每一份善意，都是護持本寺的重要力量。感謝您的發心！</p>
-            
-            <div class="donation-amounts">
-                <button class="amount-button" data-amount="50">$50</button>
-                <button class="amount-button" data-amount="100">$100</button>
-                <button class="amount-button" data-amount="300">$300</button>
-                <button class="amount-button" data-amount="">自訂</button>
-            </div>
-            
-            <div class="payment-tabs">
-                <button class="payment-tab active" data-target="line-pay-qr">LINE Pay</button>
-                <button class="payment-tab" data-target="jkopay-qr">街口支付</button>
-                <button class="payment-tab" data-target="bank-transfer-qr">銀行轉帳</button>
-            </div>
-            
-            <div class="qr-code-container">
-                <img id="line-pay-qr" class="qr-code-image active" src="https://placehold.co/200x200/00c300/ffffff?text=LINE+Pay" alt="LINE Pay QR Code">
-                <img id="jkopay-qr" class="qr-code-image" src="https://placehold.co/200x200/e55c2d/ffffff?text=街口支付" alt="街口支付 QR Code">
-                <img id="bank-transfer-qr" class="qr-code-image" src="https://placehold.co/200x200/5e81ac/ffffff?text=銀行轉帳資訊" alt="銀行轉帳資訊">
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-        const poems = [
-            { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
-            { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
-            { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
-            { "id": 3, "title": "第三籤 甲辰", "poem": "勸君把定心莫虛，天註姻緣自有餘。\n和合重重常吉慶，時來終遇得明珠。", "interpretation": "中吉。堅定心志，必有善果，姻緣天定，時來運轉。" },
-            { "id": 4, "title": "第四籤 甲午", "poem": "風恬浪靜可行舟，恰是中秋月一輪。\n凡事不須多憂慮，福祿自有慶家門。", "interpretation": "上上。風平浪靜，船行順利，中秋月圓，諸事亨通。" },
-            { "id": 5, "title": "第五籤 甲申", "poem": "只恐前途命有變，勸君作急可宜先。\n且守長江無大事，命逢太白守身邊。", "interpretation": "中平。前途恐有變化，宜提早準備，守舊為佳，自有吉星高照。" },
-            { "id": 6, "title": "第六籤 甲戌", "poem": "風雲致雨落洋洋，天災時氣必有傷。\n命內此事難和合，更逢一足出外鄉。", "interpretation": "下下。風雨交加，時運不佳，恐有損傷，難以和合。" },
-            { "id": 7, "title": "第七籤 乙丑", "poem": "雲開月出正分明，不須進退問前程。\n婚姻皆由天註定，和合清吉萬事成。", "interpretation": "大吉。雲開見月，前程分明，姻緣天定，萬事皆成。" },
-            { "id": 8, "title": "第八籤 乙卯", "poem": "禾稻看看結成完，此事必定兩相全。\n回到家中寬心坐，妻兒鼓舞樂團圓。", "interpretation": "上吉。收穫在望，兩相得宜，家門喜慶，凡事圓滿。" },
-            { "id": 9, "title": "第九籤 乙巳", "poem": "龍虎相隨在深山，君爾何須背後看。\n不知此去相愛愉，他日與我卻無干。", "interpretation": "中平。龍爭虎鬥，事情複雜，前途未卜，與己無關。" },
-            { "id": 10, "title": "第十籤 乙未", "poem": "花開結子一半枯，可惜今年汝虛度。\n漸漸日落西山去，勸君不用向前途。", "interpretation": "下下。事倍功半，收穫不多，時運已過，不宜前進。" },
-            { "id": 11, "title": "第十一籤 乙酉", "poem": "靈雞漸漸見分明，凡事且看子丑寅。\n雲開月出照天下，郎君即便見太平。", "interpretation": "中吉。時機將至，耐心等待，雲開月出，終見光明。" },
-            { "id": 12, "title": "第十二籤 乙亥", "poem": "長江風浪漸漸靜，于今得進可安寧。\n必有貴人相扶助，凶事脫出見太平。", "interpretation": "上吉。風浪平息，漸入佳境，貴人扶助，化險為夷。" },
-            { "id": 13, "title": "第十三籤 丙子", "poem": "命中正逢羅孛關，用盡心機總未安。\n作福問神難得過，恰是行舟上高灘。", "interpretation": "下下。命中遇關，心神不安，行舟上灘，諸事困難。" },
-            { "id": 14, "title": "第十四籤 丙寅", "poem": "財中漸漸見分明，花開花謝結子成。\n寬心且看月中桂，郎君即便見太平。", "interpretation": "中吉。財運漸顯，開花結果，月中見桂，終得安寧。" },
-            { "id": 15, "title": "第十五籤 丙辰", "poem": "八十原來是太公，看看晚景遇文王。\n目下緊事休相問，勸君且守待運通。", "interpretation": "中平。大器晚成，時運未到，堅守靜待，必遇轉機。" },
-            { "id": 16, "title": "第十六籤 丙午", "poem": "不須作福不須求，用盡心機總未休。\n陽世不知陰世事，官法如爐不自由。", "interpretation": "下下。枉費心機，諸事無成，陰陽相隔，身不由己。" },
-            { "id": 17, "title": "第十七籤 丙申", "poem": "舊恨重重未改為，家中禍患不臨身。\n須當謹防宜作福，龍蛇交會得和合。", "interpretation": "中平。舊事未了，須防禍患，謹慎作福，時來運轉。" },
-            { "id": 18, "title": "第十八籤 丙戌", "poem": "君問中間此言因，看看祿馬拱前程。\n若得貴人多得利，和合自有兩分明。", "interpretation": "上吉。祿馬拱前程，貴人相助，名利雙收，諸事分明。" },
-            { "id": 19, "title": "第十九籤 丁丑", "poem": "富貴由命天註定，心高必然誤君期。\n不然且回依舊路，雲開月出自分明。", "interpretation": "中平。富貴天定，心高誤事，退守舊路，自有轉機。" },
-            { "id": 20, "title": "第二十籤 丁卯", "poem": "前途功名未得意，只恐命內有交加。\n兩家必定防損失，勸君且退莫咨嗟。", "interpretation": "下下。功名未遂，命運交加，慎防損失，宜退不宜進。" },
-            { "id": 21, "title": "第二十一籤 丁巳", "poem": "十方佛法有靈通，大難禍患不相同。\n紅日當空常照耀，還有貴人到家堂。", "interpretation": "大吉。佛法無邊，化解災難，紅日當空，貴人相助。" },
-            { "id": 22, "title": "第二十二籤 丁未", "poem": "太公家業八十成，月出光輝四海明。\n命內自然逢大吉，茅屋中間百事亨。", "interpretation": "上上。大器晚成，時來運轉，命中大吉，凡事亨通。" },
-            { "id": 23, "title": "第二十三籤 丁酉", "poem": "月出光輝四海明，前途祿位見太平。\n浮雲掃退終無事，可保禍患不臨身。", "interpretation": "大吉。月出光輝，前途光明，浮雲散盡，禍患不侵。" },
-            { "id": 24, "title": "第二十四籤 丁亥", "poem": "不須忙碌更憂愁，自有時來福祿周。\n月出惟有十六日，光輝依舊照乾坤。", "interpretation": "中吉。時來運轉，福祿自來，無須憂愁，靜待時機。" },
-            { "id": 25, "title": "第二十五籤 戊子", "poem": "總是前途莫心勞，求神問聖枉是多。\n但看雞犬日過後，不須作福事如何。", "interpretation": "下下。前途勞心，求神無益，靜待時機，無須強求。" },
-            { "id": 26, "title": "第二十六籤 戊寅", "poem": "選出牡丹第一枝，勸君折取莫遲疑。\n世間若問相知處，萬事逢春正及時。", "interpretation": "上上。時機絕佳，如牡丹初綻，把握良機，萬事逢春。" },
-            { "id": 27, "title": "第二十七籤 戊辰", "poem": "君爾寬心且自由，門庭清吉家無憂。\n財寶自然終吉利，凡事無傷不用求。", "interpretation": "大吉。家門清吉，無憂無慮，財寶自來，諸事順利。" },
-            { "id": 28, "title": "第二十八籤 戊午", "poem": "于今莫作此當時，虎落平陽被犬欺。\n世間凡事何難定，千山萬水也遲疑。", "interpretation": "下下。時不我予，虎落平陽，凡事難定，充滿變數。" },
-            { "id": 29, "title": "第二十九籤 戊申", "poem": "枯木可惜未逢春，如今反在暗中藏。\n寬心且守風霜退，還君依舊作乾坤。", "interpretation": "中平。時運未到，如枯木未春，堅守待時，終能扭轉乾坤。" },
-            { "id": 30, "title": "第三十籤 戊戌", "poem": "漸漸看此月中和，過後須防未得高。\n改變顏色前途去，凡事必定見重勞。", "interpretation": "中平。運勢中和，須防後變，改變方針，事多辛勞。" },
-            { "id": 31, "title": "第三十一籤 己丑", "poem": "綠柳蒼蒼正當時，任君此去作乾坤。\n花果結實無殘謝，福祿自有慶家門。", "interpretation": "大吉。時機正好，任君發揮，必有善果，福祿滿門。" },
-            { "id": 32, "title": "第三十二籤 己卯", "poem": "龍虎相交在門前，此事必定兩相連。\n黃金忽然變成鐵，何用作福問神仙。", "interpretation": "下下。龍虎相爭，事情相連，黃金變鐵，求神無益。" },
-            { "id": 33, "title": "第三十三籤 己巳", "poem": "木有根荄水有源，君當自此究其原。\n莫隨道路人閒話，訟則終凶是至言。", "interpretation": "中平。追本溯源，探究根本，勿聽閒言，訴訟則凶。" },
-            { "id": 34, "title": "第三十四籤 己未", "poem": "危險高山行過盡，莫嫌此路有重重。\n若見蘭桂漸漸發，長蛇反轉變成龍。", "interpretation": "上吉。歷盡艱險，漸入佳境，終能化龍，大有作為。" },
-            { "id": 35, "title": "第三十五籤 己酉", "poem": "此事何須用心機，前途變怪自然知。\n看看此去得和合，漸漸脫出見太平。", "interpretation": "中吉。順其自然，不必強求，自有轉機，終見太平。" },
-            { "id": 36, "title": "第六籤 己亥", "poem": "福如東海壽如山，君爾何須嘆苦難。\n命內自然逢大吉，祈保分明自平安。", "interpretation": "上上。福壽雙全，命中大吉，無須憂慮，自有平安。" },
-            { "id": 37, "title": "第三十七籤 庚子", "poem": "運逢得意身顯變，君爾身中皆有益。\n一向前途無難事，決意之中保清吉。", "interpretation": "大吉。時來運轉，身價倍增，前途無量，諸事順利。" },
-            { "id": 38, "title": "第三十八籤 庚寅", "poem": "名顯有意在中央，不須祈禱心自安。\n看看早晚日過後，即時得意在其間。", "interpretation": "中吉。名聲在外，心安理得，時機一到，立刻得意。" },
-            { "id": 39, "title": "第三十九籤 庚辰", "poem": "意中若問神仙路，勸爾且退望高樓。\n寬心且守寬心坐，必然遇得貴人扶。", "interpretation": "中平。目標過高，宜退一步，寬心等待，必有貴人。" },
-            { "id": 40, "title": "第四十籤 庚午", "poem": "平生富貴成祿位，君家門戶定光輝。\n此中必定無損失，夫妻百歲喜相隨。", "interpretation": "大吉。富貴功名，光耀門楣，無損無失，家庭和睦。" },
-            { "id": 41, "title": "第四十一籤 庚申", "poem": "無限好事君須記，恰如認賊作為子。\n莫貪眼下有些甜，可慮他時還受苦。", "interpretation": "下下。好壞不分，認賊作子，莫貪小利，以免後患。" },
-            { "id": 42, "title": "第四十二籤 庚戌", "poem": "一重江水一重山，誰知此去路又難。\n任他改求終不過，是非終久未得安。", "interpretation": "下下。關山重重，前路艱難，是非不斷，難得安寧。" },
-            { "id": 43, "title": "第四十三籤 辛丑", "poem": "一年作事急如飛，君爾寬心莫遲疑。\n貴人還在千里外，音信月中漸漸知。", "interpretation": "中吉。作事迅速，不必遲疑，貴人尚遠，月中見信。" },
-            { "id": 44, "title": "第四十四籤 辛卯", "poem": "客到前途多得利，君爾何故兩相疑。\n雖是中間防進退，月出光輝得運時。", "interpretation": "中吉。前途多利，不必懷疑，謹防進退，月出運來。" },
-            { "id": 45, "title": "第四十五籤 辛巳", "poem": "花開今已結成果，富貴榮華終到老。\n君子小人相會合，萬事清吉莫煩惱。", "interpretation": "上上。開花結果，富貴到老，萬事順利，無須煩惱。" },
-            { "id": 46, "title": "第四十六籤 辛未", "poem": "功名得意與君顯，前途富貴喜安然。\n若遇一輪明月照，十五團圓光滿天。", "interpretation": "大吉。功名顯達，富貴安然，月圓之時，圓滿無缺。" },
-            { "id": 47, "title": "第四十七籤 辛酉", "poem": "君爾何須問聖跡，自己心中皆有益。\n于今且看月中旬，凶事脫出化成吉。", "interpretation": "中吉。問神不如問己，心中自有答案，月中之時，凶化為吉。" },
-            { "id": 48, "title": "第四十八籤 辛亥", "poem": "陽世作事未和同，雲遮月色正朦朧。\n心中意欲前途去，只恐前途運未通。", "interpretation": "下下。諸事不順，月被雲遮，前途未明，時運不通。" },
-            { "id": 49, "title": "第四十九籤 壬子", "poem": "言語雖多不可從，風雲靜處未行龍。\n暗中終得明消息，君爾何須問重重。", "interpretation": "中平。閒言勿信，靜待時機，自有消息，不必多問。" },
-            { "id": 50, "title": "第五十籤 壬寅", "poem": "佛前發誓無異心，且看前途得好音。\n此物原來本是鐵，也能變化得成金。", "interpretation": "上吉。心誠則靈，必有佳音，鐵可成金，事在人為。" },
-            { "id": 51, "title": "第五十一籤 壬辰", "poem": "東西南北不堪行，前途此事正可當。\n勸君把定莫煩惱，家門自有保安康。", "interpretation": "中平。不宜遠行，守住當前，不必煩惱，家門平安。" },
-            { "id": 52, "title": "第五十二籤 壬午", "poem": "孤燈寂寂夜沉沉，萬事清吉萬事成。\n若逢陰中有善果，燒得好香達神明。", "interpretation": "中吉。靜中見吉，萬事可成，積陰德，神明保佑。" },
-            { "id": 53, "title": "第五十三籤 壬申", "poem": "看君來問心中事，積善之家慶有餘。\n運亨財子雙雙至，指日喜氣溢門閭。", "interpretation": "大吉。積善之家，必有餘慶，好運來臨，喜氣滿門。" },
-            { "id": 54, "title": "第五十四籤 壬戌", "poem": "孤蹤寂寞路逕難，退身保命漸漸寬。\n更有一翻春色轉，桑榆晚景見平安。", "interpretation": "中平。路途艱難，退守為佳，自有轉機，晚景平安。" },
-            { "id": 55, "title": "第五十五籤 癸丑", "poem": "須知進退總虛言，看看發暗未必全。\n珠玉深藏還未變，心中但得枉徒然。", "interpretation": "下下。進退兩難，前景不明，寶物未現，枉費心機。" },
-            { "id": 56, "title": "第五十六籤 癸卯", "poem": "病中若得苦心勞，到底完全總未遭。\n去後不須回頭問，心中事務盡消磨。", "interpretation": "中平。病中辛勞，未得痊癒，放下過去，事務消解。" },
-            { "id": 57, "title": "第五十七籤 癸巳", "poem": "勸君把定心莫虛，前途清吉得運時。\n到底中間無大事，又遇神仙守安居。", "interpretation": "上吉。堅定心志，時來運轉，無災無難，神仙守護。" },
-            { "id": 58, "title": "第五十八籤 癸未", "poem": "蛇身意欲變成龍，只恐命內運未通。\n久病且作寬心坐，言語雖多不可從。", "interpretation": "中平。有心轉變，時運未到，耐心等待，莫聽閒言。" },
-            { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "大吉。行善勿疑，求名當時，諸事可成，財寶自來。" },
-            { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，當官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
-        ];
-
-        // --- DOM ELEMENTS ---
-        const poemCard = document.getElementById('poem-card');
-        const poemTitleEl = document.getElementById('poem-title');
-        const poemContentEl = document.getElementById('poem-content');
-        const drawButton = document.getElementById('draw-button');
-        const questionInput = document.getElementById('question-input');
-        const analysisButton = document.getElementById('analysis-button');
-        const resultWrapper = document.getElementById('result-wrapper');
-        const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
-        const aiResultEl = document.getElementById('ai-analysis-result');
-        
-        const num1Input = document.getElementById('num1-input');
-        const num2Input = document.getElementById('num2-input');
-        const num3Input = document.getElementById('num3-input');
-        
-        const donationButton = document.getElementById('donation-button');
-        const donationModal = document.getElementById('donation-modal');
-        const modalCloseButton = document.getElementById('modal-close-button');
-        const amountButtons = document.querySelectorAll('.amount-button');
-        
-        const paymentTabs = document.querySelectorAll('.payment-tab');
-        const qrCodeImages = document.querySelectorAll('.qr-code-image');
-
-        let currentPoem = {};
-        let isTyping = false; 
-
-        // --- FUNCTIONS ---
-        function displayPoem(id) {
-            poemContentEl.removeAttribute('style');
-            const poem = poems.find(p => p.id === id);
-            if (poem) {
-                poemTitleEl.textContent = poem.title;
-                poemContentEl.textContent = poem.poem;
-                currentPoem = { title: poem.title, text: poem.poem };
-            }
-        }
-
-        function drawLot() {
-            if (isTyping) return;
-            drawButton.disabled = true; 
-            poemCard.classList.add('drawing');
-            
-            resultWrapper.style.display = 'none';
-            hexagramWrapper.innerHTML = '';
-            aiResultEl.innerHTML = '';
-
-            let shuffleCount = 0; 
-            const shuffleInterval = setInterval(() => {
-                const randomId = Math.floor(Math.random() * 60) + 1; 
-                displayPoem(randomId);
-                shuffleCount++; 
-                if (shuffleCount > 24) {
-                    clearInterval(shuffleInterval); 
-                    const finalId = Math.floor(Math.random() * 60) + 1;
-                    displayPoem(finalId); 
-                    drawButton.disabled = false; 
-                    poemCard.classList.remove('drawing');
-                }
-            }, 100);
-        }
-
-        async function typewriterEffect(element, paragraphs) {
-            isTyping = true;
-            element.innerHTML = '';
-            for (const pText of paragraphs) {
-                const pElement = document.createElement('p');
-                element.appendChild(pElement);
-                const lines = pText.split('\n');
-                for(let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    for (let j = 0; j < line.length; j++) {
-                        pElement.innerHTML += line.charAt(j);
-                        await new Promise(resolve => setTimeout(resolve, 35));
-                    }
-                    if (i < lines.length - 1) {
-                       pElement.innerHTML += '<br>';
-                    }
-                }
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-            isTyping = false;
-        }
-
-        async function getAIAnalysis() {
-            if (isTyping) return;
-
-            const num1 = parseInt(num1Input.value);
-            const num2 = parseInt(num2Input.value);
-            const num3 = parseInt(num3Input.value);
-
-            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
-                showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
-                return;
-            }
-            
-            const question = questionInput.value.trim();
-            if (!question) { 
-                showCustomAlert("請先輸入您想問的問題。"); 
-                return; 
-            }
-            
-            if (!currentPoem.title || currentPoem.title === '籤頭') { 
-                showCustomAlert("請先誠心抽一籤。"); 
-                return; 
-            }
-
-            resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = '';
-            aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
-            analysisButton.disabled = true;
-
-            const payload = { 
-                question: question, 
-                poemTitle: currentPoem.title, 
-                poemText: currentPoem.text, 
-                numbers: {
-                    num1: num1,
-                    num2: num2,
-                    num3: num3 
-                }
-            };
-            
-            try {
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) { 
-                    const errorText = await response.text();
-                    let errorJson = {};
-                    try {
-                        errorJson = JSON.parse(errorText);
-                    } catch (e) {
-                        console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
-                    }
-                    const errorMessage = errorJson.error || errorText || '未知錯誤';
-                    throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
-                }
-
-                const data = await response.json();
-                
-                // 【升級】顯示本卦與變卦
-                const hex = data.hexagram;
-                if(hex && hex.main && hex.changed) {
-                    hexagramWrapper.innerHTML = `
-                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem; color: #b08968;">卦象演變</h3>
-                        <div class="hexagram-comparison">
-                            <div class="hexagram-unit">
-                                <h4>本卦 (現況)</h4>
-                                <div class="symbol">${hex.main.upper.symbol}</div>
-                                <div class="symbol">${hex.main.lower.symbol}</div>
-                                <p class="name">${hex.main.name}</p>
-                            </div>
-                            <div class="hexagram-arrow">
-                                <div>→</div>
-                                <p>第 ${hex.movingLine} 爻變</p>
-                            </div>
-                            <div class="hexagram-unit">
-                                <h4>之卦 (未來)</h4>
-                                <div class="symbol">${hex.changed.upper.symbol}</div>
-                                <div class="symbol">${hex.changed.lower.symbol}</div>
-                                <p class="name">${hex.changed.name}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
-                await typewriterEffect(aiResultEl, paragraphs);
-
-            } catch (error) {
-                console.error("AI解析時發生錯誤:", error);
-                aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請確認網路連線或稍後再試。(${error.message})</p>`;
-            } finally {
-                analysisButton.disabled = false;
-            }
+router.post('/analyze', async (req, res) => {
+    if (!model) {
+        console.error("錯誤：AI 模型未被初始化。");
+        return res.status(503).json({ error: "AI 服務未配置或初始化失敗，請檢查伺服器環境變數。" });
+    }
+    try {
+        let parsedBody = req.body;
+        if (req.body instanceof Buffer) {
+            parsedBody = JSON.parse(req.body.toString());
         }
         
-        function showCustomAlert(message) {
-            console.warn("提示使用者:", message);
-            resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = ''; 
-            aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
-        }
+        const { question, poemTitle, poemText, numbers } = parsedBody;
 
-        // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            displayPoem(0); 
-            drawButton.addEventListener('click', drawLot);
-            analysisButton.addEventListener('click', getAIAnalysis);
-            
-            donationButton.addEventListener('click', () => {
-                donationModal.classList.add('visible');
-            });
-            modalCloseButton.addEventListener('click', () => {
-                donationModal.classList.remove('visible');
-            });
-            amountButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    amountButtons.forEach(btn => btn.classList.remove('selected'));
-                    button.classList.add('selected');
-                });
-            });
-            
-            paymentTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    paymentTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    const targetId = tab.dataset.target;
-                    qrCodeImages.forEach(img => img.classList.remove('active'));
-                    document.getElementById(targetId).classList.add('active');
-                });
-            });
+        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.num3 === undefined) {
+            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(parsedBody)}`;
+            console.error(errorMessage);
+            return res.status(400).json({ error: errorMessage });
+        }
+        
+        const hexagramsInfo = getHexagramByNumbers(numbers);
+        
+        // 【更新】Prompt 加入變卦資訊，並指導 AI 進行解析
+        const prompt = `
+# 角色設定
+你是一位專業的籤詩與易經解析大師。你的語氣應溫和、富有哲理且充滿智慧，能夠給予求籤者清晰的指引與心靈的慰藉。請多從正面角度提供建議，並以繁體中文回答。在回答中，請避免使用「貧道」、「老朽」等自稱。
+
+# 背景資料
+一位信眾前來求籤，以下是祂求得的所有資訊：
+1. 所問之事: "${question}"
+2. 依此數字推算的梅花易數卦象:
+   - 起卦數字: 上卦 ${numbers.num1}，下卦 ${numbers.num2}，動爻 ${numbers.num3}
+   - 本卦: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol})
+   - 動爻: 第 ${hexagramsInfo.movingLine} 爻
+   - 變卦 (之卦): ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol}，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol})
+
+# 任務指令
+請根據以上所有資訊，為這位信眾提供一次綜合性的解析。你的解析需要包含以下幾個層次，且在最終輸出中，請不要使用任何星號 '*' 來產生粗體格式。
+1. 數字卦象分析:
+   - 簡要說明「${hexagramsInfo.main.name}」這個本卦的基本涵義，它代表了當前的狀況或問題的本質。
+   - 說明「${hexagramsInfo.changed.name}」這個變卦的涵義。
+   - 根據第 ${hexagramsInfo.movingLine} 爻的變動，解析從本卦轉變為變卦的過程，這象徵著事情未來的發展趨勢或最終結果。
+2. 籤詩核心寓意:
+   - 深入解讀「${poemTitle}」這首籤詩的字面與內在含義。籤詩中的關鍵詞（例如：龍、虎、風、雲、月、舟等）代表了什麼象徵意義？
+3. 綜合解析與建議:
+   - 將「卦象的轉變趨勢」與「籤詩的核心寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。
+   - 請將「機遇」、「挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】，例如：【機遇】。標題下方為該項目的詳細說明。
+   - 提出具體的行動建議或心態調整方向，並嚴格使用條列式說明。每個條列項目前方需加上「一、」、「二、」、「三、」等編號，且每個條列項目都必須自成一個段落（即每個編號後就換行）。
+   - 最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
+
+請確保整體排版條理分明，文筆流暢優美，且各個主要段落之間僅以單一換行分隔，不要產生過多不必要的空白行。
+`;
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const analysisResult = response.text();
+
+        res.json({ 
+            analysis: analysisResult,
+            hexagram: hexagramsInfo 
         });
-    </script>
-</body>
-</html>
+    } catch (error) {
+        console.error("在 /analyze 路由處理時發生嚴重錯誤:", error);
+        res.status(500).json({ error: "AI 服務在處理您的請求時發生內部錯誤，請稍後再試。" });
+    }
+});
+
+// 【修正】將路由正確掛載到 /api 路徑下
+app.use('/api', router);
+
+module.exports.handler = serverless(app);
