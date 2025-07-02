@@ -157,9 +157,9 @@
             </div>
             
             <div class="qr-code-container">
-                <img id="line-pay-qr" class="qr-code-image active" src="linepay.png" alt="LINE Pay QR Code">
-                <img id="jkopay-qr" class="qr-code-image" src="jo.png" alt="街口支付 QR Code">
-                <img id="bank-transfer-qr" class="qr-code-image" src="bk.png" alt="銀行轉帳資訊">
+                <img id="lin-pay-qr" class="qr-code-image active" src="linepay.png" alt="LINE Pay QR Code">
+                <img id="jopay-qr" class="qr-code-image" src="jo.png" alt="街口支付 QR Code">
+                <img id="ban-transfer-qr" class="qr-code-image" src="bk.png" alt="銀行轉帳資訊">
             </div>
         </div>
     </div>
@@ -251,7 +251,7 @@
         const modalCloseButton = document.getElementById('modal-close-button');
         const amountButtons = document.querySelectorAll('.amount-button');
         const paymentTabs = document.querySelectorAll('.payment-tab');
-        const qrCodeImages = document.querySelectorAll('.qr-code-image');
+        const CodeImages = document.querySelectorAll('.qr-code-image');
 
         let currentPoem = {};
         let isTyping = false; 
