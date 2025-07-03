@@ -71,8 +71,22 @@
         
         footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
         
+        /* --- ✨ 新增的頁尾連結樣式 --- */
+        .footer-links {
+            margin: 0.8rem 0;
+        }
+        .footer-links a {
+            color: #9c897a;
+            text-decoration: none;
+            margin: 0 8px;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: #8a6c4c;
+            text-decoration: underline;
+        }
         /* --- 捐款功能樣式 --- */
-        #donation-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 2px solid #a58362; padding: 8px 20px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; margin-top: 1.5rem; }
+        #donation-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 2px solid #a58362; padding: 8px 20px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem; }
         #donation-button:hover { background-color: #a58362; color: #fff; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
@@ -133,6 +147,13 @@
         
         <footer>
             <p>© 2025 - 僅供參考，心誠則靈</p>
+            
+            <div class="footer-links">
+                <a href="#">關於我們</a> |
+                <a href="#">聯絡我們</a> |
+                <a href="#">隱私權政策</a>
+            </div>
+
             <button id="donation-button">隨喜功德</button>
         </footer>
     </div>
