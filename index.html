@@ -84,6 +84,15 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
+        /* [新增] 計數器樣式 */
+        #visitor-counter {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+        #visitor-count {
+            font-weight: 600;
+            color: #8a6c4c;
+        }
     </style>
 </head>
 <body>
@@ -133,12 +142,16 @@
                 <a href="privacy.html">隱私權政策</a>
             </div>
 
-            </footer>
+            <div id="visitor-counter">
+                累計結緣人數: <span id="visitor-count">載入中...</span>
+            </div>
+
+        </footer>
     </div>
 
     <script>
         const poems = [
-            // ... 您的籤詩資料庫保持不變 ...
+            // ... 您的61首籤詩資料庫保持不變 ...
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
@@ -217,8 +230,9 @@
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
         
-        // 捐款功能的 DOM 元素已移除
-
+        // [新增] 訪問計數器的 DOM 元素
+        const visitorCountEl = document.getElementById('visitor-count');
+        
         let currentPoem = {};
         let isTyping = false; 
 
@@ -352,8 +366,8 @@
                                 <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
                             </div>
                             <div style="text-align: center; padding: 0 0.5rem;">
-                                 <div style="font-size: 2rem; color: #b08968;">→</div>
-                                 <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
+                                <div style="font-size: 2rem; color: #b08968;">→</div>
+                                <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
                             </div>
                             <div style="text-align: center;">
                                 <div style="font-size: 1rem; color: #6c584c;">之卦</div>
@@ -383,13 +397,38 @@
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
+        // --- [新增] 更新訪問人數的函式 ---
+        async function updateVisitorCount() {
+            // 我們使用一個免費、無需註冊的計數器 API：countapi.xyz
+            // 'guanyin-temple-online' 是這個網站的專屬命名空間，確保計數獨立
+            // 'visits' 是這個計數器的鍵名
+            const namespace = 'guanyin-temple-online';
+            const key = 'visits';
+            const apiUrl = `https://api.countapi.xyz/hit/${namespace}/${key}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('網路回應不正常');
+                }
+                const data = await response.json();
+                // 將回傳的數字格式化，例如 12345 變成 12,345
+                visitorCountEl.textContent = data.value.toLocaleString(); 
+            } catch (error) {
+                console.error("無法獲取訪問人數:", error);
+                visitorCountEl.textContent = '無法取得'; // 如果出錯，顯示錯誤訊息
+            }
+        }
+
+
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
             
-            // 捐款功能的事件監聽器已全部移除
+            // [新增] 頁面載入完成後，呼叫函式來更新訪問人數
+            updateVisitorCount();
         });
     </script>
 </body>
