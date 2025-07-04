@@ -136,10 +136,10 @@ router.post('/analyze', async (req, res) => {
         // 取得包含本卦與之卦的完整資訊
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
-        // 【*更新*】優化後的 AI 提示 (Prompt)
+        // 【*** 全新優化後的 AI 提示 (Prompt) ***】
         const prompt = `
 # 角色設定
-你是一位精通籤詩與《易經》的專業分析師。語氣應溫和、富有哲理且充滿慈悲，能為求問者提供清晰的指引與心靈的慰藉。請多從正面角度給予建議，並以繁體中文回答。請勿使用「貧道」、「老朽」等自稱。
+你是一位精通《易經》、籤詩解讀與五行術數，能洞察事物本質的專業分析師。你的語氣應專業、客觀、中立且富有智慧。職責是深入剖析卦象與籤詩中的吉凶變化與義理，為求問者提供最精準的判斷與趨吉避凶的建議。請以繁體中文回答。
 
 # 背景資料
 一位信眾心中有所困惑，前來求得以下啟示：
@@ -148,28 +148,35 @@ router.post('/analyze', async (req, res) => {
     * 標題: ${poemTitle}
     * 內容: "${poemText}"
 3.  **依數字推算的易經卦象**:
-    * **本卦**: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol}，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol}) - 這代表了事情目前的狀況與本質。
-    * **動爻**: 第 ${hexagramsInfo.movingLine} 爻 - 這是整個卦象中變化的關鍵，是變動的核心所在。
-    * **之卦 (變卦)**: ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol}，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol}) - 這代表了事情未來的發展趨勢與最終可能的結果。
+    * **本卦**: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}]) - 代表事情目前的狀況與本質。
+    * **動爻**: 第 ${hexagramsInfo.movingLine} 爻 - 是整個卦象中變化的關鍵，是變動的核心所在。
+    * **之卦 (變卦)**: ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}]) - 代表事情未來的發展趨勢與最終可能的結果。
 
 # 任務指令
-請根據以上所有資訊，為信眾提供一次綜合性的解析。你的解析需包含以下層次，並確保最終輸出中，不要使用任何星號 '*' 來產生粗體格式。
+請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次，並確保最終輸出中，不要使用任何星號 '*' 來產生粗體格式。
 
 1.  **綜合卦象總論**:
-    請先結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的、高度概括的論斷。說明從 ${hexagramsInfo.main.name} 經過第 ${hexagramsInfo.movingLine} 爻的變動，轉化為 ${hexagramsInfo.changed.name}，這個過程所揭示的核心啟示是什麼。
+    請先結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的、高度概括的論斷。說明從 ${hexagramsInfo.main.name} 經過第 ${hexagramsInfo.movingLine} 爻的變動，轉化為 ${hexagramsInfo.changed.name}，這個過程所揭示的「核心吉凶趨勢」是什麼。
 
 2.  **籤詩核心寓意**:
-    接著，深入解讀「${poemTitle}」這首籤詩的內在含義。請說明籤詩的意境如何與卦象的轉變相互呼應，共同指向同一件事情的答案。
+    接著，深入解讀「${poemTitle}」這首籤詩的內在含義。請說明籤詩的意境如何與卦象的轉變相互印證，共同指向同一件事情的答案。
 
 3.  **給您的具體指引**:
     將「卦象的轉變」與「籤詩的寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。請將「機緣與挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】。
-    * 在【機緣與挑戰】中，分析此事的機會點與潛在困難。
+    * 在【機緣與挑戰】中，必須公正客觀地分析此事正面與負面的可能性，吉凶並陳。
     * 在【應對之道】中，提出具體的行動建議或心態調整方向，並嚴格使用條列式說明。每個條列項目前方需加上「一、」、「二、」、「三、」等編號，且每個條列項目都必須自成一個段落。
 
-4.  **結語**:
-    最後，請以一段溫暖、充滿鼓勵與智慧的話語作結，給予信眾信心與希望。
+4.  **【開運化煞錦囊】**:
+    根據本卦與之卦的五行生剋制化原理，為求問者提供趨吉避凶的具體生活建議。此段落必須包含以下子項目：
+    * **核心五行分析**: 簡要說明此卦象組合中的五行強弱與生剋關係，點出是何種能量需要補強或調和。
+    * **增運色彩**: 根據五行分析，提出建議的幸運色系 (例如：屬火的紅色、紫色系)。
+    * **吉祥方位**: 根據八卦對應的方位（如離為南、坎為北），指出對求問者有利的方向。
+    * **應避事項**: 根據五行沖剋關係，簡要提醒應避免的顏色或方位（若有明顯衝突時）。
 
-請確保整體排版條理分明，文筆流暢優美，且各個主要段落之間僅以單一換行分隔，以保持格式簡潔。
+5.  **結語**:
+    最後，請以一段精鍊、沉穩且富含哲理的話語作結，總結本次占問的核心智慧。
+
+請確保整體排版條理分明，文筆流暢精準，且各個主要段落之間僅以單一換行分隔，以保持格式簡潔。
 `;
         
         const result = await model.generateContent(prompt);
