@@ -133,7 +133,7 @@
                 <a href="privacy.html">隱私權政策</a>
             </div>
 
-            <div id="visitor-badge-container" style="margin-top: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+            <div id="visitor-badge-container" style="margin-top: 1.2rem; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 0.5rem;">
                 </div>
 
         </footer>
@@ -384,7 +384,6 @@
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
-        // [新增] 顯示總計數與今日計數的徽章
         function displayVisitorBadges() {
             const container = document.getElementById('visitor-badge-container');
             if (!container) return;
@@ -418,7 +417,6 @@
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
 
-            // [新增] 頁面載入後，呼叫函式來顯示計數器
             displayVisitorBadges();
         });
     </script>
