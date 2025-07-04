@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聯絡我們 - 觀音禪寺線上靈籤</title>
+    
+    <style>
+        /* 沿用主頁的優雅樣式 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Noto Serif TC', serif; 
+            background-color: #f4f1ea; 
+            color: #3d2c1d; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            min-height: 100vh; 
+            padding: 40px 20px;
+        }
+        
+        .container { 
+            width: 100%; 
+            max-width: 680px;
+            text-align: left;
+            background-color: #fff;
+            border: 1px solid #ddd8cf;
+            border-radius: 8px;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #8a6c4c;
+            text-align: center;
+        }
+
+        p { 
+            font-size: 1.1rem; 
+            color: #3d2c1d; 
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* ✨ QR Code 區塊的樣式 ✨ */
+        .contact-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .contact-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #b08968;
+        }
+
+        .qr-code {
+            max-width: 250px; /* 調整QR Code大小 */
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd8cf;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background-color: #ddd8cf;
+            margin: 3rem auto;
+        }
+
+        /* ✨ 返回主頁按鈕的樣式 ✨ */
+        .back-button-container {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .back-button {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #a58362;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            background-color: #8a6c4c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>聯絡我們</h1>
+        <p>若您有任何問題或需要協助，歡迎透過以下方式與我們聯繫。願您平安順心。</p>
+
+        <hr class="divider">
+
+        <div class="contact-section">
+            <h2>掃描加入官方 LINE</h2>
+            <img src="line_qr.png" alt="LINE QR Code" class="qr-code">
+        </div>
+
+        <div class="contact-section">
+            <h2>其他資訊</h2>
+            <p style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <strong>地址：</strong>（請填寫您的地址）<br>
+                <strong>電子郵件：</strong>（請填寫您的電子郵件）<br>
+                <strong>開放時間：</strong>（請填寫您的開放時間）
+            </p>
+        </div>
+        
+        <div class="back-button-container">
+            <a href="index.html" class="back-button">返回主頁</a>
+        </div>
+    </div>
+
+</body>
+</html>
