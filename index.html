@@ -133,16 +133,15 @@
                 <a href="privacy.html">隱私權政策</a>
             </div>
 
-            <div style="margin-top: 1.2rem;">
-                <img src="https://api.visitorbadge.io/api/visitors?path=guanyin-temple-online.page&label=累計結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%238a6c4c" alt="累計結緣人數"/>
-            </div>
+            <div id="visitor-badge-container" style="margin-top: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+                </div>
 
         </footer>
     </div>
 
     <script>
-        // [最終修改] 關於計數器的 JavaScript 已全部移除，因為不再需要
         const poems = [
+            // ... 您的61首籤詩資料庫保持不變 ...
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
@@ -385,11 +384,42 @@
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
+        // [新增] 顯示總計數與今日計數的徽章
+        function displayVisitorBadges() {
+            const container = document.getElementById('visitor-badge-container');
+            if (!container) return;
+
+            // 1. 總計數器 (識別碼固定)
+            const totalBadge = document.createElement('img');
+            const totalPath = 'guanyin-temple-online.page';
+            totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%238a6c4c`;
+            totalBadge.alt = '累計結緣人數';
+            
+            // 2. 今日計數器 (識別碼每天變化)
+            const dailyBadge = document.createElement('img');
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
+            const day = String(today.getDate()).padStart(2, '0'); // 日期補零
+            const dailyPath = `guanyin-temple-daily-${year}-${month}-${day}`;
+            
+            // 為了區分，今日計數器使用稍微不同的顏色
+            dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a58362`;
+            dailyBadge.alt = '今日結緣人數';
+
+            // 3. 將兩個徽章加入到容器中
+            container.appendChild(totalBadge);
+            container.appendChild(dailyBadge);
+        }
+
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
+
+            // [新增] 頁面載入後，呼叫函式來顯示計數器
+            displayVisitorBadges();
         });
     </script>
 </body>
