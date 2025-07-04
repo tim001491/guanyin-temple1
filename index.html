@@ -6,7 +6,7 @@
     <title>觀音禪寺線上靈籤</title>
     
     <style>
-        /* 您的所有優美 CSS 樣式都將保留 */
+        /* CSS 樣式完全不變 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
@@ -84,14 +84,6 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
-        #visitor-counter {
-            margin-top: 1rem;
-            font-size: 0.95rem;
-        }
-        #visitor-count {
-            font-weight: 600;
-            color: #8a6c4c;
-        }
     </style>
 </head>
 <body>
@@ -141,14 +133,15 @@
                 <a href="privacy.html">隱私權政策</a>
             </div>
 
-            <div id="visitor-counter">
-                累計結緣人數: <span id="visitor-count">載入中...</span>
+            <div style="margin-top: 1.2rem;">
+                <img src="https://api.visitorbadge.io/api/visitors?path=guanyin-temple-online.page&label=累計結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%238a6c4c" alt="累計結緣人數"/>
             </div>
 
         </footer>
     </div>
 
     <script>
+        // [最終修改] 關於計數器的 JavaScript 已全部移除，因為不再需要
         const poems = [
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
@@ -227,8 +220,6 @@
         const num1Input = document.getElementById('num1-input');
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
-        
-        const visitorCountEl = document.getElementById('visitor-count');
         
         let currentPoem = {};
         let isTyping = false; 
@@ -394,42 +385,11 @@
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
-        async function updateVisitorCount() {
-            // 更換成一個更穩定的免費計數器服務: visitorbadge.io
-            // 我們用一個獨特的路徑來確保計數器是專屬於您的網站的
-            const pageId = 'guanyin-temple-online.page';
-            const apiUrl = `https://api.visitorbadge.io/api/visitors?path=${pageId}`;
-
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    // 如果 API 回應錯誤，就拋出一個錯誤
-                    throw new Error(`網路回應不正常: ${response.statusText}`);
-                }
-                const data = await response.json();
-                // 這個 API 回傳的計數在 data.value 中
-                const count = data.value;
-                // 檢查回傳的是否為數字
-                if (typeof count === 'number') {
-                    visitorCountEl.textContent = count.toLocaleString();
-                } else {
-                     throw new Error('API回傳的格式不正確');
-                }
-            } catch (error) {
-                console.error("無法獲取訪問人數:", error);
-                visitorCountEl.textContent = '無法取得'; // 如果出錯，顯示錯誤訊息
-            }
-        }
-
-
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
-            
-            // 頁面載入完成後，呼叫函式來更新訪問人數
-            updateVisitorCount();
         });
     </script>
 </body>
