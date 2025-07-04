@@ -84,7 +84,6 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
-        /* [新增] 計數器樣式 */
         #visitor-counter {
             margin-top: 1rem;
             font-size: 0.95rem;
@@ -151,7 +150,6 @@
 
     <script>
         const poems = [
-            // ... 您的61首籤詩資料庫保持不變 ...
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
@@ -230,7 +228,6 @@
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
         
-        // [新增] 訪問計數器的 DOM 元素
         const visitorCountEl = document.getElementById('visitor-count');
         
         let currentPoem = {};
@@ -397,23 +394,27 @@
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
-        // --- [新增] 更新訪問人數的函式 ---
         async function updateVisitorCount() {
-            // 我們使用一個免費、無需註冊的計數器 API：countapi.xyz
-            // 'guanyin-temple-online' 是這個網站的專屬命名空間，確保計數獨立
-            // 'visits' 是這個計數器的鍵名
-            const namespace = 'guanyin-temple-online';
-            const key = 'visits';
-            const apiUrl = `https://api.countapi.xyz/hit/${namespace}/${key}`;
+            // 更換成一個更穩定的免費計數器服務: visitorbadge.io
+            // 我們用一個獨特的路徑來確保計數器是專屬於您的網站的
+            const pageId = 'guanyin-temple-online.page';
+            const apiUrl = `https://api.visitorbadge.io/api/visitors?path=${pageId}`;
 
             try {
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
-                    throw new Error('網路回應不正常');
+                    // 如果 API 回應錯誤，就拋出一個錯誤
+                    throw new Error(`網路回應不正常: ${response.statusText}`);
                 }
                 const data = await response.json();
-                // 將回傳的數字格式化，例如 12345 變成 12,345
-                visitorCountEl.textContent = data.value.toLocaleString(); 
+                // 這個 API 回傳的計數在 data.value 中
+                const count = data.value;
+                // 檢查回傳的是否為數字
+                if (typeof count === 'number') {
+                    visitorCountEl.textContent = count.toLocaleString();
+                } else {
+                     throw new Error('API回傳的格式不正確');
+                }
             } catch (error) {
                 console.error("無法獲取訪問人數:", error);
                 visitorCountEl.textContent = '無法取得'; // 如果出錯，顯示錯誤訊息
@@ -427,7 +428,7 @@
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
             
-            // [新增] 頁面載入完成後，呼叫函式來更新訪問人數
+            // 頁面載入完成後，呼叫函式來更新訪問人數
             updateVisitorCount();
         });
     </script>
