@@ -6,127 +6,124 @@
     <title>隱私權政策 - 觀音禪寺線上靈籤</title>
     
     <style>
-        /* 引入與主頁相同的字體 */
+        /* 沿用主頁的優雅樣式 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
-
-        body {
-            font-family: 'Noto Serif TC', serif;
-            line-height: 1.8;
-            background-color: #f4f1ea; /* 與主頁相同的背景色 */
-            color: #3d2c1d;         /* 與主頁相同的文字顏色 */
-            margin: 0;
-            padding: 20px;
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Noto Serif TC', serif; 
+            background-color: #f4f1ea; 
+            color: #3d2c1d; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; /* 改為從頂部對齊 */
+            min-height: 100vh; 
+            padding: 40px 20px; /* 增加頂部間距 */
         }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px 50px;
-            background-color: #fff; /* 卡片背景色 */
-            border: 1px solid #ddd8cf; /* 卡片邊框色 */
+        
+        .container { 
+            width: 100%; 
+            max-width: 680px; /* 內容頁面可以寬一點 */
+            text-align: left; /* 內文靠左對齊 */
+            background-color: #fff;
+            border: 1px solid #ddd8cf;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* 卡片陰影 */
-            text-align: left;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
+        
         h1 {
             font-size: 2.2rem;
             font-weight: 600;
-            color: #8a6c4c; /* 主標題顏色 */
-            text-align: center;
-            border-bottom: 1px solid #ddd8cf;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 1.5rem;
+            color: #8a6c4c;
+            text-align: center; /* 標題置中 */
         }
+
         h2 {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #6c584c; /* 次標題顏色 */
-            margin-top: 35px;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #b08968;
             border-left: 4px solid #b08968;
-            padding-left: 15px;
+            padding-left: 0.8rem;
         }
-        p, li {
-            font-size: 1.1rem;
-            color: #3d2c1d;
+        
+        p, li { 
+            font-size: 1.1rem; 
+            color: #3d2c1d; 
+            line-height: 1.9;
+            margin-bottom: 1rem;
         }
+
         ul {
-            padding-left: 25px;
+            padding-left: 2rem;
         }
-        li {
-            margin-bottom: 10px;
-        }
-        a {
-            color: #a58362; /* 連結顏色 */
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        a:hover {
-            color: #8a6c4c;
-            text-decoration: underline;
-        }
+        
         .last-updated {
-            font-size: 0.9em;
             text-align: center;
-            color: #9c897a; /* 日期顏色 */
-            margin-top: -15px;
-            margin-bottom: 30px;
-        }
-        .disclaimer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd8cf;
-            font-size: 0.9em;
+            font-size: 0.9rem;
             color: #9c897a;
+            margin-bottom: 2.5rem;
         }
+
+        /* ✨ 返回主頁按鈕的樣式 ✨ */
+        .back-button-container {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .back-button {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #a58362;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-decoration: none; /* 確保連結沒有底線 */
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            background-color: #8a6c4c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>隱私權政策</h1>
-        <p class="last-updated">最後更新日期：2025年07月04日</p>
+        <p class="last-updated">最後更新日期：2025年7月4日</p>
 
-        <p>歡迎您使用「觀音禪寺線上靈籤」（以下稱「本網站」）。我們非常重視您的隱私權，因此制訂了本隱私權政策。請您在使用本網站服務前，詳細閱讀以下內容。</p>
+        <h2>一、資訊收集</h2>
+        <p>當您使用我們的線上靈籤服務時，我們可能會收集您主動提供的資訊，例如您為了解析而輸入的特定問題。我們承諾，除了您為取得解析而明確提供的資訊外，本網站不會收集任何可用於識別您個人身份的資訊（如姓名、電子郵件地址或IP位址）。</p>
 
-        <h2>一、我們收集的資訊</h2>
-        <p>當您使用本網站時，我們可能會收集以下類型的資訊：</p>
-        <ul>
-            <li><strong>您主動提供的資訊</strong>：當您使用本網站的服務（例如，為了解析卦象而輸入的特定問題），我們將處理您輸入的文字內容以提供相應的解析服務。</li>
-            <li><strong>自動收集的資訊 (Cookies 與技術)</strong>：為了優化您的使用體驗，我們會使用 Cookies 及類似技術。這包括您的 IP 位址、瀏覽器類型、作業系統、瀏覽紀錄與使用時間。本網站可能使用 Google Analytics 等分析工具來了解流量與使用者行為。</li>
-        </ul>
+        <h2>二、資訊使用</h2>
+        <p>您提供的問題內容僅用於當次的靈籤與卦象解析，這些資訊不會被儲存或用於任何其他目的。我們的目標是提供一個單純、安心的體驗，您的隱私對我們至關重要。</p>
 
-        <h2>二、我們如何使用您的資訊</h2>
-        <p>我們將收集到的資訊用於以下目的：</p>
-        <ul>
-            <li>提供、維護及改善本網站的服務，例如產生靈籤與卦象解析。</li>
-            <li>回覆您的查詢與請求（若有聯絡管道）。</li>
-            <li>進行數據分析與研究，以提升服務品質。</li>
-        </ul>
+        <h2>三、資訊儲存與安全</h2>
+        <p>本服務不會在我們的伺服器上儲存您的任何提問紀錄或解析結果。所有操作均為一次性，當您關閉或離開頁面後，所有相關資訊即會消失，以確保您的隱私安全。</p>
 
-        <h2>三、資訊分享與揭露</h2>
-        <p>除非有以下情況，否則我們不會將您的個人資訊與第三方分享：</p>
-        <ul>
-            <li>已取得您的明確同意。</li>
-            <li>基於法律規定或政府機關的要求。</li>
-            <li>為了提供您所請求的服務，而有必要與我們的技術合作夥伴（如提供 AI 解析的服務商）匿名化地分享資訊。</li>
-        </ul>
+        <h2>四、第三方服務</h2>
+        <p>本網站可能使用第三方服務（例如網站分析工具）來了解使用者與網站的互動情況，以改善服務品質。這些第三方服務可能會收集匿名的使用數據，但不會包含您的個人隱私資訊。</p>
 
-        <h2>四、使用者權利</h2>
-        <p>根據個人資料保護法，您對您的個人資料擁有以下權利：</p>
-        <ul>
-            <li>查詢或請求閱覽。</li>
-            <li>請求製給複製本。</li>
-            <li>請求補充或更正。</li>
-            <li>請求停止收集、處理或利用。</li>
-            <li>請求刪除。</li>
-        </ul>
-        <p>若您希望行使上述權利，請透過電子郵件與我們聯繫：<a href="mailto:[請填寫您的聯絡Email]">[請務必填寫您的聯絡Email]</a>。</p>
-
-        <h2>五、隱私權政策修訂</h2>
-        <p>我們可能會不時修訂本隱私權政策。當我們做出重大變更時，將會在本網站上公佈通知。建議您定期查看本頁面以了解最新的隱私權政策。</p>
+        <h2>五、政策變更</h2>
+        <p>我們保留隨時修改本隱私權政策的權利。任何修改將會在此頁面上公佈，並更新頁首的「最後更新日期」。我們鼓勵您定期查看本頁面，以了解我們如何保護您的資訊。</p>
         
-        <div class="disclaimer">
-            <p><strong>免責聲明：</strong>這是一份通用範本，可能無法完全涵蓋您網站的所有具體情況。建議您根據自身網站的功能與業務需求進行客製化，並在必要時諮詢法律專業人士。</p>
+        <div class="back-button-container">
+            <a href="index.html" class="back-button">返回主頁</a>
         </div>
     </div>
+
 </body>
 </html>
