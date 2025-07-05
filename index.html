@@ -17,11 +17,12 @@
         #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
         
-        /* [修改] 移除 white-space: pre-wrap; 讓排版更穩定 */
+        /* [修改] 讓籤詩內容置中，並設定合適的行高 */
         #poem-content { 
             font-size: 1.3rem; 
             line-height: 2.2; 
             color: #3d2c1d;
+            text-align: center; /* 讓文字置中 */
         }
 
         #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -209,222 +210,227 @@
             { "id": 58, "title": "第五十八籤 癸未", "poem": "蛇身意欲變成龍，只恐命內運未通。\n久病且作寬心坐，言語雖多不可從。", "interpretation": "中平。有心轉變，時運未到，耐心等待，莫聽閒言。" },
             { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "大吉。行善勿疑，求名當時，諸事可成，財寶自來。" },
             { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，當官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
-        ];
-
-        // --- DOM ELEMENTS ---
-        const poemCard = document.getElementById('poem-card');
-        const poemTitleEl = document.getElementById('poem-title');
-        const poemContentEl = document.getElementById('poem-content');
-        const drawButton = document.getElementById('draw-button');
-        const questionInput = document.getElementById('question-input');
-        const analysisButton = document.getElementById('analysis-button');
-        const resultWrapper = document.getElementById('result-wrapper');
-        const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
-        const aiResultEl = document.getElementById('ai-analysis-result');
-        
-        const num1Input = document.getElementById('num1-input');
-        const num2Input = document.getElementById('num2-input');
-        const num3Input = document.getElementById('num3-input');
-        
-        let currentPoem = {};
-        let isTyping = false; 
-
-        // --- FUNCTIONS ---
-        function displayPoem(id) {
-            const poem = poems.find(p => p.id === id);
-            if (poem) {
-                poemTitleEl.textContent = poem.title;
-                // [修改] 將 \n 換成 <br>，並使用 innerHTML 寫入，以獲得正確的換行效果
-                poemContentEl.innerHTML = poem.poem.replace(/\n/g, '<br>');
-                currentPoem = { title: poem.title, text: poem.poem };
-            }
-        }
-
-        function drawLot() {
-            if (isTyping) return;
-            drawButton.disabled = true; 
-            poemCard.classList.add('drawing');
-            
-            resultWrapper.style.display = 'none';
-            hexagramWrapper.innerHTML = '';
-            aiResultEl.innerHTML = '';
-
-            let shuffleCount = 0; 
-            const shuffleInterval = setInterval(() => {
-                const randomId = Math.floor(Math.random() * 60) + 1; 
-                displayPoem(randomId);
-                shuffleCount++; 
-                if (shuffleCount > 24) {
-                    clearInterval(shuffleInterval); 
-                    const finalId = Math.floor(Math.random() * 60) + 1;
-                    displayPoem(finalId); 
-                    drawButton.disabled = false; 
-                    poemCard.classList.remove('drawing');
-                }
-            }, 100);
-        }
-
-        async function typewriterEffect(element, paragraphs) {
-            isTyping = true;
-            element.innerHTML = '';
-            for (const pText of paragraphs) {
-                const pElement = document.createElement('p');
-                element.appendChild(pElement);
-                const lines = pText.split('\n');
-                for(let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    for (let j = 0; j < line.length; j++) {
-                        pElement.innerHTML += line.charAt(j);
-                        await new Promise(resolve => setTimeout(resolve, 35));
-                    }
-                    if (i < lines.length - 1) {
-                       pElement.innerHTML += '<br>';
-                    }
-                }
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-            isTyping = false;
-        }
-
-        async function getAIAnalysis() {
-            if (isTyping) return;
-
-            const num1 = parseInt(num1Input.value);
-            const num2 = parseInt(num2Input.value);
-            const num3 = parseInt(num3Input.value);
-
-            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
-                showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
-                return;
-            }
-            
-            const question = questionInput.value.trim();
-            if (!question) { 
-                showCustomAlert("請先輸入您想問的問題。"); 
-                return; 
-            }
-            
-            if (!currentPoem.title || currentPoem.title === '籤頭') { 
-                showCustomAlert("請先誠心抽一籤。"); 
-                return; 
-            }
-
-            resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = '';
-            aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
-            analysisButton.disabled = true;
-
-            const payload = { 
-                question: question, 
-                poemTitle: currentPoem.title, 
-                poemText: currentPoem.text, 
-                numbers: {
-                    num1: num1,
-                    num2: num2,
-                    num3: num3 
-                }
-            };
-            
-            try {
-                // 請將 '/api/analyze' 替換成您部署後端的實際 URL
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) { 
-                    const errorText = await response.text();
-                    let errorJson = {};
-                    try {
-                        errorJson = JSON.parse(errorText);
-                    } catch (e) {
-                        console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
-                    }
-                    const errorMessage = errorJson.error || errorText || '未知錯誤';
-                    throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
-                }
-
-                const data = await response.json();
-                
-                const hex = data.hexagram;
-                if(hex && hex.main && hex.changed) {
-                    hexagramWrapper.innerHTML = `
-                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
-                        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">本卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
-                            </div>
-                            <div style="text-align: center; padding: 0 0.5rem;">
-                                <div style="font-size: 2rem; color: #b08968;">→</div>
-                                <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">之卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
-                await typewriterEffect(aiResultEl, paragraphs);
-
-            } catch (error) {
-                console.error("AI解析時發生錯誤:", error);
-                aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請確認網路連線或稍後再試。(${error.message})</p>`;
-            } finally {
-                analysisButton.disabled = false;
-            }
-        }
-        
-        function showCustomAlert(message) {
-            console.warn("提示使用者:", message);
-            resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = ''; 
-            aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
-        }
-
-        function displayVisitorBadges() {
-            const container = document.getElementById('visitor-badge-container');
-            if (!container) return;
-
-            // 1. 總計數器 (識別碼固定)
-            const totalBadge = document.createElement('img');
-            const totalPath = 'guanyin-temple-online.page';
-            totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%238a6c4c`;
-            totalBadge.alt = '累計結緣人數';
-            
-            // 2. 今日計數器 (識別碼每天變化)
-            const dailyBadge = document.createElement('img');
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
-            const day = String(today.getDate()).padStart(2, '0'); // 日期補零
-            const dailyPath = `guanyin-temple-daily-${year}-${month}-${day}`;
-            
-            // 為了區分，今日計數器使用稍微不同的顏色
-            dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a58362`;
-            dailyBadge.alt = '今日結緣人數';
-
-            // 3. 將兩個徽章加入到容器中
-            container.appendChild(totalBadge);
-            container.appendChild(dailyBadge);
-        }
-
-        // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            displayPoem(0); 
-            drawButton.addEventListener('click', drawLot);
-            analysisButton.addEventListener('click', getAIAnalysis);
-
-            displayVisitorBadges();
-        });
-    </script>
-</body>
-</html>
+         ];
+ 
+         // --- DOM ELEMENTS ---
+         const poemCard = document.getElementById('poem-card');
+         const poemTitleEl = document.getElementById('poem-title');
+         const poemContentEl = document.getElementById('poem-content');
+         const drawButton = document.getElementById('draw-button');
+         const questionInput = document.getElementById('question-input');
+         const analysisButton = document.getElementById('analysis-button');
+         const resultWrapper = document.getElementById('result-wrapper');
+         const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
+         const aiResultEl = document.getElementById('ai-analysis-result');
+         
+         const num1Input = document.getElementById('num1-input');
+         const num2Input = document.getElementById('num2-input');
+         const num3Input = document.getElementById('num3-input');
+         
+         let currentPoem = {};
+         let isTyping = false; 
+ 
+         // --- FUNCTIONS ---
+         function displayPoem(id) {
+             const poem = poems.find(p => p.id === id);
+             if (poem) {
+                 poemTitleEl.textContent = poem.title;
+                 
+                 // 將逗號和換行符都轉換為 <br>
+                 const formattedPoem = poem.poem
+                     .replace(/，/g, '，<br>') 
+                     .replace(/\n/g, '<br>');
+                 
+                 poemContentEl.innerHTML = formattedPoem;
+                 currentPoem = { title: poem.title, text: poem.poem };
+             }
+         }
+ 
+         function drawLot() {
+             if (isTyping) return;
+             drawButton.disabled = true; 
+             poemCard.classList.add('drawing');
+             
+             resultWrapper.style.display = 'none';
+             hexagramWrapper.innerHTML = '';
+             aiResultEl.innerHTML = '';
+ 
+             let shuffleCount = 0; 
+             const shuffleInterval = setInterval(() => {
+                 const randomId = Math.floor(Math.random() * 60) + 1; 
+                 displayPoem(randomId);
+                 shuffleCount++; 
+                 if (shuffleCount > 24) {
+                     clearInterval(shuffleInterval); 
+                     const finalId = Math.floor(Math.random() * 60) + 1;
+                     displayPoem(finalId); 
+                     drawButton.disabled = false; 
+                     poemCard.classList.remove('drawing');
+                 }
+             }, 100);
+         }
+ 
+         async function typewriterEffect(element, paragraphs) {
+             isTyping = true;
+             element.innerHTML = '';
+             for (const pText of paragraphs) {
+                 const pElement = document.createElement('p');
+                 element.appendChild(pElement);
+                 const lines = pText.split('\n');
+                 for(let i = 0; i < lines.length; i++) {
+                     const line = lines[i];
+                     for (let j = 0; j < line.length; j++) {
+                         pElement.innerHTML += line.charAt(j);
+                         await new Promise(resolve => setTimeout(resolve, 35));
+                     }
+                     if (i < lines.length - 1) {
+                        pElement.innerHTML += '<br>';
+                     }
+                 }
+                 await new Promise(resolve => setTimeout(resolve, 300));
+             }
+             isTyping = false;
+         }
+ 
+         async function getAIAnalysis() {
+             if (isTyping) return;
+ 
+             const num1 = parseInt(num1Input.value);
+             const num2 = parseInt(num2Input.value);
+             const num3 = parseInt(num3Input.value);
+ 
+             if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
+                 showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
+                 return;
+             }
+             
+             const question = questionInput.value.trim();
+             if (!question) { 
+                 showCustomAlert("請先輸入您想問的問題。"); 
+                 return; 
+             }
+             
+             if (!currentPoem.title || currentPoem.title === '籤頭') { 
+                 showCustomAlert("請先誠心抽一籤。"); 
+                 return; 
+             }
+ 
+             resultWrapper.style.display = 'block';
+             hexagramWrapper.innerHTML = '';
+             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
+             analysisButton.disabled = true;
+ 
+             const payload = { 
+                 question: question, 
+                 poemTitle: currentPoem.title, 
+                 poemText: currentPoem.text, 
+                 numbers: {
+                     num1: num1,
+                     num2: num2,
+                     num3: num3 
+                 }
+             };
+             
+             try {
+                 // 請將 '/api/analyze' 替換成您部署後端的實際 URL
+                 const response = await fetch('/api/analyze', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(payload),
+                 });
+ 
+                 if (!response.ok) { 
+                     const errorText = await response.text();
+                     let errorJson = {};
+                     try {
+                         errorJson = JSON.parse(errorText);
+                     } catch (e) {
+                         console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
+                     }
+                     const errorMessage = errorJson.error || errorText || '未知錯誤';
+                     throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
+                 }
+ 
+                 const data = await response.json();
+                 
+                 const hex = data.hexagram;
+                 if(hex && hex.main && hex.changed) {
+                     hexagramWrapper.innerHTML = `
+                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
+                         <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+                             <div style="text-align: center;">
+                                 <div style="font-size: 1rem; color: #6c584c;">本卦</div>
+                                 <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
+                                 <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
+                                 <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
+                             </div>
+                             <div style="text-align: center; padding: 0 0.5rem;">
+                                 <div style="font-size: 2rem; color: #b08968;">→</div>
+                                 <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
+                             </div>
+                             <div style="text-align: center;">
+                                 <div style="font-size: 1rem; color: #6c584c;">之卦</div>
+                                 <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
+                                 <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
+                                 <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
+                             </div>
+                         </div>
+                     `;
+                 }
+ 
+                 const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
+                 await typewriterEffect(aiResultEl, paragraphs);
+ 
+             } catch (error) {
+                 console.error("AI解析時發生錯誤:", error);
+                 aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請確認網路連線或稍後再試。(${error.message})</p>`;
+             } finally {
+                 analysisButton.disabled = false;
+             }
+         }
+         
+         function showCustomAlert(message) {
+             console.warn("提示使用者:", message);
+             resultWrapper.style.display = 'block';
+             hexagramWrapper.innerHTML = ''; 
+             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
+         }
+ 
+         function displayVisitorBadges() {
+             const container = document.getElementById('visitor-badge-container');
+             if (!container) return;
+ 
+             // 1. 總計數器 (識別碼固定)
+             const totalBadge = document.createElement('img');
+             const totalPath = 'guanyin-temple-online.page';
+             totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%238a6c4c`;
+             totalBadge.alt = '累計結緣人數';
+             
+             // 2. 今日計數器 (識別碼每天變化)
+             const dailyBadge = document.createElement('img');
+             const today = new Date();
+             const year = today.getFullYear();
+             const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
+             const day = String(today.getDate()).padStart(2, '0'); // 日期補零
+             const dailyPath = `guanyin-temple-daily-${year}-${month}-${day}`;
+             
+             // 為了區分，今日計數器使用稍微不同的顏色
+             dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%239c897a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a58362`;
+             dailyBadge.alt = '今日結緣人數';
+ 
+             // 3. 將兩個徽章加入到容器中
+             container.appendChild(totalBadge);
+             container.appendChild(dailyBadge);
+         }
+ 
+         // --- EVENT LISTENERS ---
+         document.addEventListener('DOMContentLoaded', () => {
+             displayPoem(0); 
+             drawButton.addEventListener('click', drawLot);
+             analysisButton.addEventListener('click', getAIAnalysis);
+ 
+             displayVisitorBadges();
+         });
+     </script>
+ </body>
+ </html>
