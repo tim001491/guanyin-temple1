@@ -125,54 +125,6 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
-
-        /* [新增] 吉祥物相關樣式 */
-        @keyframes float-animation {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-            100% { transform: translateY(0); }
-        }
-        #mascot-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-        #mascot-container img {
-            width: 100px;
-            height: auto;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-            animation: float-animation 5s ease-in-out infinite;
-            cursor: pointer;
-        }
-        #mascot-container:hover {
-            transform: scale(1.1);
-        }
-        #mascot-bubble {
-            position: absolute;
-            bottom: 110px; /* 顯示在吉祥物上方 */
-            right: 0;
-            width: 200px;
-            background-color: #fff;
-            padding: 12px 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #3d2c1d;
-            text-align: left;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, transform 0.3s;
-            transform: translateY(10px);
-        }
-        #mascot-bubble.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
     </style>
 </head>
 <body>
@@ -230,12 +182,6 @@
 
         </footer>
     </div>
-    
-    <div id="mascot-container">
-        <div id="mascot-bubble"></div>
-        <img src="https://cloud.gemini.com/static/images/mascot.svg" alt="吉祥物小龍" title="哈囉！心誠則靈喔！">
-    </div>
-
 
     <script>
         const poems = [
@@ -352,8 +298,6 @@
             hexagramWrapper.innerHTML = '';
             aiResultEl.innerHTML = '';
 
-            mascotSpeak("正在為您搖動籤筒，請稍候..."); // 吉祥物互動
-
             let shuffleCount = 0; 
             const shuffleInterval = setInterval(() => {
                 const randomId = Math.floor(Math.random() * 60) + 1; 
@@ -408,7 +352,6 @@
             hexagramWrapper.innerHTML = '';
             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
             analysisButton.disabled = true;
-            mascotSpeak("菩薩正在為您開示，請靜心等候。"); // 吉祥物互動
 
             const num1 = parseInt(num1Input.value);
             const num2 = parseInt(num2Input.value);
@@ -451,6 +394,7 @@
                 const data = await response.json();
                 
                 const hex = data.hexagram;
+                // [修改] 重新加入卦象顯示的邏輯
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
@@ -491,7 +435,6 @@
             resultWrapper.style.display = 'block';
             hexagramWrapper.innerHTML = ''; 
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
-            mascotSpeak(message); // 吉祥物同步顯示錯誤訊息
         }
 
         function displayVisitorBadges() {
@@ -544,20 +487,6 @@
                 dateDisplayEl.textContent = "無法載入農曆日期";
             }
         }
-        
-        // [新增] 吉祥物互動函式
-        let bubbleTimeout;
-        function mascotSpeak(text) {
-            const bubble = document.getElementById('mascot-bubble');
-            if(bubbleTimeout) clearTimeout(bubbleTimeout);
-
-            bubble.textContent = text;
-            bubble.classList.add('show');
-
-            bubbleTimeout = setTimeout(() => {
-                bubble.classList.remove('show');
-            }, 5000); // 氣泡顯示 5 秒
-        }
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -566,9 +495,6 @@
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
             displayVisitorBadges();
-            
-            // 初始對話
-            mascotSpeak("請誠心向觀音菩薩稟告您的問題。");
         });
     </script>
 </body>
