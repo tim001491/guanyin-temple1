@@ -64,7 +64,7 @@
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #analysis-section { margin-top: 2.5rem; width: 100%; }
         
-        #number-input-section { margin-top: 1.5rem; margin-bottom: 1.5rem; } /* [修改] 調整上方間距 */
+        #number-input-section { margin-top: 1.5rem; margin-bottom: 1.5rem; }
         #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
         #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
         .number-input { 
@@ -147,7 +147,7 @@
             <button id="draw-button">誠心抽一籤</button>
             
             <div id="analysis-section">
-
+                
                 <div id="number-input-section">
                     <p>請隨心輸入三組數字以生成卦象。</p>
                     <div id="number-input-container">
@@ -394,12 +394,28 @@
                 const data = await response.json();
                 
                 const hex = data.hexagram;
+                // [修改] 重新加入卦象顯示的邏輯
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
-                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
-                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
-                        <p style="text-align: center; margin-top: 0.75rem; font-size: 1.2rem;">${hex.main.name} <span style="color: #c0392b; font-weight: 600;">(動爻：${hex.movingLine})</span> → ${hex.changed.name}</p>
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1rem; color: #6c584c;">本卦</div>
+                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
+                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
+                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
+                            </div>
+                            <div style="text-align: center; padding: 0 0.5rem;">
+                                <div style="font-size: 2rem; color: #b08968;">→</div>
+                                <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1rem; color: #6c584c;">之卦</div>
+                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
+                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
+                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
+                            </div>
+                        </div>
                     `;
                 }
 
