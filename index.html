@@ -5,15 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>觀音禪寺線上靈籤</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/solarlunar/solarlunar.min.js"></script>
+    
     <style>
-        /* [修改] 恢復為原始的深色系，僅讓計數器保持淡色 */
+        /* 恢復為原始的深色系，僅讓計數器保持淡色 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .container { width: 100%; max-width: 500px; text-align: center; }
         #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
         header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        header p { font-size: 1rem; color: #6c584c; margin-bottom: 2rem; }
+        header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; } /* 調整下方間距 */
+        
+        /* [新增] 日期與干支的樣式 */
+        #date-display {
+            margin-bottom: 2rem;
+            color: #6c584c;
+        }
+        #gregorian-date {
+            font-size: 0.95rem;
+        }
+        #ganzhi-pillars {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            border-top: 1px solid #ddd8cf;
+            border-bottom: 1px solid #ddd8cf;
+            padding: 1rem 0;
+            user-select: none;
+        }
+        .pillar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pillar-ganzhi {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #5c4d3d;
+            line-height: 1.1;
+        }
+        .pillar-label {
+            font-size: 1rem;
+            color: #8c786c;
+            margin-top: 0.25rem;
+        }
+
         #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
         #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
@@ -100,6 +137,13 @@
             <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
             <h1>觀音禪寺線上靈籤</h1>
             <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
+
+            <div id="date-display">
+                <p id="gregorian-date"></p>
+                <div id="ganzhi-pillars">
+                    </div>
+            </div>
+
         </header>
         
         <main>
@@ -405,13 +449,13 @@
             const container = document.getElementById('visitor-badge-container');
             if (!container) return;
 
-            // 1. 總計數器 (識別碼固定) - [修改] 使用新的淡色
+            // 1. 總計數器 (識別碼固定)
             const totalBadge = document.createElement('img');
             const totalPath = 'guanyin-temple-online.page';
             totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a08a74`;
             totalBadge.alt = '累計結緣人數';
             
-            // 2. 今日計數器 (識別碼每天變化) - [修改] 使用新的淡色
+            // 2. 今日計數器 (識別碼每天變化)
             const dailyBadge = document.createElement('img');
             const today = new Date();
             const year = today.getFullYear();
@@ -427,6 +471,55 @@
             container.appendChild(dailyBadge);
         }
 
+        // [新增] 顯示日期與干支時辰的函式
+        function updateDateDisplay() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+
+            // 使用 solarLunar 函式庫進行轉換
+            const lunarData = solarLunar.solar2lunar(year, month, day);
+            
+            // 組合公曆與農曆字串
+            const gregorianDateEl = document.getElementById('gregorian-date');
+            gregorianDateEl.textContent = `今天是：${year}年 ${month}月 ${day}日 (農曆 ${lunarData.GanZhiYear}(${lunarData.zodiac})年 ${lunarData.lunarMonthName} ${lunarData.lunarDayName})`;
+
+            // 處理天干地支
+            const pillarsContainer = document.getElementById('ganzhi-pillars');
+            pillarsContainer.innerHTML = ''; // 清空容器
+
+            const dayGan = lunarData.GanZhiDay.charAt(0); // 取得日干
+            const hourGanzhi = solarLunar.hour2GanZhi(hour, dayGan);
+
+            const pillars = {
+                '年': lunarData.GanZhiYear,
+                '月': lunarData.GanZhiMonth,
+                '日': lunarData.GanZhiDay,
+                '時': hourGanzhi
+            };
+
+            for (const label in pillars) {
+                const ganzhi = pillars[label];
+                const pillarDiv = document.createElement('div');
+                pillarDiv.className = 'pillar';
+
+                const ganzhiP = document.createElement('p');
+                ganzhiP.className = 'pillar-ganzhi';
+                // 將干支拆成兩行顯示
+                ganzhiP.innerHTML = `${ganzhi.charAt(0)}<br>${ganzhi.charAt(1)}`;
+
+                const labelP = document.createElement('p');
+                labelP.className = 'pillar-label';
+                labelP.textContent = label;
+
+                pillarDiv.appendChild(ganzhiP);
+                pillarDiv.appendChild(labelP);
+                pillarsContainer.appendChild(pillarDiv);
+            }
+        }
+
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
@@ -434,6 +527,7 @@
             analysisButton.addEventListener('click', getAIAnalysis);
 
             displayVisitorBadges();
+            updateDateDisplay(); // 呼叫函式來顯示日期
         });
     </script>
 </body>
