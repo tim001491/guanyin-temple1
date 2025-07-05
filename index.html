@@ -17,7 +17,6 @@
         header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; }
         
-        /* 日期與干支的樣式 */
         #date-display { 
             font-size: 0.95rem; 
             color: #8a6c4c; 
@@ -39,7 +38,7 @@
             width: 25%;
         }
         .bazi-char { 
-            font-size: 1.8rem; /* [修改] 將字體從 2.2rem 縮小為 1.8rem */
+            font-size: 1.8rem;
             font-weight: 600; 
             line-height: 1.1; 
             color: #3d2c1d; 
@@ -66,6 +65,45 @@
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #analysis-section { margin-top: 2.5rem; width: 100%; }
         
+        /* [新增] 起卦方式選擇器的樣式 */
+        #method-selector {
+            color: #6c584c;
+            margin-bottom: 1.5rem;
+        }
+        #method-selector label {
+            margin: 0 1rem 0 0.2rem;
+            cursor: pointer;
+        }
+        #method-selector input[type="radio"] {
+            cursor: pointer;
+        }
+        
+        #number-input-section { margin-bottom: 1.5rem; }
+        #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
+        #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
+        .number-input { 
+            font-family: 'Noto Serif TC', serif; 
+            font-size: 1rem; 
+            width: 32%; 
+            padding: 0.75rem; 
+            border: 1px solid #ddd8cf; 
+            border-radius: 8px; 
+            background-color: #fff; 
+            color: #3d2c1d; 
+            text-align: center; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            appearance: none;
+            -moz-appearance: textfield;
+        }
+        .number-input:focus {
+             outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2);
+        }
+        .number-input::-webkit-outer-spin-button,
+        .number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
         #question-input::placeholder { color: #b08968; opacity: 0.8; }
         #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
@@ -123,6 +161,27 @@
             <button id="draw-button">誠心抽一籤</button>
             
             <div id="analysis-section">
+
+                <div id="method-selector">
+                    <p style="margin-bottom: 0.5rem;">請選擇起卦方式：</p>
+                    <div>
+                        <input type="radio" id="time-method" name="divination-method" value="time" checked>
+                        <label for="time-method">依當前時間</label>
+                        
+                        <input type="radio" id="number-method" name="divination-method" value="number">
+                        <label for="number-method">依心選數字</label>
+                    </div>
+                </div>
+
+                <div id="number-input-section">
+                    <p>若選擇數字起卦，請隨心輸入三組數字。</p>
+                    <div id="number-input-container">
+                        <input type="number" id="num1-input" class="number-input" placeholder="第一組數字">
+                        <input type="number" id="num2-input" class="number-input" placeholder="第二組數字">
+                        <input type="number" id="num3-input" class="number-input" placeholder="第三組數字">
+                    </div>
+                </div>
+                
                 <textarea id="question-input" placeholder="請在此輸入您想問的具體問題..."></textarea>
                 <button id="analysis-button">開始綜合解析</button>
                 
@@ -227,6 +286,9 @@
         const aiResultEl = document.getElementById('ai-analysis-result');
         const dateDisplayEl = document.getElementById('date-display');
         const baziDisplayEl = document.getElementById('bazi-display');
+        const num1Input = document.getElementById('num1-input');
+        const num2Input = document.getElementById('num2-input');
+        const num3Input = document.getElementById('num3-input');
         
         let currentPoem = {};
         let currentBazi = {};
@@ -320,9 +382,26 @@
             const payload = { 
                 question: question, 
                 poemTitle: currentPoem.title, 
-                poemText: currentPoem.text, 
-                bazi: currentBazi
+                poemText: currentPoem.text
             };
+
+            // [修改] 根據選擇的起卦方式，加入對應的數據
+            const selectedMethod = document.querySelector('input[name="divination-method"]:checked').value;
+            if (selectedMethod === 'time') {
+                payload.bazi = currentBazi;
+            } else {
+                const num1 = parseInt(num1Input.value);
+                const num2 = parseInt(num2Input.value);
+                const num3 = parseInt(num3Input.value);
+
+                if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
+                    showCustomAlert("請務必在三個數字欄位中都輸入有效的數字。");
+                    analysisButton.disabled = false; // 解除按鈕鎖定
+                    resultWrapper.style.display = 'none'; // 隱藏結果區
+                    return;
+                }
+                payload.numbers = { num1, num2, num3 };
+            }
             
             try {
                 // 請將 '/api/analyze' 替換成您部署後端的實際 URL
@@ -349,7 +428,7 @@
                 const hex = data.hexagram;
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
-                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">時間卦象</h3>
+                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">${selectedMethod === 'time' ? '時間' : '數字'}卦象</h3>
                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
                         <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
                         <p style="text-align: center; margin-top: 0.75rem; font-size: 1.2rem;">${hex.main.name} <span style="color: #c0392b; font-weight: 600;">(動爻：${hex.movingLine})</span> → ${hex.changed.name}</p>
@@ -412,10 +491,10 @@
                 const hourPillar = lunar.getTimeInGanZhi();
 
                 currentBazi = {
-                    year: yearPillar,
+                    year: lunar.getYear(),
                     month: lunar.getMonth(),
                     day: lunar.getDay(),
-                    hour: lunar.getTimeZhi()
+                    hour: today.getHours()
                 };
 
                 const pillars = { '年': yearPillar, '月': monthPillar, '日': dayPillar, '時': hourPillar };
