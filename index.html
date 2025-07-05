@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>觀音禪寺線上靈籤</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/solarlunar/solarlunar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
     
     <style>
         /* 恢復為原始的深色系，僅讓計數器保持淡色 */
@@ -15,40 +15,39 @@
         .container { width: 100%; max-width: 500px; text-align: center; }
         #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
         header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; } /* 調整下方間距 */
+        header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; }
         
         /* [新增] 日期與干支的樣式 */
-        #date-display {
-            margin-bottom: 2rem;
-            color: #6c584c;
+        #date-display { 
+            font-size: 0.95rem; 
+            color: #8a6c4c; 
+            margin-bottom: 1.5rem; 
         }
-        #gregorian-date {
-            font-size: 0.95rem;
-        }
-        #ganzhi-pillars {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 1rem;
-            border-top: 1px solid #ddd8cf;
-            border-bottom: 1px solid #ddd8cf;
-            padding: 1rem 0;
+        #bazi-display { 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 1rem 0; 
+            border-top: 1px solid #ddd8cf; 
+            border-bottom: 1px solid #ddd8cf; 
+            margin-bottom: 2rem; 
             user-select: none;
         }
-        .pillar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .bazi-column { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 25%;
         }
-        .pillar-ganzhi {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #5c4d3d;
-            line-height: 1.1;
+        .bazi-char { 
+            font-size: 2.2rem; 
+            font-weight: 600; 
+            line-height: 1.1; 
+            color: #3d2c1d; 
         }
-        .pillar-label {
-            font-size: 1rem;
-            color: #8c786c;
-            margin-top: 0.25rem;
+        .bazi-label { 
+            font-size: 1rem; 
+            color: #9c897a; 
+            margin-top: 0.4rem; 
         }
 
         #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
@@ -67,32 +66,6 @@
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #analysis-section { margin-top: 2.5rem; width: 100%; }
         
-        #number-input-section { margin-bottom: 1.5rem; }
-        #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
-        #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
-        .number-input { 
-            font-family: 'Noto Serif TC', serif; 
-            font-size: 1rem; 
-            width: 32%; 
-            padding: 0.75rem; 
-            border: 1px solid #ddd8cf; 
-            border-radius: 8px; 
-            background-color: #fff; 
-            color: #3d2c1d; 
-            text-align: center; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-            appearance: none;
-            -moz-appearance: textfield;
-        }
-        .number-input:focus {
-             outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2);
-        }
-        .number-input::-webkit-outer-spin-button,
-        .number-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
         #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
         #question-input::placeholder { color: #b08968; opacity: 0.8; }
         #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
@@ -138,12 +111,8 @@
             <h1>觀音禪寺線上靈籤</h1>
             <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
 
-            <div id="date-display">
-                <p id="gregorian-date"></p>
-                <div id="ganzhi-pillars">
-                    </div>
-            </div>
-
+            <div id="date-display"></div>
+            <div id="bazi-display"></div>
         </header>
         
         <main>
@@ -154,16 +123,6 @@
             <button id="draw-button">誠心抽一籤</button>
             
             <div id="analysis-section">
-                
-                <div id="number-input-section">
-                    <p>請隨心輸入三組數字以生成卦象。</p>
-                    <div id="number-input-container">
-                        <input type="number" id="num1-input" class="number-input" placeholder="第一組數字">
-                        <input type="number" id="num2-input" class="number-input" placeholder="第二組數字">
-                        <input type="number" id="num3-input" class="number-input" placeholder="第三組數字">
-                    </div>
-                </div>
-
                 <textarea id="question-input" placeholder="請在此輸入您想問的具體問題..."></textarea>
                 <button id="analysis-button">開始綜合解析</button>
                 
@@ -229,7 +188,7 @@
             { "id": 33, "title": "第三十三籤 己巳", "poem": "木有根荄水有源，君當自此究其原。\n莫隨道路人閒話，訟則終凶是至言。", "interpretation": "中平。追本溯源，探究根本，勿聽閒言，訴訟則凶。" },
             { "id": 34, "title": "第三十四籤 己未", "poem": "危險高山行過盡，莫嫌此路有重重。\n若見蘭桂漸漸發，長蛇反轉變成龍。", "interpretation": "上吉。歷盡艱險，漸入佳境，終能化龍，大有作為。" },
             { "id": 35, "title": "第三十五籤 己酉", "poem": "此事何須用心機，前途變怪自然知。\n看看此去得和合，漸漸脫出見太平。", "interpretation": "中吉。順其自然，不必強求，自有轉機，終見太平。" },
-            { "id": 36, "title": "第六籤 己亥", "poem": "福如東海壽如山，君爾何須嘆苦難。\n命內自然逢大吉，祈保分明自平安。", "interpretation": "上上。福壽雙全，命中大吉，無須憂慮，自有平安。" },
+            { "id": 36, "title": "第三十六籤 己亥", "poem": "福如東海壽如山，君爾何須嘆苦難。\n命內自然逢大吉，祈保分明自平安。", "interpretation": "上上。福壽雙全，命中大吉，無須憂慮，自有平安。" },
             { "id": 37, "title": "第三十七籤 庚子", "poem": "運逢得意身顯變，君爾身中皆有益。\n一向前途無難事，決意之中保清吉。", "interpretation": "大吉。時來運轉，身價倍增，前途無量，諸事順利。" },
             { "id": 38, "title": "第三十八籤 庚寅", "poem": "名顯有意在中央，不須祈禱心自安。\n看看早晚日過後，即時得意在其間。", "interpretation": "中吉。名聲在外，心安理得，時機一到，立刻得意。" },
             { "id": 39, "title": "第三十九籤 庚辰", "poem": "意中若問神仙路，勸爾且退望高樓。\n寬心且守寬心坐，必然遇得貴人扶。", "interpretation": "中平。目標過高，宜退一步，寬心等待，必有貴人。" },
@@ -266,12 +225,11 @@
         const resultWrapper = document.getElementById('result-wrapper');
         const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
         const aiResultEl = document.getElementById('ai-analysis-result');
-        
-        const num1Input = document.getElementById('num1-input');
-        const num2Input = document.getElementById('num2-input');
-        const num3Input = document.getElementById('num3-input');
+        const dateDisplayEl = document.getElementById('date-display'); // [新增]
+        const baziDisplayEl = document.getElementById('bazi-display'); // [新增]
         
         let currentPoem = {};
+        let currentBazi = {}; // [新增]
         let isTyping = false; 
 
         // --- FUNCTIONS ---
@@ -343,22 +301,12 @@
 
         async function getAIAnalysis() {
             if (isTyping) return;
-
-            const num1 = parseInt(num1Input.value);
-            const num2 = parseInt(num2Input.value);
-            const num3 = parseInt(num3Input.value);
-
-            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
-                showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
-                return;
-            }
             
             const question = questionInput.value.trim();
             if (!question) { 
                 showCustomAlert("請先輸入您想問的問題。"); 
                 return; 
             }
-            
             if (!currentPoem.title || currentPoem.title === '籤頭') { 
                 showCustomAlert("請先誠心抽一籤。"); 
                 return; 
@@ -369,15 +317,12 @@
             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
             analysisButton.disabled = true;
 
+            // [修改] 使用 Bazi 數據進行解析
             const payload = { 
                 question: question, 
                 poemTitle: currentPoem.title, 
                 poemText: currentPoem.text, 
-                numbers: {
-                    num1: num1,
-                    num2: num2,
-                    num3: num3 
-                }
+                bazi: currentBazi
             };
             
             try {
@@ -405,25 +350,10 @@
                 const hex = data.hexagram;
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
-                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
-                        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">本卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
-                            </div>
-                            <div style="text-align: center; padding: 0 0.5rem;">
-                                <div style="font-size: 2rem; color: #b08968;">→</div>
-                                <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">之卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
-                            </div>
-                        </div>
+                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">時間卦象</h3>
+                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
+                        <div style="font-size: 2.5rem; text-align: center; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
+                        <p style="text-align: center; margin-top: 0.75rem; font-size: 1.2rem;">${hex.main.name} <span style="color: #c0392b; font-weight: 600;">(動爻：${hex.movingLine})</span> → ${hex.changed.name}</p>
                     `;
                 }
 
@@ -449,13 +379,11 @@
             const container = document.getElementById('visitor-badge-container');
             if (!container) return;
 
-            // 1. 總計數器 (識別碼固定)
             const totalBadge = document.createElement('img');
             const totalPath = 'guanyin-temple-online.page';
             totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a08a74`;
             totalBadge.alt = '累計結緣人數';
             
-            // 2. 今日計數器 (識別碼每天變化)
             const dailyBadge = document.createElement('img');
             const today = new Date();
             const year = today.getFullYear();
@@ -466,68 +394,53 @@
             dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23b59d84`;
             dailyBadge.alt = '今日結緣人數';
 
-            // 3. 將兩個徽章加入到容器中
             container.appendChild(totalBadge);
             container.appendChild(dailyBadge);
         }
 
         // [新增] 顯示日期與干支時辰的函式
-        function updateDateDisplay() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
-            const hour = now.getHours();
+        function initializeDateTime() {
+            try {
+                const today = new Date();
+                const lunar = Lunar.fromDate(today);
 
-            // 使用 solarLunar 函式庫進行轉換
-            const lunarData = solarLunar.solar2lunar(year, month, day);
-            
-            // 組合公曆與農曆字串
-            const gregorianDateEl = document.getElementById('gregorian-date');
-            gregorianDateEl.textContent = `今天是：${year}年 ${month}月 ${day}日 (農曆 ${lunarData.GanZhiYear}(${lunarData.zodiac})年 ${lunarData.lunarMonthName} ${lunarData.lunarDayName})`;
+                const gregorianStr = `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`;
+                const lunarStr = `農曆 ${lunar.getYearInGanZhi()}(${lunar.getYearShengXiao()})年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`;
+                dateDisplayEl.textContent = `今天是：${gregorianStr}（${lunarStr}）`;
 
-            // 處理天干地支
-            const pillarsContainer = document.getElementById('ganzhi-pillars');
-            pillarsContainer.innerHTML = ''; // 清空容器
+                const yearPillar = lunar.getYearInGanZhi();
+                const monthPillar = lunar.getMonthInGanZhi();
+                const dayPillar = lunar.getDayInGanZhi();
+                const hourPillar = lunar.getTimeInGanZhi();
 
-            const dayGan = lunarData.GanZhiDay.charAt(0); // 取得日干
-            const hourGanzhi = solarLunar.hour2GanZhi(hour, dayGan);
+                currentBazi = {
+                    year: yearPillar,
+                    month: lunar.getMonth(),
+                    day: lunar.getDay(),
+                    hour: lunar.getTimeZhi()
+                };
 
-            const pillars = {
-                '年': lunarData.GanZhiYear,
-                '月': lunarData.GanZhiMonth,
-                '日': lunarData.GanZhiDay,
-                '時': hourGanzhi
-            };
+                const pillars = { '年': yearPillar, '月': monthPillar, '日': dayPillar, '時': hourPillar };
+                let baziHTML = '';
+                for(const label in pillars) {
+                    const ganzhi = pillars[label];
+                    baziHTML += `<div class="bazi-column"><div class="bazi-char">${ganzhi.charAt(0)}</div><div class="bazi-char">${ganzhi.charAt(1)}</div><div class="bazi-label">${label}</div></div>`;
+                }
+                baziDisplayEl.innerHTML = baziHTML;
 
-            for (const label in pillars) {
-                const ganzhi = pillars[label];
-                const pillarDiv = document.createElement('div');
-                pillarDiv.className = 'pillar';
-
-                const ganzhiP = document.createElement('p');
-                ganzhiP.className = 'pillar-ganzhi';
-                // 將干支拆成兩行顯示
-                ganzhiP.innerHTML = `${ganzhi.charAt(0)}<br>${ganzhi.charAt(1)}`;
-
-                const labelP = document.createElement('p');
-                labelP.className = 'pillar-label';
-                labelP.textContent = label;
-
-                pillarDiv.appendChild(ganzhiP);
-                pillarDiv.appendChild(labelP);
-                pillarsContainer.appendChild(pillarDiv);
+            } catch (error) {
+                console.error("無法載入農曆日期:", error);
+                dateDisplayEl.textContent = "無法載入農曆日期";
             }
         }
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
+            initializeDateTime();
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
-
             displayVisitorBadges();
-            updateDateDisplay(); // 呼叫函式來顯示日期
         });
     </script>
 </body>
