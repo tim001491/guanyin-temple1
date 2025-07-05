@@ -185,7 +185,7 @@
 
     <script>
         const poems = [
-            // ... 您的61首籤詩資料庫保持不變 ...
+            // ... 您原有的61首籤詩資料庫，此處省略以節省篇幅 ...
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
@@ -246,7 +246,7 @@
             { "id": 57, "title": "第五十七籤 癸巳", "poem": "勸君把定心莫虛，前途清吉得運時。\n到底中間無大事，又遇神仙守安居。", "interpretation": "上吉。堅定心志，時來運轉，無災無難，神仙守護。" },
             { "id": 58, "title": "第五十八籤 癸未", "poem": "蛇身意欲變成龍，只恐命內運未通。\n久病且作寬心坐，言語雖多不可從。", "interpretation": "中平。有心轉變，時運未到，耐心等待，莫聽閒言。" },
             { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "大吉。行善勿疑，求名當時，諸事可成，財寶自來。" },
-            { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，當官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
+            { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，当官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
         ];
 
         // --- DOM ELEMENTS ---
@@ -266,7 +266,9 @@
         const num3Input = document.getElementById('num3-input');
         
         let currentPoem = {};
-        let isTyping = false; 
+        let isTyping = false;
+        // 【修改】新增全域變數，用於儲存當前的四柱八字資訊
+        let currentBaziInfo = {};
 
         // --- FUNCTIONS ---
         function displayPoem(id) {
@@ -364,11 +366,13 @@
                 return;
             }
 
+            // 【修改】將儲存的 currentBaziInfo 加入到 payload 中
             const payload = { 
                 question: question, 
                 poemTitle: currentPoem.title, 
                 poemText: currentPoem.text,
-                numbers: { num1, num2, num3 }
+                numbers: { num1, num2, num3 },
+                bazi: currentBaziInfo // 新增此行，將完整的八字資訊傳遞給後端
             };
             
             try {
@@ -394,7 +398,6 @@
                 const data = await response.json();
                 
                 const hex = data.hexagram;
-                // [修改] 重新加入卦象顯示的邏輯
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
                         <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">數字卦象</h3>
@@ -473,6 +476,15 @@
                 const monthPillar = lunar.getMonthInGanZhi();
                 const dayPillar = lunar.getDayInGanZhi();
                 const hourPillar = lunar.getTimeInGanZhi();
+
+                // 【修改】將計算出的八字資訊儲存到全域變數中
+                currentBaziInfo = {
+                    gregorian: `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`,
+                    yearPillar: yearPillar,
+                    monthPillar: monthPillar,
+                    dayPillar: dayPillar,
+                    hourPillar: hourPillar
+                };
 
                 const pillars = { '年': yearPillar, '月': monthPillar, '日': dayPillar, '時': hourPillar };
                 let baziHTML = '';

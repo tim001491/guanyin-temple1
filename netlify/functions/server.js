@@ -4,7 +4,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const serverless = require('serverless-http');
-const lunar = require('lunar-calendar'); // *** 新增：引入農曆計算套件 ***
+// 【修改】移除不再需要的 lunar-calendar 套件
+// const lunar = require('lunar-calendar'); 
 
 // 載入 .env 檔案中的環境變數
 dotenv.config();
@@ -42,7 +43,7 @@ const linesToTrigramNum = Object.fromEntries(
   Object.entries(trigramLines).map(([num, lines]) => [lines.join(''), num])
 );
 
-// *** 新增：干支五行對應表 ***
+// 干支五行對應表 (保持不變)
 const heavenlyStemsElements = {
     '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
 };
@@ -51,7 +52,7 @@ const earthlyBranchesElements = {
 };
 
 
-// --- 起卦與變卦計算函式 ---
+// --- 起卦與變卦計算函式 (保持不變) ---
 function getHexagramByNumbers(numbers) {
     const { num1, num2, num3 } = numbers;
     
@@ -91,28 +92,10 @@ function getHexagramByNumbers(numbers) {
     };
 }
 
-// *** 新增：取得今日干支與五行的函式 ***
-function getDailyGanzhiInfo() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
-    const day = today.getDate();
-
-    const lunarData = lunar.solarToLunar(year, month, day);
-    const dayGan = lunarData.Gan;
-    const dayZhi = lunarData.Zhi;
-    const ganZhi = `${dayGan}${dayZhi}`;
-
-    return {
-        date: `${year}-${month}-${day}`,
-        ganZhi: ganZhi,
-        stem: { name: dayGan, element: heavenlyStemsElements[dayGan] },
-        branch: { name: dayZhi, element: earthlyBranchesElements[dayZhi] }
-    };
-}
+// 【修改】移除不再需要的 getDailyGanzhiInfo 函式
 
 
-// --- 初始化 Google AI 客戶端 ---
+// --- 初始化 Google AI 客戶端 (保持不變) ---
 let model;
 if (process.env.GOOGLE_API_KEY) {
     try {
@@ -140,25 +123,24 @@ router.post('/analyze', async (req, res) => {
             parsedBody = JSON.parse(req.body.toString());
         }
         
-        const { question, poemTitle, poemText, numbers } = parsedBody;
+        // 【修改】從請求中解構出 bazi 資訊
+        const { question, poemTitle, poemText, numbers, bazi } = parsedBody;
 
-        if (!question || !poemTitle || !poemText || !numbers || numbers.num1 === undefined || numbers.num2 === undefined || numbers.num3 === undefined) {
-            const errorMessage = `請求資料不完整，缺少必要欄位。收到的資料為: ${JSON.stringify(parsedBody)}`;
+        // 【修改】更新驗證邏輯，確保 bazi 存在
+        if (!question || !poemTitle || !poemText || !numbers || !bazi || !bazi.dayPillar) {
+            const errorMessage = `請求資料不完整，缺少必要欄位(question, poem, numbers, bazi)。收到的資料為: ${JSON.stringify(parsedBody)}`;
             console.error(errorMessage);
             return res.status(400).json({ error: errorMessage });
         }
         
         // 取得卦象資訊
         const hexagramsInfo = getHexagramByNumbers(numbers);
-        // *** 新增：取得今日干支五行資訊 ***
-        const dailyInfo = getDailyGanzhiInfo();
+        // 【修改】移除對 getDailyGanzhiInfo 的呼叫
         
-        // 【*** 全新優化，融入日課分析的 AI 提示 (Prompt) ***】
+        // 【修改】使用全新的 AI Prompt，將完整的四柱八字資訊融入其中
         const prompt = `
 # 角色設定
-你是一位精通《易經》、術數（包含日課旺衰分析）、籤詩解讀的頂尖分析師。
-你的語氣應專業、客觀、中立且富有智慧。職責是深入剖析卦象與籤詩中的吉凶變化與義理，
-並結合問卜當下的時空能量（日辰干支），為求問者提供最精準的判斷與趨吉避凶的建議。請以繁體中文回答。
+你是一位精通《易經》、術數（包含四柱八字日課旺衰分析）、籤詩解讀的頂尖分析師。你的語氣應專業、客觀、中立且富有智慧。職責是深入剖析卦象與籤詩中的吉凶變化與義理，並結合問卜當下的時空能量（四柱干支），為求問者提供最精準的判斷與趨吉避凶的建議。請以繁體中文回答。
 
 # 背景資料
 一位信眾心中有所困惑，前來求得以下啟示：
@@ -167,40 +149,39 @@ router.post('/analyze', async (req, res) => {
     * 標題: ${poemTitle}
     * 內容: "${poemText}"
 3.  **依數字推算的易經卦象**:
-    * **本卦**: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}]) - 代表事情目前的狀況與本質。
-    * **動爻**: 第 ${hexagramsInfo.movingLine} 爻 - 是整個卦象中變化的關鍵，是變動的核心所在。
-    * **之卦 (變卦)**: ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}]) - 代表事情未來的發展趨勢與最終可能的結果。
-4.  **占卜日課 (時間背景)**:
-    * **占卜日期**: ${dailyInfo.date}
-    * **本日干支**: ${dailyInfo.ganZhi}
-    * **本日五行**: 天干屬「${dailyInfo.stem.element}」，地支屬「${dailyInfo.branch.element}」。這是影響今日萬事萬物能量流動的關鍵時間因素。
+    * **本卦**: ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}])
+    * **動爻**: 第 ${hexagramsInfo.movingLine} 爻
+    * **之卦 (變卦)**: ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}])
+4.  **占卜日課 (完整四柱八字)**:
+    * **占卜公曆**: ${bazi.gregorian}
+    * **年柱**: ${bazi.yearPillar} (年干${heavenlyStemsElements[bazi.yearPillar.charAt(0)]} / 年支${earthlyBranchesElements[bazi.yearPillar.charAt(1)]})
+    * **月柱**: ${bazi.monthPillar} (月干${heavenlyStemsElements[bazi.monthPillar.charAt(0)]} / 月支${earthlyBranchesElements[bazi.monthPillar.charAt(1)]})
+    * **日柱 (日主)**: ${bazi.dayPillar} (日干${heavenlyStemsElements[bazi.dayPillar.charAt(0)]} / 日支${earthlyBranchesElements[bazi.dayPillar.charAt(1)]})
+    * **時柱**: ${bazi.hourPillar} (時干${heavenlyStemsElements[bazi.hourPillar.charAt(0)]} / 時支${earthlyBranchesElements[bazi.hourPillar.charAt(1)]})
 
 # 任務指令
-請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次，
-並確保最終輸出中，不要使用任何星號 '*' 來產生粗體格式。
+請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次，且不要使用任何星號 '*' 來產生粗體格式。
 
-1.  **綜合卦象總論**:
-    請先結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的、高度概括的論斷。說明從 ${hexagramsInfo.main.name} 轉化為 ${hexagramsInfo.changed.name} 的過程所揭示的「核心吉凶趨勢」。最重要的是，**你必須結合本日干支五行（天干${dailyInfo.stem.element}、地支${dailyInfo.branch.element}）與「本卦、之卦的五行」之間的生剋關係來進行論斷**，分析日辰對卦象的影響是「生助扶持」（吉）還是「克洩耗」（凶），這會直接影響吉凶的程度。
+1.  **綜合卦象與日課總論**:
+    結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的論斷。**最關鍵的是，你必須分析卦象的「體卦」與「用卦」的五行，並結合「日柱」干支（${bazi.dayPillar}）的五行旺衰來進行論斷**。分析日辰對卦中各五行是「生助扶持」（吉）還是「克洩耗」（凶），這會直接影響吉凶的真實程度。
 
 2.  **籤詩核心寓意**:
-    接著，深入解讀「${poemTitle}」這首籤詩的內在含義。請說明籤詩的意境如何與（已被日辰影響的）卦象轉變相互印證，共同指向同一件事情的答案。
+    深入解讀「${poemTitle}」這首籤詩，並說明其意境如何與（已被日課影響的）卦象轉變相互印證。
 
 3.  **給您的具體指引**:
-    將「卦象的轉變」與「籤詩的寓意」結合，針對信眾提出的「${question}」這個具體問題，給出綜合性的回答。請將「機緣與挑戰」與「應對之道」作為獨立的段落標題，格式為：【標題名稱】。
-    * 在【機緣與挑戰】中，必須公正客觀地分析此事正面與負面的可能性，吉凶並陳。
-    * 在【應對之道】中，提出具體的行動建議或心態調整方向，並嚴格使用條列式說明。每個條列項目前方需加上「一、」、「二、」、「三、」等編號，且每個條列項目都必須自成一個段落。
+    針對「${question}」，結合卦象與籤詩，給出綜合性的回答。請使用【機緣與挑戰】和【應對之道】作為段落標題。
+    * 在【機緣與挑戰】中，客觀分析正面與負面的可能性。
+    * 在【應對之道】中，以「一、」、「二、」等條列式提出具體建議。
 
 4.  **【開運化煞錦囊】**:
-    根據本卦與之卦的五行生剋制化原理，並**充分考量今日干支的影響**，為求問者提供趨吉避凶的具體生活建議。此段落必須包含以下子項目：
-    * **核心五行分析**: 簡要說明此卦象組合中的五行強弱，並結合今日干支五行，分析何種能量得到時令的加持（旺相），何種能量受到壓制（休囚），點出當下最需要補強或調和的能量。
-    * **增運色彩**: 根據五行分析，提出建議的幸運色系。
-    * **吉祥方位**: 根據八卦對應的方位，指出對求問者有利的方向。
-    * **應避事項**: 根據五行沖剋關係，簡要提醒應避免的顏色或方位。
+    根據卦象五行與**日課四柱的綜合平衡**，提出趨吉避凶的建議，包含：
+    * **核心五行分析**: 點出當下最需要補強或調和的五行能量。
+    * **增運色彩**、**吉祥方位**、**應避事項**。
 
 5.  **結語**:
-    最後，請以一段精鍊、沉穩且富含哲理的話語作結，總結本次占問的核心智慧。
+    以一段精鍊、沉穩且富含哲理的話語作結。
 
-請確保整體排版條理分明，文筆流暢精準，且各個主要段落之間僅以單一換行分隔，以保持格式簡潔。
+請確保整體排版條理分明，文筆流暢精準，且各個主要段落之間僅以單一換行分隔。
 `;
         
         const result = await model.generateContent(prompt);
