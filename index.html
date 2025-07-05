@@ -6,32 +6,32 @@
     <title>觀音禪寺線上靈籤</title>
     
     <style>
-        /* [修改] 整體色調調淡 */
+        /* [修改] 恢復為原始的深色系，僅讓計數器保持淡色 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #5c4d3d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .container { width: 100%; max-width: 500px; text-align: center; }
         #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
-        header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #a08a74; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); }
-        header p { font-size: 1rem; color: #8c786c; margin-bottom: 2rem; }
+        header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        header p { font-size: 1rem; color: #6c584c; margin-bottom: 2rem; }
         #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
         #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
-        #poem-title { font-size: 1.8rem; font-weight: 600; color: #c0a988; margin-bottom: 1.5rem; }
+        #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
         
         #poem-content { 
             font-size: 1.3rem; 
             line-height: 2.2; 
-            color: #5c4d3d;
+            color: #3d2c1d;
             text-align: center; 
         }
 
-        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #b59d84; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #draw-button:hover { background-color: #a08a74; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #analysis-section { margin-top: 2.5rem; width: 100%; }
         
         #number-input-section { margin-bottom: 1.5rem; }
-        #number-input-section p { color: #8c786c; margin-bottom: 1rem; font-size: 1rem; }
+        #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
         #number-input-container { display: flex; justify-content: space-between; gap: 1rem; }
         .number-input { 
             font-family: 'Noto Serif TC', serif; 
@@ -41,14 +41,14 @@
             border: 1px solid #ddd8cf; 
             border-radius: 8px; 
             background-color: #fff; 
-            color: #5c4d3d; 
+            color: #3d2c1d; 
             text-align: center; 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
             appearance: none;
             -moz-appearance: textfield;
         }
         .number-input:focus {
-             outline: none; border-color: #c0a988; box-shadow: 0 0 0 3px rgba(192, 169, 136, 0.2);
+             outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2);
         }
         .number-input::-webkit-outer-spin-button,
         .number-input::-webkit-inner-spin-button {
@@ -56,11 +56,11 @@
             margin: 0;
         }
 
-        #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #5c4d3d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
-        #question-input::placeholder { color: #c0a988; opacity: 0.8; }
-        #question-input:focus { outline: none; border-color: #c0a988; box-shadow: 0 0 0 3px rgba(192, 169, 136, 0.2); }
-        #analysis-button { font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #fff; background-color: #a08a74; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #analysis-button:hover { background-color: #8c786c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
+        #question-input::placeholder { color: #b08968; opacity: 0.8; }
+        #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
+        #analysis-button { font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #fff; background-color: #8a6c4c; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #analysis-button:hover { background-color: #6c584c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         #analysis-button:disabled { background-color: #b0a395; cursor: wait; transform: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         #result-wrapper {
@@ -74,21 +74,21 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid #eee9e4;
         }
-        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #5c4d3d; white-space: pre-wrap; }
+        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #3d2c1d; white-space: pre-wrap; }
         
-        footer { margin-top: 3rem; font-size: 0.9rem; color: #ac9a8a; }
+        footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
         
         .footer-links {
             margin: 0.8rem 0;
         }
         .footer-links a {
-            color: #ac9a8a;
+            color: #9c897a;
             text-decoration: none;
             margin: 0 8px;
             transition: color 0.2s ease;
         }
         .footer-links a:hover {
-            color: #a08a74;
+            color: #8a6c4c;
             text-decoration: underline;
         }
     </style>
@@ -222,30 +222,30 @@
         const resultWrapper = document.getElementById('result-wrapper');
         const hexagramWrapper = document.getElementById('hexagram-display-wrapper');
         const aiResultEl = document.getElementById('ai-analysis-result');
-
+        
         const num1Input = document.getElementById('num1-input');
         const num2Input = document.getElementById('num2-input');
         const num3Input = document.getElementById('num3-input');
-
+        
         let currentPoem = {};
-        let isTyping = false;
+        let isTyping = false; 
 
         // --- FUNCTIONS ---
         function displayPoem(id) {
             const poem = poems.find(p => p.id === id);
             if (poem) {
                 poemTitleEl.textContent = poem.title;
-
+                
                 let formattedPoem;
 
                 if (poem.id === 0) {
                     formattedPoem = poem.poem.replace(/\n/g, '<br>');
                 } else {
                     formattedPoem = poem.poem
-                        .replace(/，/g, '，<br>')
+                        .replace(/，/g, '，<br>') 
                         .replace(/\n/g, '<br>');
                 }
-
+                
                 poemContentEl.innerHTML = formattedPoem;
                 currentPoem = { title: poem.title, text: poem.poem };
             }
@@ -253,23 +253,23 @@
 
         function drawLot() {
             if (isTyping) return;
-            drawButton.disabled = true;
+            drawButton.disabled = true; 
             poemCard.classList.add('drawing');
-
+            
             resultWrapper.style.display = 'none';
             hexagramWrapper.innerHTML = '';
             aiResultEl.innerHTML = '';
 
-            let shuffleCount = 0;
+            let shuffleCount = 0; 
             const shuffleInterval = setInterval(() => {
-                const randomId = Math.floor(Math.random() * 60) + 1;
+                const randomId = Math.floor(Math.random() * 60) + 1; 
                 displayPoem(randomId);
-                shuffleCount++;
+                shuffleCount++; 
                 if (shuffleCount > 24) {
-                    clearInterval(shuffleInterval);
+                    clearInterval(shuffleInterval); 
                     const finalId = Math.floor(Math.random() * 60) + 1;
-                    displayPoem(finalId);
-                    drawButton.disabled = false;
+                    displayPoem(finalId); 
+                    drawButton.disabled = false; 
                     poemCard.classList.remove('drawing');
                 }
             }, 100);
@@ -308,16 +308,16 @@
                 showCustomAlert("請務必在三個欄位中都輸入有效的數字。");
                 return;
             }
-
+            
             const question = questionInput.value.trim();
-            if (!question) {
-                showCustomAlert("請先輸入您想問的問題。");
-                return;
+            if (!question) { 
+                showCustomAlert("請先輸入您想問的問題。"); 
+                return; 
             }
-
-            if (!currentPoem.title || currentPoem.title === '籤頭') {
-                showCustomAlert("請先誠心抽一籤。");
-                return;
+            
+            if (!currentPoem.title || currentPoem.title === '籤頭') { 
+                showCustomAlert("請先誠心抽一籤。"); 
+                return; 
             }
 
             resultWrapper.style.display = 'block';
@@ -325,25 +325,26 @@
             aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
             analysisButton.disabled = true;
 
-            const payload = {
-                question: question,
-                poemTitle: currentPoem.title,
-                poemText: currentPoem.text,
+            const payload = { 
+                question: question, 
+                poemTitle: currentPoem.title, 
+                poemText: currentPoem.text, 
                 numbers: {
                     num1: num1,
                     num2: num2,
-                    num3: num3
+                    num3: num3 
                 }
             };
-
+            
             try {
+                // 請將 '/api/analyze' 替換成您部署後端的實際 URL
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 });
 
-                if (!response.ok) {
+                if (!response.ok) { 
                     const errorText = await response.text();
                     let errorJson = {};
                     try {
@@ -356,7 +357,7 @@
                 }
 
                 const data = await response.json();
-
+                
                 const hex = data.hexagram;
                 if(hex && hex.main && hex.changed) {
                     hexagramWrapper.innerHTML = `
@@ -392,11 +393,11 @@
                 analysisButton.disabled = false;
             }
         }
-
+        
         function showCustomAlert(message) {
             console.warn("提示使用者:", message);
             resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = '';
+            hexagramWrapper.innerHTML = ''; 
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
         }
 
@@ -404,21 +405,20 @@
             const container = document.getElementById('visitor-badge-container');
             if (!container) return;
 
-            // 1. 總計數器 (識別碼固定)
+            // 1. 總計數器 (識別碼固定) - [修改] 使用新的淡色
             const totalBadge = document.createElement('img');
             const totalPath = 'guanyin-temple-online.page';
             totalBadge.src = `https://api.visitorbadge.io/api/visitors?path=${totalPath}&label=累計結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23a08a74`;
             totalBadge.alt = '累計結緣人數';
-
-            // 2. 今日計數器 (識別碼每天變化)
+            
+            // 2. 今日計數器 (識別碼每天變化) - [修改] 使用新的淡色
             const dailyBadge = document.createElement('img');
             const today = new Date();
             const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
-            const day = String(today.getDate()).padStart(2, '0'); // 日期補零
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
             const dailyPath = `guanyin-temple-daily-${year}-${month}-${day}`;
-
-            // 為了區分，今日計數器使用稍微不同的顏色
+            
             dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23b59d84`;
             dailyBadge.alt = '今日結緣人數';
 
@@ -429,7 +429,7 @@
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            displayPoem(0);
+            displayPoem(0); 
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
 
