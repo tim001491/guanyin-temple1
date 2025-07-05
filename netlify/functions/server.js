@@ -4,8 +4,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const serverless = require('serverless-http');
-// 【修改】移除不再需要的 lunar-calendar 套件
-// const lunar = require('lunar-calendar'); 
 
 // 載入 .env 檔案中的環境變數
 dotenv.config();
@@ -43,7 +41,7 @@ const linesToTrigramNum = Object.fromEntries(
   Object.entries(trigramLines).map(([num, lines]) => [lines.join(''), num])
 );
 
-// 干支五行對應表 (保持不變)
+// 干支五行對應表
 const heavenlyStemsElements = {
     '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
 };
@@ -52,7 +50,7 @@ const earthlyBranchesElements = {
 };
 
 
-// --- 起卦與變卦計算函式 (保持不變) ---
+// --- 起卦與變卦計算函式 ---
 function getHexagramByNumbers(numbers) {
     const { num1, num2, num3 } = numbers;
     
@@ -92,10 +90,8 @@ function getHexagramByNumbers(numbers) {
     };
 }
 
-// 【修改】移除不再需要的 getDailyGanzhiInfo 函式
 
-
-// --- 初始化 Google AI 客戶端 (保持不變) ---
+// --- 初始化 Google AI 客戶端 ---
 let model;
 if (process.env.GOOGLE_API_KEY) {
     try {
@@ -123,21 +119,17 @@ router.post('/analyze', async (req, res) => {
             parsedBody = JSON.parse(req.body.toString());
         }
         
-        // 【修改】從請求中解構出 bazi 資訊
         const { question, poemTitle, poemText, numbers, bazi } = parsedBody;
 
-        // 【修改】更新驗證邏輯，確保 bazi 存在
         if (!question || !poemTitle || !poemText || !numbers || !bazi || !bazi.dayPillar) {
             const errorMessage = `請求資料不完整，缺少必要欄位(question, poem, numbers, bazi)。收到的資料為: ${JSON.stringify(parsedBody)}`;
             console.error(errorMessage);
             return res.status(400).json({ error: errorMessage });
         }
         
-        // 取得卦象資訊
         const hexagramsInfo = getHexagramByNumbers(numbers);
-        // 【修改】移除對 getDailyGanzhiInfo 的呼叫
         
-        // 【修改】使用全新的 AI Prompt，將完整的四柱八字資訊融入其中
+        // 【修改重點】在 AI Prompt 中新增「吉祥物品」的要求
         const prompt = `
 # 角色設定
 你是一位精通《易經》、術數（包含四柱八字日課旺衰分析）、籤詩解讀的頂尖分析師。你的語氣應專業、客觀、中立且富有智慧。職責是深入剖析卦象與籤詩中的吉凶變化與義理，並結合問卜當下的時空能量（四柱干支），為求問者提供最精準的判斷與趨吉避凶的建議。請以繁體中文回答。
@@ -174,9 +166,12 @@ router.post('/analyze', async (req, res) => {
     * 在【應對之道】中，以「一、」、「二、」等條列式提出具體建議。
 
 4.  **【開運化煞錦囊】**:
-    根據卦象五行與**日課四柱的綜合平衡**，提出趨吉避凶的建議，包含：
+    根據卦象五行與**日課四柱的綜合平衡**，提出趨吉避凶的建議，包含以下子項目：
     * **核心五行分析**: 點出當下最需要補強或調和的五行能量。
-    * **增運色彩**、**吉祥方位**、**應避事項**。
+    * **增運色彩**: 根據五行分析，提出建議的幸運色系。
+    * **吉祥方位**: 根據八卦對應的方位，指出對求問者有利的方向。
+    * **吉祥物品**: 根據需要補強的五行，推薦一至兩樣具體、容易取得的開運物品（例如：水晶、植物、金屬飾品、香氛等）。
+    * **應避事項**: 根據五行沖剋關係，簡要提醒應避免的顏色或方位。
 
 5.  **結語**:
     以一段精鍊、沉穩且富含哲理的話語作結。
