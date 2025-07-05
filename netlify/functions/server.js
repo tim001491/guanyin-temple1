@@ -222,12 +222,3 @@ app.use('/api', router);
 
 // 導出給 Serverless 環境使用
 module.exports.handler = serverless(app);
-
-            const payload = { 
-                question: question, 
-                poemTitle: currentPoem.title, 
-                poemText: currentPoem.text, 
-                bazi: { // 直接從 currentBazi 獲取八字數據
-                    year: currentBazi.year,
-                    month: currentBazi.month,
-                    day: current
