@@ -135,44 +135,44 @@ router.post('/analyze', async (req, res) => {
 
 # 背景資料
 一位信眾心中有所困惑，前來求得以下啟示：
-1.  **所問之事**： "${question}"
-2.  **所抽籤詩**：
-    * **標題**： ${poemTitle}
-    * **內容**： "${poemText}"
-3.  **依數字推算的易經卦象**：
-    * **本卦**： ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}])
-    * **動爻**： 第 ${hexagramsInfo.movingLine} 爻
-    * **之卦 (變卦)**： ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}])
-4.  **占卜日課 (完整四柱八字)**：
-    * **占卜公曆**： ${bazi.gregorian}
-    * **年柱**： ${bazi.yearPillar} (年干${heavenlyStemsElements[bazi.yearPillar.charAt(0)]} / 年支${earthlyBranchesElements[bazi.yearPillar.charAt(1)]})
-    * **月柱**： ${bazi.monthPillar} (月干${heavenlyStemsElements[bazi.monthPillar.charAt(0)]} / 月支${earthlyBranchesElements[bazi.monthPillar.charAt(1)]})
-    * **日柱 (日主)**： ${bazi.dayPillar} (日干${heavenlyStemsElements[bazi.dayPillar.charAt(0)]} / 日支${earthlyBranchesElements[bazi.dayPillar.charAt(1)]})
-    * **時柱**： ${bazi.hourPillar} (時干${heavenlyStemsElements[bazi.hourPillar.charAt(0)]} / 時支${earthlyBranchesElements[bazi.hourPillar.charAt(1)]})
+1.  所問之事： "${question}"
+2.  所抽籤詩：
+    * 標題： ${poemTitle}
+    * 內容： "${poemText}"
+3.  依數字推算的易經卦象：
+    * 本卦： ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}])
+    * 動爻： 第 ${hexagramsInfo.movingLine} 爻
+    * 之卦 (變卦)： ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}])
+4.  占卜日課 (完整四柱八字)：
+    * 占卜公曆： ${bazi.gregorian}
+    * 年柱： ${bazi.yearPillar} (年干${heavenlyStemsElements[bazi.yearPillar.charAt(0)]} / 年支${earthlyBranchesElements[bazi.yearPillar.charAt(1)]})
+    * 月柱： ${bazi.monthPillar} (月干${heavenlyStemsElements[bazi.monthPillar.charAt(0)]} / 月支${earthlyBranchesElements[bazi.monthPillar.charAt(1)]})
+    * 日柱 (日主)： ${bazi.dayPillar} (日干${heavenlyStemsElements[bazi.dayPillar.charAt(0)]} / 日支${earthlyBranchesElements[bazi.dayPillar.charAt(1)]})
+    * 時柱： ${bazi.hourPillar} (時干${heavenlyStemsElements[bazi.hourPillar.charAt(0)]} / 時支${earthlyBranchesElements[bazi.hourPillar.charAt(1)]})
 
 # 任務指令
-請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次。
+請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次。請勿在您的回覆中使用任何星號 '*' 來進行格式化。
 
-**【籤詩核心寓意】：**
+【籤詩核心寓意】：
 深入解讀「${poemTitle}」這首籤詩，並說明其意境如何與（已被日課影響的）卦象轉變相互印證。
 
-**【綜合卦象與日課總論】：**
-結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的論斷。**最關鍵的是，你必須分析卦象的「體卦」與「用卦」的五行，並結合「日柱」干支（${bazi.dayPillar}）的五行旺衰來進行論斷**。分析日辰對卦中各五行是「生助扶持」（吉）還是「克洩耗」（凶），這會直接影響吉凶的真實程度。
+【綜合卦象與日課總論】：
+結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的論斷。你必須分析卦象的「體卦」與「用卦」的五行，並結合「日柱」干支（${bazi.dayPillar}）的五行旺衰來進行論斷。分析日辰對卦中各五行是「生助扶持」（吉）還是「克洩耗」（凶），這會直接影響吉凶的真實程度。
 
-**給您的具體指引：**
-針對「${question}」，結合卦象與籤詩，給出綜合性的回答。請使用 **【機緣與挑戰】：** 和 **【應對之道】：** 作為段落標題。
-* 在 **【機緣與挑戰】：** 中，客觀分析正面與負面的可能性。
-* 在 **【應對之道】：** 中，以「一、」、「二、」等條列式提出具體建議。
+給您的具體指引：
+針對「${question}」，結合卦象與籤詩，給出綜合性的回答。請使用 【機緣與挑戰】： 和 【應對之道】： 作為段落標題。
+* 在 【機緣與挑戰】： 中，客觀分析正面與負面的可能性。
+* 在 【應對之道】： 中，以「一、」、「二、」等條列式提出具體建議。
 
-**【開運化煞錦囊】：**
-根據卦象五行與**日課四柱的綜合平衡**，提出趨吉避凶的建議，包含以下子項目：
-* **核心五行分析：** 點出當下最需要補強或調和的五行能量。
-* **增運色彩：** 根據五行分析，提出建議的幸運色系。
-* **吉祥方位：** 根據八卦對應的方位，指出對求問者有利的方向。
-* **吉祥物品：** 根據需要補強的五行，推薦一至兩樣具體、容易取得的開運物品（例如：水晶、植物、金屬飾品、香氛等）。
-* **應避事項：** 根據五行沖剋關係，簡要提醒應避免的顏色或方位。
+【開運化煞錦囊】：
+根據卦象五行與日課四柱的綜合平衡，提出趨吉避凶的建議，包含以下子項目：
+* 核心五行分析： 點出當下最需要補強或調和的五行能量。
+* 增運色彩： 根據五行分析，提出建議的幸運色系。
+* 吉祥方位： 根據八卦對應的方位，指出對求問者有利的方向。
+* 吉祥物品： 根據需要補強的五行，推薦一至兩樣具體、容易取得的開運物品（例如：水晶、植物、金屬飾品、香氛等）。
+* 應避事項： 根據五行沖剋關係，簡要提醒應避免的顏色或方位。
 
-**【結語】：**
+【結語】：
 以一段精鍊、沉穩且富含哲理的話語作結。
 
 請確保整體排版條理分明，文筆流暢精準，且各個主要段落之間僅以單一換行分隔。
