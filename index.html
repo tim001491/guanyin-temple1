@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA 相關設定 -->
+    <meta name="theme-color" content="#f4f1ea"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/192.png">
+
     <title>觀音禪寺線上靈籤</title>
     
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
@@ -40,7 +46,7 @@
             font-size: 1.8rem;
             font-weight: 600; 
             line-height: 1.1; 
-            color: #ff4b37; 
+            color: #8a6c4c; /* Changed color to match theme */
         }
         .bazi-label { 
             font-size: 1rem; 
@@ -57,12 +63,14 @@
             line-height: 2.2; 
             color: #3d2c1d;
             text-align: center; 
+            white-space: pre-line; /* Use pre-line to respect newlines */
         }
 
-        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #analysis-section { margin-top: 2.5rem; width: 100%; }
+        .action-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .action-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .action-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        #analysis-section { margin-top: 2.5rem; width: 100%; display: none; /* Initially hidden */ }
         
         #number-input-section { margin-top: 1.5rem; margin-bottom: 1.5rem; }
         #number-input-section p { color: #6c584c; margin-bottom: 1rem; font-size: 1rem; }
@@ -125,13 +133,21 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
+        #reset-container {
+            margin-top: 1.5rem;
+            display: none; /* Initially hidden */
+        }
+        #reset-button {
+            background-color: #d1c7bc;
+            color: #6c584c;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
+            <img src="https://raw.githubusercontent.com/jason861023/aifortune/main/logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
             <h1>觀音禪寺線上靈籤</h1>
             <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
 
@@ -144,7 +160,7 @@
                 <h2 id="poem-title"></h2>
                 <p id="poem-content"></p>
             </div>
-            <button id="draw-button">誠心抽一籤</button>
+            <button id="draw-button" class="action-button">誠心抽一籤</button>
             
             <div id="analysis-section">
                 
@@ -164,8 +180,13 @@
                     <div id="hexagram-display-wrapper"></div>
                     <div id="ai-analysis-result"></div> 
                 </div>
-
             </div>
+            
+            <!-- Reset Button Container -->
+            <div id="reset-container">
+                 <button id="reset-button" class="action-button">重新求籤</button>
+            </div>
+
         </main>
         
         <footer>
@@ -178,14 +199,23 @@
             </div>
 
             <div id="visitor-badge-container" style="margin-top: 1.2rem; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 0.5rem;">
-                </div>
-
+            </div>
         </footer>
     </div>
 
     <script>
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('ServiceWorker Registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker Registration failed: ', err);
+                });
+            });
+        }
+
         const poems = [
-            // ... 您原有的61首籤詩資料庫，此處省略以節省篇幅 ...
             { "id": 0, "title": "籤頭", "poem": "籤頭百事良，添油大吉昌。\n萬般皆如意，富貴福壽長。", "interpretation": "" },
             { "id": 1, "title": "第一籤 甲子", "poem": "日出便見風雲散，光明清靜照世間。\n一向前途通大道，萬事清吉保平安。", "interpretation": "大吉。旭日東昇，萬事如意，謀事順遂，轉禍為福。" },
             { "id": 2, "title": "第二籤 甲寅", "poem": "于今此景正當時，看看欲吐百花魁。\n若能遇得春色到，一洒清吉脫塵埃。", "interpretation": "上吉。時機得宜，春色一到，必有佳音，所問之事，漸入佳境。" },
@@ -248,12 +278,34 @@
             { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "大吉。行善勿疑，求名當時，諸事可成，財寶自來。" },
             { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，当官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
         ];
+        
+        const iChingData = {
+            trigrams: [
+                { name: '乾', symbol: '☰' }, { name: '兌', symbol: '☱' },
+                { name: '離', symbol: '☲' }, { name: '震', symbol: '☳' },
+                { name: '巽', symbol: '☴' }, { name: '坎', symbol: '☵' },
+                { name: '艮', symbol: '☶' }, { name: '坤', symbol: '☷' }
+            ],
+            hexagrams: [
+                null, '乾為天', '天澤履', '天火同人', '天雷無妄', '天風姤', '天水訟', '天山遯', '天地否',
+                '澤天夬', '兌為澤', '澤火革', '澤雷隨', '澤風大過', '澤水困', '澤山咸', '澤地萃',
+                '火天大有', '火澤睽', '離為火', '火雷噬嗑', '火風鼎', '火水未濟', '火山旅', '火地晉',
+                '雷天大壯', '雷澤歸妹', '雷火豐', '震為雷', '雷風恆', '雷水解', '雷山小過', '雷地豫',
+                '風天小畜', '風澤中孚', '風火家人', '風雷益', '巽為風', '風水渙', '風山漸', '風地觀',
+                '水天需', '水澤節', '水火既濟', '水雷屯', '水風井', '坎為水', '水山蹇', '水地比',
+                '山天大畜', '山澤損', '山火賁', '山雷頤', '山風蠱', '山水蒙', '艮為山', '山地剝',
+                '地天泰', '地澤臨', '地火明夷', '地雷復', '地風升', '地水師', '地山謙', '坤為地'
+            ]
+        };
 
         // --- DOM ELEMENTS ---
         const poemCard = document.getElementById('poem-card');
         const poemTitleEl = document.getElementById('poem-title');
         const poemContentEl = document.getElementById('poem-content');
         const drawButton = document.getElementById('draw-button');
+        const resetButton = document.getElementById('reset-button');
+        const resetContainer = document.getElementById('reset-container');
+        const analysisSection = document.getElementById('analysis-section');
         const questionInput = document.getElementById('question-input');
         const analysisButton = document.getElementById('analysis-button');
         const resultWrapper = document.getElementById('result-wrapper');
@@ -267,36 +319,34 @@
         
         let currentPoem = {};
         let isTyping = false;
-        // 【修改】新增全域變數，用於儲存當前的四柱八字資訊
+        let isDrawing = false;
         let currentBaziInfo = {};
 
         // --- FUNCTIONS ---
+
         function displayPoem(id) {
             const poem = poems.find(p => p.id === id);
             if (poem) {
                 poemTitleEl.textContent = poem.title;
-                
-                let formattedPoem;
-
-                if (poem.id === 0) {
-                    formattedPoem = poem.poem.replace(/\n/g, '<br>');
-                } else {
-                    formattedPoem = poem.poem
-                        .replace(/，/g, '，<br>') 
-                        .replace(/\n/g, '<br>');
-                }
-                
-                poemContentEl.innerHTML = formattedPoem;
-                currentPoem = { title: poem.title, text: poem.poem };
+                poemContentEl.textContent = poem.poem;
+                currentPoem = { 
+                    id: poem.id,
+                    title: poem.title, 
+                    text: poem.poem,
+                    interpretation: poem.interpretation 
+                };
             }
         }
 
         function drawLot() {
-            if (isTyping) return;
+            if (isDrawing || isTyping) return;
+            isDrawing = true;
             drawButton.disabled = true; 
             poemCard.classList.add('drawing');
             
+            analysisSection.style.display = 'none';
             resultWrapper.style.display = 'none';
+            resetContainer.style.display = 'none';
             hexagramWrapper.innerHTML = '';
             aiResultEl.innerHTML = '';
 
@@ -309,30 +359,91 @@
                     clearInterval(shuffleInterval); 
                     const finalId = Math.floor(Math.random() * 60) + 1;
                     displayPoem(finalId); 
-                    drawButton.disabled = false; 
                     poemCard.classList.remove('drawing');
+                    analysisSection.style.display = 'block';
+                    resetContainer.style.display = 'block';
+                    isDrawing = false;
                 }
             }, 100);
         }
+        
+        function getHexagram() {
+            const num1 = parseInt(num1Input.value);
+            const num2 = parseInt(num2Input.value);
+            const num3 = parseInt(num3Input.value);
 
-        async function typewriterEffect(element, paragraphs) {
+            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
+                showCustomAlert("請務必在三個數字欄位中都輸入有效的數字。");
+                return null;
+            }
+
+            const upperIndex = (num1 % 8);
+            const lowerIndex = (num2 % 8);
+            const movingLine = (num3 % 6) + 1;
+
+            const mainTrigrams = [iChingData.trigrams[upperIndex], iChingData.trigrams[lowerIndex]];
+            const mainHexName = iChingData.hexagrams[upperIndex * 8 + lowerIndex + 1] || "未知卦";
+            
+            // Simplified changed hexagram logic
+            const changedHexName = "變化之卦";
+
+            return {
+                main: { name: mainHexName, upper: mainTrigrams[0], lower: mainTrigrams[1] },
+                movingLine: movingLine,
+                changed: { name: changedHexName, upper: mainTrigrams[0], lower: mainTrigrams[1] } // Placeholder
+            };
+        }
+        
+        function displayHexagram(hex) {
+             if (!hex || !hex.main) {
+                hexagramWrapper.innerHTML = '';
+                return;
+            }
+            hexagramWrapper.innerHTML = `
+                <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">卦象</h3>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1rem; color: #6c584c;">本卦</div>
+                        <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
+                        <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
+                        <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
+                    </div>
+                    <div style="text-align: center; padding: 0 0.5rem;">
+                        <div style="font-size: 2rem; color: #b08968;">→</div>
+                        <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1rem; color: #6c584c;">之卦</div>
+                        <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
+                        <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
+                        <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        async function typewriterEffect(element, text) {
             isTyping = true;
             element.innerHTML = '';
-            for (const pText of paragraphs) {
-                const pElement = document.createElement('p');
-                element.appendChild(pElement);
-                const lines = pText.split('\n');
-                for(let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    for (let j = 0; j < line.length; j++) {
-                        pElement.innerHTML += line.charAt(j);
-                        await new Promise(resolve => setTimeout(resolve, 35));
-                    }
-                    if (i < lines.length - 1) {
-                       pElement.innerHTML += '<br>';
-                    }
+            // Replace markdown bold with strong tags and newlines with br
+            const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            
+            for (let i = 0; i < formattedText.length; i++) {
+                 // Check for <br> tag
+                if (formattedText.substring(i, i + 4) === '<br>') {
+                    element.innerHTML += '<br>';
+                    i += 3;
+                } // Check for <strong> tag
+                else if (formattedText.substring(i, i + 8) === '<strong>') {
+                    const closingTagIndex = formattedText.indexOf('</strong>', i);
+                    element.innerHTML += formattedText.substring(i, closingTagIndex + 9);
+                    i = closingTagIndex + 8;
                 }
-                await new Promise(resolve => setTimeout(resolve, 300));
+                else {
+                    element.innerHTML += formattedText.charAt(i);
+                }
+                await new Promise(resolve => setTimeout(resolve, 25));
             }
             isTyping = false;
         }
@@ -345,96 +456,87 @@
                 showCustomAlert("請先輸入您想問的問題。"); 
                 return; 
             }
-            if (!currentPoem.title || currentPoem.title === '籤頭') { 
+            if (!currentPoem.id) { 
                 showCustomAlert("請先誠心抽一籤。"); 
                 return; 
             }
 
-            resultWrapper.style.display = 'block';
-            hexagramWrapper.innerHTML = '';
-            aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
+            const hexagram = getHexagram();
+            if (!hexagram) return;
+
+            isTyping = true;
             analysisButton.disabled = true;
+            resultWrapper.style.display = 'block';
+            displayHexagram(hexagram);
+            aiResultEl.innerHTML = `<p>菩薩慈悲，正在為您綜合解析，請稍候...</p>`;
+            
+            const prompt = `
+                你是一位精通東方玄學與佛法，慈悲為懷的解籤大師。請以觀世音菩薩的慈悲與智慧，為信眾提供溫暖、正面且富有啟發的指引。
 
-            const num1 = parseInt(num1Input.value);
-            const num2 = parseInt(num2Input.value);
-            const num3 = parseInt(num3Input.value);
+                請綜合以下所有資訊，為信眾解惑：
 
-            if (isNaN(num1) || isNaN(num2) || isNaN(num3)) {
-                showCustomAlert("請務必在三個數字欄位中都輸入有效的數字。");
-                analysisButton.disabled = false;
-                resultWrapper.style.display = 'none';
-                return;
-            }
+                1.  **今日時辰八字**:
+                    -   公曆: ${currentBaziInfo.gregorian}
+                    -   年柱: ${currentBaziInfo.yearPillar}
+                    -   月柱: ${currentBaziInfo.monthPillar}
+                    -   日柱: ${currentBaziInfo.dayPillar}
+                    -   時柱: ${currentBaziInfo.hourPillar}
 
-            // 【修改】將儲存的 currentBaziInfo 加入到 payload 中
-            const payload = { 
-                question: question, 
-                poemTitle: currentPoem.title, 
-                poemText: currentPoem.text,
-                numbers: { num1, num2, num3 },
-                bazi: currentBaziInfo // 新增此行，將完整的八字資訊傳遞給後端
-            };
+                2.  **所求籤詩**:
+                    -   籤題: ${currentPoem.title}
+                    -   籤詩: \n${currentPoem.text}
+                    -   基本解譯: ${currentPoem.interpretation}
+
+                3.  **卜得卦象**:
+                    -   本卦: ${hexagram.main.name} (${hexagram.main.upper.name}上${hexagram.main.lower.name}下)
+                    -   動爻: 第 ${hexagram.movingLine} 爻
+
+                4.  **信眾問題**: "${question}"
+
+                **解說要求**:
+                - **風格**: 語氣溫和、慈悲、穩定人心，多用鼓勵與建議，而非鐵口直斷。
+                - **結構**:
+                    a. **(總論)**：首先，針對問題核心，結合籤詩與卦象給出一個整體的方向與建議。
+                    b. **(籤詩深解)**：深入解釋這首籤詩的意涵，並將其與信眾所問之事聯繫起來。
+                    c. **(卦象啟示)**：解釋本卦和動爻所帶來的啟示，以及它如何對應目前狀況。
+                    d. **(綜合指引)**：結合所有資訊，提供具體、可行的生活或心態調整建議。
+                - **格式**: 請使用 Markdown 格式，用標題和分段讓內容清晰易讀。多用換行，避免文字擠在一起。
+            `;
             
             try {
-                // 請將 '/api/analyze' 替換成您部署後端的實際 URL
-                const response = await fetch('/api/analyze', {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Leave empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) { 
-                    const errorText = await response.text();
-                    let errorJson = {};
-                    try {
-                        errorJson = JSON.parse(errorText);
-                    } catch (e) {
-                        console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
-                    }
-                    const errorMessage = errorJson.error || errorText || '未知錯誤';
-                    throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
+                if (!response.ok) {
+                    throw new Error(`API 請求失敗，狀態碼: ${response.status}`);
                 }
 
-                const data = await response.json();
-                
-                const hex = data.hexagram;
-                if(hex && hex.main && hex.changed) {
-                    hexagramWrapper.innerHTML = `
-                        <h3 style="font-size: 1.5rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: #b08968;">卦象</h3>
-                        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">本卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.main.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.main.name}</div>
-                            </div>
-                            <div style="text-align: center; padding: 0 0.5rem;">
-                                <div style="font-size: 2rem; color: #b08968;">→</div>
-                                <div style="font-size: 1rem; color: #8a6c4c;">動爻 ${hex.movingLine}</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1rem; color: #6c584c;">之卦</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.upper.symbol}</div>
-                                <div style="font-size: 2.5rem; font-weight: 600; line-height: 1;">${hex.changed.lower.symbol}</div>
-                                <div style="font-size: 1.2rem; margin-top: 0.5rem;">${hex.changed.name}</div>
-                            </div>
-                        </div>
-                    `;
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    await typewriterEffect(aiResultEl, text);
+                } else {
+                    throw new Error("API 返回的結果無效。");
                 }
-
-                const paragraphs = data.analysis.split('\n\n').filter(p => p.trim() !== '');
-                await typewriterEffect(aiResultEl, paragraphs);
 
             } catch (error) {
                 console.error("AI解析時發生錯誤:", error);
                 aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請確認網路連線或稍後再試。(${error.message})</p>`;
             } finally {
                 analysisButton.disabled = false;
+                isTyping = false;
             }
         }
         
         function showCustomAlert(message) {
-            console.warn("提示使用者:", message);
             resultWrapper.style.display = 'block';
             hexagramWrapper.innerHTML = ''; 
             aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
@@ -451,10 +553,7 @@
             
             const dailyBadge = document.createElement('img');
             const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const dailyPath = `guanyin-temple-daily-${year}-${month}-${day}`;
+            const dailyPath = `guanyin-temple-daily-${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             
             dailyBadge.src = `https://api.visitorbadge.io/api/visitors?path=${dailyPath}&label=今日結緣人數&labelColor=%23ac9a8a&countColor=%23ffffff&style=flat-square&labelStyle=upper&color=%23b59d84`;
             dailyBadge.alt = '今日結緣人數';
@@ -477,9 +576,8 @@
                 const dayPillar = lunar.getDayInGanZhi();
                 const hourPillar = lunar.getTimeInGanZhi();
 
-                // 【修改】將計算出的八字資訊儲存到全域變數中
                 currentBaziInfo = {
-                    gregorian: `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`,
+                    gregorian: gregorianStr,
                     yearPillar: yearPillar,
                     monthPillar: monthPillar,
                     dayPillar: dayPillar,
@@ -499,15 +597,35 @@
                 dateDisplayEl.textContent = "無法載入農曆日期";
             }
         }
+        
+        function resetApp() {
+            isDrawing = false;
+            isTyping = false;
+            
+            drawButton.disabled = false;
+            analysisButton.disabled = false;
+
+            analysisSection.style.display = 'none';
+            resultWrapper.style.display = 'none';
+            resetContainer.style.display = 'none';
+
+            questionInput.value = '';
+            num1Input.value = '';
+            num2Input.value = '';
+            num3Input.value = '';
+
+            displayPoem(0);
+        }
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             displayPoem(0); 
             initializeDateTime();
+            displayVisitorBadges();
             drawButton.addEventListener('click', drawLot);
             analysisButton.addEventListener('click', getAIAnalysis);
-            displayVisitorBadges();
+            resetButton.addEventListener('click', resetApp);
         });
     </script>
 </body>
-</html>
+</ht

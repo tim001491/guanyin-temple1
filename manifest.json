@@ -1,0 +1,21 @@
+{
+  "name": "觀音禪寺線上靈籤",
+  "short_name": "觀音靈籤",
+  "description": "觀音禪寺線上靈籤提供 AI 綜合解析，為您指點迷津。",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "icons": [
+    {
+      "src": "icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
