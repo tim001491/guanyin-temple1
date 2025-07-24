@@ -26,6 +26,7 @@
             font-size: 0.95rem; 
             color: #8a6c4c; 
             margin-bottom: 1.5rem; 
+            line-height: 1.6; /* 調整行高讓換行更美觀 */
         }
         #bazi-display { 
             display: flex; 
@@ -138,7 +139,7 @@
     <div class="container">
         <header>
             <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
-            <h1>觀音 靈籤</h1>
+            <h1>觀音靈籤</h1>
             <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
 
             <div id="date-display"></div>
@@ -476,14 +477,16 @@
 
                 const gregorianStr = `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`;
                 const lunarStr = `農曆 ${lunar.getYearInGanZhi()}(${lunar.getYearShengXiao()})年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`;
-                dateDisplayEl.textContent = `今天是：${gregorianStr}（${lunarStr}）`;
+                
+                // 【修改處】使用 innerHTML 和 <br> 來換行
+                dateDisplayEl.innerHTML = `今天是：${gregorianStr}<br>（${lunarStr}）`;
 
                 const yearPillar = lunar.getYearInGanZhi();
                 const monthPillar = lunar.getMonthInGanZhi();
                 const dayPillar = lunar.getDayInGanZhi();
                 const hourPillar = lunar.getTimeInGanZhi();
 
-                // 【修改】將計算出的八字資訊儲存到全域變數中
+                // 將計算出的八字資訊儲存到全域變數中
                 currentBaziInfo = {
                     gregorian: `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`,
                     yearPillar: yearPillar,
