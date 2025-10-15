@@ -96,7 +96,7 @@ let model;
 if (process.env.GOOGLE_API_KEY) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+        model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         console.log("AI 模型初始化成功。");
     } catch (e) {
         console.error("AI 模型初始化失敗:", e);
