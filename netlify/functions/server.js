@@ -86,6 +86,7 @@ let model;
 if (process.env.GOOGLE_API_KEY) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        // 使用速度最快的 Flash 模型以避免超時
         model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         console.log("AI 模型初始化成功。");
     } catch (e) {
@@ -121,24 +122,38 @@ router.post('/analyze', async (req, res) => {
         
         const prompt = `
 # 角色與目標
-你是一位頂尖的易經術數分析師。你的首要目標是在幾秒內提供快速、精簡、核心的斷言。請使用繁體中文，語氣專業且直接。
+你是一位頂尖的易經與籤詩整合分析師，擅長將兩者結合，提供快速、深刻且精準的指引。請使用專業、沉穩的語氣，並以繁體中文回答。
 
 # 背景資料
 - 所問之事： "${question}"
 - 所抽籤詩： ${poemTitle} - "${poemText}"
-- 易經卦象： 本卦為「${hexagramsInfo.main.name}」，動爻在第 ${hexagramsInfo.movingLine} 爻，變卦為「${hexagramsInfo.changed.name}」。
-- 占卜日課： 日柱為 ${bazi.dayPillar}。
+- 易經卦象：
+    - 本卦 (現狀)： ${hexagramsInfo.main.name}
+    - 動爻 (關鍵)： 第 ${hexagramsInfo.movingLine} 爻
+    - 之卦 (未來)： ${hexagramsInfo.changed.name}
 
-# 任務指令
-請嚴格遵守以下指示，快速生成回應：
-1.  **綜合論斷**：基於以上所有資訊，直接對所問之事「${question}」給出最核心的吉凶判斷與情勢分析。此部分應作為主要回覆。
-2.  **應對建議**：用一到兩句話，提供最關鍵的行動建議。
-3.  **開運提示**：用一句話總結最需要的開運元素（例如：顏色、方位或物品）。
+# 任務指令：逐行整合解析
+請嚴格按照以下三段式結構，快速生成回應。每一段的解釋都必須簡潔有力。
+
+**【籤詩首句 vs. 本卦】**
+(此處對應籤詩前兩句)
+首先，簡要說明籤詩開頭所描繪的意象或處境，如何與「${hexagramsInfo.main.name}」卦所揭示的當前狀況相互印證。
+
+**【籤詩轉折 vs. 動爻】**
+(此處對應籤詩第三句)
+接著，分析籤詩中關鍵的轉折句，如何體現了「第 ${hexagramsInfo.movingLine} 爻」的核心變動與啟示。
+
+**【籤詩結局 vs. 之卦】**
+(此處對應籤詩第四句)
+最後，闡述籤詩的結局，如何預示了走向「${hexagramsInfo.changed.name}」卦的未來情勢。
+
+**【綜合建議】**
+基於以上分析，用一句話總結對「${question}」這件事最核心的行動建議。
 
 # 限制
-- 絕對不要長篇大論。
-- 保持整體回應簡潔有力，總字數控制在 300 字以內。
-- 直接開始回答，不要有開場白。
+- 總字數嚴格控制在 400 字以內。
+- 保持每個段落解釋精簡，不要過度展開。
+- 直接開始回答，無需任何開場白。
 `;
         
         const result = await model.generateContent(prompt);
