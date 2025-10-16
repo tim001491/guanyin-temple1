@@ -130,32 +130,19 @@ router.post('/analyze', async (req, res) => {
         const hexagramsInfo = getHexagramByNumbers(numbers);
         
         const prompt = `
-# 角色設定
-你是一位精通《易經》、術數（包含四柱八字日課旺衰分析）、籤詩解讀的頂尖分析師。你的語氣應專業、客觀、中立且富有智慧。職責是深入剖析卦象與籤詩中的吉凶變化與義理，並結合問卜當下的時空能量（四柱干支），為求問者提供最精準的判斷與趨吉避凶的建議。請以繁體中文回答。
+const prompt = `
+# 角色與目標
+你是一位易經分析師，目標是極速回應。請用繁體中文。
 
-# 背景資料
-一位信眾心中有所困惑，前來求得以下啟示：
-1.  所問之事： "${question}"
-2.  所抽籤詩：
-    * 標題： ${poemTitle}
-    * 內容： "${poemText}"
-3.  依數字推算的易經卦象：
-    * 本卦： ${hexagramsInfo.main.name} (上${hexagramsInfo.main.upper.name}${hexagramsInfo.main.upper.symbol} [${hexagramsInfo.main.upper.element}]，下${hexagramsInfo.main.lower.name}${hexagramsInfo.main.lower.symbol} [${hexagramsInfo.main.lower.element}])
-    * 動爻： 第 ${hexagramsInfo.movingLine} 爻
-    * 之卦 (變卦)： ${hexagramsInfo.changed.name} (上${hexagramsInfo.changed.upper.name}${hexagramsInfo.changed.upper.symbol} [${hexagramsInfo.changed.upper.element}]，下${hexagramsInfo.changed.lower.name}${hexagramsInfo.changed.lower.symbol} [${hexagramsInfo.changed.lower.element}])
-4.  占卜日課 (完整四柱八字)：
-    * 占卜公曆： ${bazi.gregorian}
-    * 年柱： ${bazi.yearPillar} (年干${heavenlyStemsElements[bazi.yearPillar.charAt(0)]} / 年支${earthlyBranchesElements[bazi.yearPillar.charAt(1)]})
-    * 月柱： ${bazi.monthPillar} (月干${heavenlyStemsElements[bazi.monthPillar.charAt(0)]} / 月支${earthlyBranchesElements[bazi.monthPillar.charAt(1)]})
-    * 日柱 (日主)： ${bazi.dayPillar} (日干${heavenlyStemsElements[bazi.dayPillar.charAt(0)]} / 日支${earthlyBranchesElements[bazi.dayPillar.charAt(1)]})
-    * 時柱： ${bazi.hourPillar} (時干${heavenlyStemsElements[bazi.hourPillar.charAt(0)]} / 時支${earthlyBranchesElements[bazi.hourPillar.charAt(1)]})
+# 核心資訊
+- 問題： "${question}"
+- 籤詩： ${poemTitle}
+- 卦象： 由「${hexagramsInfo.main.name}」變為「${hexagramsInfo.changed.name}」
+- 日柱： ${bazi.dayPillar}
 
 # 任務指令
-請根據以上所有資訊，為信眾提供一次綜合性的專業解析。你的解析需包含以下層次。請勿在您的回覆中使用任何星號 '*' 來進行格式化。
-
-【籤詩核心寓意】：
-深入解讀「${poemTitle}」這首籤詩，並說明其意境如何與（已被日課影響的）卦象轉變相互印證。
-
+根據以上資訊，用一句話總結吉凶，再用條列式提供兩點核心建議。總字數務必在 150 字以內。快速！
+`;
 【綜合卦象與日課總論】：
 結合「本卦」、「動爻」與「之卦」，對所問之事給出一個整體的論斷。你必須分析卦象的「體卦」與「用卦」的五行，並結合「日柱」干支（${bazi.dayPillar}）的五行旺衰來進行論斷。分析日辰對卦中各五行是「生助扶持」（吉）還是「克洩耗」（凶），這會直接影響吉凶的真實程度。
 
