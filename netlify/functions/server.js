@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- 梅花易數常數與資料 ---
+// --- 梅花易數與五行常數 ---
 const trigrams = {
     1: { name: "乾", symbol: "☰", element: "金" }, 2: { name: "兌", symbol: "☱", element: "金" },
     3: { name: "離", symbol: "☲", element: "火" }, 4: { name: "震", symbol: "☳", element: "木" },
@@ -86,7 +86,6 @@ let model;
 if (process.env.GOOGLE_API_KEY) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        // 使用速度最快的 Flash 模型以避免超時
         model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         console.log("AI 模型初始化成功。");
     } catch (e) {
@@ -122,36 +121,34 @@ router.post('/analyze', async (req, res) => {
         
         const prompt = `
 # 角色與目標
-你是一位頂尖的易經與籤詩整合分析師，擅長將兩者結合，提供快速、深刻且精準的指引。請使用專業、沉穩的語氣，並以繁體中文回答。
+你是一位頂尖的易經術數整合分析師，擅長結合籤詩、卦象、日課，提供快速、深刻且實用的指引。請使用專業、沉穩的語氣，並以繁體中文回答。
 
 # 背景資料
 - 所問之事： "${question}"
 - 所抽籤詩： ${poemTitle} - "${poemText}"
 - 易經卦象：
-    - 本卦 (現狀)： ${hexagramsInfo.main.name}
+    - 本卦 (現狀)： ${hexagramsInfo.main.name} (體卦五行: ${(hexagramsInfo.movingLine <= 3 ? hexagramsInfo.main.upper.element : hexagramsInfo.main.lower.element)})
     - 動爻 (關鍵)： 第 ${hexagramsInfo.movingLine} 爻
     - 之卦 (未來)： ${hexagramsInfo.changed.name}
+- 占卜日課 (四柱八字)：
+    - 年柱: ${bazi.yearPillar} | 月柱: ${bazi.monthPillar} | 日柱: ${bazi.dayPillar} | 時柱: ${bazi.hourPillar}
 
-# 任務指令：逐行整合解析
-請嚴格按照以下三段式結構，快速生成回應。每一段的解釋都必須簡潔有力。
+# 任務指令：
+請嚴格按照以下結構，快速生成回應。每一段的解釋都必須簡潔有力。
 
-**【籤詩首句 vs. 本卦】**
-(此處對應籤詩前兩句)
-首先，簡要說明籤詩開頭所描繪的意象或處境，如何與「${hexagramsInfo.main.name}」卦所揭示的當前狀況相互印證。
-
-**【籤詩轉折 vs. 動爻】**
-(此處對應籤詩第三句)
-接著，分析籤詩中關鍵的轉折句，如何體現了「第 ${hexagramsInfo.movingLine} 爻」的核心變動與啟示。
-
-**【籤詩結局 vs. 之卦】**
-(此處對應籤詩第四句)
-最後，闡述籤詩的結局，如何預示了走向「${hexagramsInfo.changed.name}」卦的未來情勢。
+**【籤詩與卦象整合解析】**
+快速整合籤詩的三個層次（起、承、合）與卦象的三個階段（本卦、動爻、之卦），對所問之事「${question}」給出一個整體的趨勢分析。
 
 **【綜合建議】**
-基於以上分析，用一句話總結對「${question}」這件事最核心的行動建議。
+基於以上分析，用一句話總結最核心的行動建議。
+
+**【開運化煞錦囊】**
+分析占卜日課的干支五行，如何影響卦象的「體卦」五行。基於此專業判斷，提出趨吉避凶的建議：
+- **核心五行**：點出當下對您最有利的「喜用五行」（金、木、水、火、或土）。
+- **開運建議**：圍繞此「喜用五行」，用條列式快速提供一項顏色、一項方位、及一項具體的吉祥物品（例如：白色水晶、西方、金屬飾品）。
 
 # 限制
-- 總字數嚴格控制在 400 字以內。
+- 總字數嚴格控制在 600 字以內。
 - 保持每個段落解釋精簡，不要過度展開。
 - 直接開始回答，無需任何開場白。
 `;
