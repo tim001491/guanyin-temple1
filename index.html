@@ -276,32 +276,43 @@
         }
 
         // 組合要交給 AI 的解籤提問（含籤詩與求籤當下的年月日時干支）
+        // 籤號（例如「第三十一籤」）。籤名後面的干支（例如「己丑」）只是籤的代號，
+        // 與求籤時間的干支沒有關係，所以不送給 AI，避免被拿去做生剋合沖。
+        function getLotNumber() {
+            return currentPoem.title.split(' ')[0];
+        }
+
+        function getPoemText() {
+            return currentPoem.text.replace(/\n/g, '');
+        }
+
+        // 組合要交給 ChatGPT 的完整解籤提問：以「籤詩內容」與「求籤時間的年月日時干支」互相參照
         function buildAIPrompt() {
             const b = currentBaziInfo;
-            const lotGanzhi = currentPoem.title.split(' ').pop(); // 本籤干支，例如「丁酉」
             const timeLine = b.yearPillar
                 ? `求籤時間：${b.gregorian}（${b.yearPillar}年 ${b.monthPillar}月 ${b.dayPillar}日 ${b.hourPillar}時）`
                 : '';
             return [
                 '請以觀音靈籤解籤師的角度，為我解這支籤：',
-                `觀音靈籤 ${currentPoem.title}（本籤干支：${lotGanzhi}）`,
-                `籤詩：${currentPoem.text.replace(/\n/g, '')}`,
+                `觀音靈籤 ${getLotNumber()}`,
+                `籤詩：${getPoemText()}`,
                 timeLine,
-                '請將籤詩與求籤時間的年月日時天干地支互相參照來解籤：',
+                '請以「籤詩內容」與「求籤時間的年月日時天干地支」互相參照來解籤：',
                 '1. 白話解釋籤詩含意',
-                `2. 比對本籤干支「${lotGanzhi}」與求籤四柱（尤其日柱、時柱）的五行生剋、合沖，說明對籤意是加強還是化解`,
-                '3. 綜合籤詩與干支，分析事業、感情、健康、財運',
-                '4. 給我具體建議'
+                '2. 從籤詩的意象（如草木屬木、日屬火、山屬土、金銀屬金、月與江水屬水，以及季節、時機用語）看出籤詩的五行與氣象，再與求籤時間四柱的天干地支五行互相參照，說明時機是有利還是需要謹慎',
+                '3. 綜合以上，分析事業、感情、健康、財運',
+                '4. 給我具體建議',
+                '註：籤號只是編號，籤號或籤名所附的干支不列入生剋合沖分析。'
             ].filter(Boolean).join('\n');
         }
 
         function showAILinks() {
-            // Google：只送短關鍵字，看起來像一般搜尋，避免跳出「要繼續搜尋嗎？」確認視窗
+            // Google：送簡短查詢（籤詩全文＋求籤時間干支），不放指令句，避免跳出「要繼續搜尋嗎？」確認視窗
             const b = currentBaziInfo;
-            const ganzhi = b.yearPillar ? ` 籤詩干支與${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時 五行生剋互相參照` : '';
-            const googleQuery = `觀音靈籤 ${currentPoem.title} 解籤 白話解釋${ganzhi}`;
+            const timePart = b.yearPillar ? ` 求籤時間 ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時` : '';
+            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
-            // ChatGPT：送完整提問（含籤詩與年月日時干支）
+            // ChatGPT：送完整提問
             chatgptLink.href = `https://chatgpt.com/?q=${encodeURIComponent(buildAIPrompt())}`;
             aiCopiedEl.textContent = '';
             aiSection.classList.add('show');
