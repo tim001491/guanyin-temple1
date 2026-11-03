@@ -455,6 +455,7 @@
                 '2. 從籤詩的意象（如草木屬木、日屬火、山屬土、金銀屬金、月與江水屬水，以及季節、時機用語）看出籤詩的五行與氣象，再與求籤時間四柱的天干地支五行互相參照，說明時機是有利還是需要謹慎',
                 '3. 綜合以上，分析事業、感情、健康、財運',
                 '4. 給我具體建議',
+                '5. 推算撥雲見日的時間點：依籤詩意象透露的時機（季節、月令、日月、草木榮枯等）與求籤時間四柱的干支五行生剋，推算未來哪個時間點運勢可望撥雲見日，盡量具體到哪一年、哪個農曆月份或節氣（可附上該月的干支），並說明推算理由；若籤詩本身已是好時機，也請說明好運大約持續到何時',
                 '註：籤號只是編號，籤號或籤名所附的干支不列入生剋合沖分析。'
             ].filter(Boolean).join('\n');
         }
@@ -463,7 +464,7 @@
             // Google：送簡短查詢（籤詩全文＋求籤時間干支），不放指令句，避免跳出「要繼續搜尋嗎？」確認視窗
             const b = currentBaziInfo;
             const timePart = b.yearPillar ? ` 求籤時間 ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時` : '';
-            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤`;
+            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤 推算何時撥雲見日`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
             // ChatGPT：送完整提問
             chatgptLink.href = `https://chatgpt.com/?q=${encodeURIComponent(buildAIPrompt())}`;
