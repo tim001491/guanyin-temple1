@@ -77,6 +77,12 @@
         .ai-link { flex: 1; max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 10px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
         .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
         #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
+        /* --- 開場動畫 --- */
+        #intro-overlay { position: fixed; inset: 0; z-index: 1000; background: #f4f1ea; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s ease, visibility 1s ease; }
+        #intro-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        #intro-video { width: 92vw; max-width: 520px; max-height: 80vh; object-fit: contain; border-radius: 16px; box-shadow: 0 0 60px rgba(212, 175, 55, 0.35); background: #f4f1ea; }
+        #intro-skip { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; font-family: 'Noto Serif TC', serif; font-size: 0.95rem; color: #8a6c4c; background: rgba(255,255,255,0.7); border: 1px solid #ddd8cf; border-radius: 50px; padding: 6px 18px; cursor: pointer; }
+        body.intro-playing { overflow: hidden; }
         footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
         
         .footer-links {
@@ -94,7 +100,13 @@
         }
     </style>
 </head>
-<body>
+<body class="intro-playing">
+
+    <!-- 開場動畫：播放完或按「略過」後淡出，進入首頁 -->
+    <div id="intro-overlay">
+        <video id="intro-video" src="intro.mp4" poster="intro-poster.jpg" muted playsinline autoplay preload="auto"></video>
+        <button id="intro-skip">略過</button>
+    </div>
 
     <div class="container">
         <header>
@@ -379,6 +391,35 @@
     </script>
     
     <script>
+        // --- 開場動畫控制 ---
+        (function () {
+            const overlay = document.getElementById('intro-overlay');
+            const video = document.getElementById('intro-video');
+            const skip = document.getElementById('intro-skip');
+            let closed = false;
+
+            function closeIntro() {
+                if (closed) return;
+                closed = true;
+                overlay.classList.add('hide');
+                document.body.classList.remove('intro-playing');
+                setTimeout(() => { video.pause(); overlay.remove(); }, 1100);
+            }
+
+            // 同一次瀏覽只播一次，重新整理不會重播
+            let seen = false;
+            try { seen = sessionStorage.getItem('introSeen') === '1'; sessionStorage.setItem('introSeen', '1'); } catch (e) {}
+            if (seen) { overlay.remove(); document.body.classList.remove('intro-playing'); return; }
+
+            video.addEventListener('ended', closeIntro);
+            video.addEventListener('error', closeIntro);
+            skip.addEventListener('click', closeIntro);
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeIntro(); });
+            const playTry = video.play();
+            if (playTry && playTry.catch) playTry.catch(() => {}); // 手機省電模式可能擋自動播放，仍可按略過
+            setTimeout(closeIntro, 13000); // 保險：最多 13 秒一定進入首頁
+        })();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
