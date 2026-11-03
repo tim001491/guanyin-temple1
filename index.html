@@ -303,7 +303,7 @@
             }
         }
 
-        // --- 抽籤動畫：轉動 → 隨機暫停三次 → 繼續轉 → 慢慢停下 ---
+        // --- 抽籤動畫：轉動 → 隨機暫停兩次 → 繼續轉 → 慢慢停下 ---
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         const randomBetween = (min, max) => min + Math.random() * (max - min);
         const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
@@ -326,7 +326,7 @@
             aiSection.classList.remove('show');
             poemCard.classList.add('drawing');
 
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 2; i++) {
                 await spin(randomBetween(700, 1200), 90);    // 轉動（每段長短隨機）
                 poemCard.classList.remove('drawing');         // 暫停：停在某一支籤上
                 await sleep(randomBetween(600, 1100));        // 暫停時間也隨機
