@@ -69,6 +69,7 @@
         #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #draw-button:disabled { background-color: #b0a395; cursor: wait; transform: none; }
         #ai-section { margin-top: 2rem; width: 100%; display: none; }
         #ai-section.show { display: block; animation: fadeIn 0.6s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -302,28 +303,51 @@
             }
         }
 
-        function drawLot() {
-            drawButton.disabled = true; 
-            poemCard.classList.add('drawing');
-            aiSection.classList.remove('show');
+        // --- 抽籤動畫：轉動 → 隨機暫停三次 → 繼續轉 → 慢慢停下 ---
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const randomBetween = (min, max) => min + Math.random() * (max - min);
+        const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
 
-            let shuffleCount = 0; 
-            const shuffleInterval = setInterval(() => {
-                const randomId = Math.floor(Math.random() * 60) + 1; 
-                displayPoem(randomId);
-                shuffleCount++; 
-                if (shuffleCount > 24) {
-                    clearInterval(shuffleInterval); 
-                    const finalId = Math.floor(Math.random() * 60) + 1;
-                    displayPoem(finalId); 
-                    drawButton.disabled = false; 
-                    poemCard.classList.remove('drawing');
-                    showAILinks();
-                }
-            }, 100);
+        // 以固定速度快速換籤，持續 duration 毫秒
+        async function spin(duration, tick) {
+            const end = Date.now() + duration;
+            while (Date.now() < end) {
+                displayPoem(randomPoemId());
+                await sleep(tick);
+            }
         }
 
-        // 組合要交給 AI 的解籤提問（含籤詩與求籤當下的年月日時干支）
+        let isDrawing = false;
+        async function drawLot() {
+            if (isDrawing) return;
+            isDrawing = true;
+            drawButton.disabled = true;
+            drawButton.textContent = '抽籤中…';
+            aiSection.classList.remove('show');
+            poemCard.classList.add('drawing');
+
+            for (let i = 0; i < 3; i++) {
+                await spin(randomBetween(700, 1200), 90);    // 轉動（每段長短隨機）
+                poemCard.classList.remove('drawing');         // 暫停：停在某一支籤上
+                await sleep(randomBetween(600, 1100));        // 暫停時間也隨機
+                poemCard.classList.add('drawing');            // 繼續轉
+            }
+            await spin(randomBetween(700, 1200), 90);
+
+            // 最後越轉越慢，再停在最終的籤
+            for (const tick of [140, 190, 250, 320, 400]) {
+                displayPoem(randomPoemId());
+                await sleep(tick);
+            }
+            displayPoem(randomPoemId());
+
+            poemCard.classList.remove('drawing');
+            drawButton.textContent = '誠心抽一籤';
+            drawButton.disabled = false;
+            isDrawing = false;
+            showAILinks();
+        }
+
         // 籤號（例如「第三十一籤」）。籤名後面的干支（例如「己丑」）只是籤的代號，
         // 與求籤時間的干支沒有關係，所以不送給 AI，避免被拿去做生剋合沖。
         function getLotNumber() {
