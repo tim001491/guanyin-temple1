@@ -70,6 +70,25 @@
         #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #draw-button:disabled { background-color: #b0a395; cursor: wait; transform: none; }
+
+        /* --- 按鈕動畫 --- */
+        /* 抽籤按鈕：金色光暈像呼吸一樣明暗，並不時有一道光掃過 */
+        #draw-button { position: relative; overflow: hidden; animation: btnBreath 2.8s ease-in-out infinite; }
+        #draw-button:active { transform: scale(0.96); }
+        #draw-button::after { content: ''; position: absolute; top: 0; left: 0; width: 45%; height: 100%; background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%); transform: translateX(-160%) skewX(-20deg); animation: btnSheen 3.6s ease-in-out infinite 1s; pointer-events: none; }
+        #draw-button:disabled, #draw-button:disabled::after { animation: none; }
+        #draw-button:disabled::after { opacity: 0; }
+        @keyframes btnBreath {
+            0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 0 0 rgba(212,175,55,0); }
+            50% { box-shadow: 0 4px 14px rgba(0,0,0,0.12), 0 0 24px 6px rgba(212,175,55,0.5); }
+        }
+        @keyframes btnSheen {
+            0% { transform: translateX(-160%) skewX(-20deg); }
+            35%, 100% { transform: translateX(330%) skewX(-20deg); }
+        }
+        /* 點擊時從手指位置擴散一圈金光 */
+        .ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255, 228, 160, 0.6); animation: ripple 0.65s ease-out forwards; pointer-events: none; }
+        @keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
         #ai-section { margin-top: 2rem; width: 100%; display: none; }
         #ai-section.show { display: block; animation: fadeIn 0.6s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -77,6 +96,22 @@
         #ai-buttons { display: flex; justify-content: center; gap: 0.8rem; }
         .ai-link { flex: 1; max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 10px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
         .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
+        /* 解籤按鈕：抽完籤後依序彈出，之後不時有金色光澤掃過 */
+        .ai-link { position: relative; overflow: hidden; }
+        .ai-link:active { transform: scale(0.96); }
+        #ai-section.show .ai-link { animation: aiPop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) backwards; }
+        #ai-section.show .ai-link:nth-child(2) { animation-delay: 0.18s; }
+        .ai-link::after { content: ''; position: absolute; top: 0; left: 0; width: 45%; height: 100%; background: linear-gradient(110deg, transparent 0%, rgba(212,175,55,0.3) 50%, transparent 100%); transform: translateX(-160%) skewX(-20deg); animation: btnSheen 4.2s ease-in-out infinite 1.2s; pointer-events: none; }
+        .ai-link:nth-child(2)::after { animation-delay: 1.6s; }
+        @keyframes aiPop {
+            from { opacity: 0; transform: translateY(14px) scale(0.92); }
+            to { opacity: 1; transform: none; }
+        }
+        /* 手機設定「減少動態效果」的訪客，不播放這些動畫 */
+        @media (prefers-reduced-motion: reduce) {
+            #draw-button, #draw-button::after, .ai-link, .ai-link::after, #ai-section.show .ai-link { animation: none !important; }
+            .ripple { display: none; }
+        }
         #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
         /* --- 開場動畫 --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 1000; background: #f4f1ea; overflow: hidden; transition: opacity 1s ease, visibility 1s ease; }
@@ -172,7 +207,7 @@
                 <h2 id="poem-title"></h2>
                 <p id="poem-content"></p>
             </div>
-            <button id="draw-button">誠心抽一籤</button>
+            <button id="draw-button"><span id="draw-label">誠心抽一籤</span></button>
 
             <div id="ai-section">
                 <p id="ai-hint">想看這支籤的詳細解釋？點下方按鈕，AI 會直接為您解籤：</p>
@@ -271,6 +306,7 @@
         const poemTitleEl = document.getElementById('poem-title');
         const poemContentEl = document.getElementById('poem-content');
         const drawButton = document.getElementById('draw-button');
+        const drawLabel = document.getElementById('draw-label');
         const aiSection = document.getElementById('ai-section');
         const googleAiLink = document.getElementById('google-ai-link');
         const chatgptLink = document.getElementById('chatgpt-link');
@@ -317,12 +353,27 @@
             }
         }
 
+        // 按鈕點擊漣漪效果
+        function addRipple(el) {
+            el.addEventListener('pointerdown', e => {
+                const rect = el.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const r = document.createElement('span');
+                r.className = 'ripple';
+                r.style.width = r.style.height = size + 'px';
+                r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                r.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                el.appendChild(r);
+                r.addEventListener('animationend', () => r.remove());
+            });
+        }
+
         let isDrawing = false;
         async function drawLot() {
             if (isDrawing) return;
             isDrawing = true;
             drawButton.disabled = true;
-            drawButton.textContent = '抽籤中…';
+            drawLabel.textContent = '抽籤中…';
             aiSection.classList.remove('show');
             poemCard.classList.add('drawing');
 
@@ -342,7 +393,7 @@
             displayPoem(randomPoemId());
 
             poemCard.classList.remove('drawing');
-            drawButton.textContent = '誠心抽一籤';
+            drawLabel.textContent = '誠心抽一籤';
             drawButton.disabled = false;
             isDrawing = false;
             showAILinks();
@@ -467,6 +518,7 @@
             displayPoem(0); 
             initializeDateTime();
             drawButton.addEventListener('click', drawLot);
+            [drawButton, googleAiLink, chatgptLink].forEach(addRipple);
             googleAiLink.addEventListener('click', copyPromptOnClick);
             chatgptLink.addEventListener('click', copyPromptOnClick);
             displayVisitorBadges();
