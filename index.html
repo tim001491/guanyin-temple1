@@ -112,9 +112,49 @@
     <!-- 開場動畫：播放完或按「略過」後淡出，進入首頁 -->
     <div id="intro-overlay">
         <video id="intro-bg" muted playsinline preload="none" aria-hidden="true"></video>
-        <video id="intro-video" src="intro.mp4" poster="intro-poster.jpg" muted playsinline autoplay preload="auto"></video>
+        <video id="intro-video" muted playsinline autoplay preload="auto"></video>
         <button id="intro-skip">略過</button>
     </div>
+    <script>
+        // --- 開場動畫控制（放在動畫後面，讓影片盡早開始載入）---
+        (function () {
+            var overlay = document.getElementById('intro-overlay');
+            var video = document.getElementById('intro-video');
+            var bgVideo = document.getElementById('intro-bg');
+            var skip = document.getElementById('intro-skip');
+            var closed = false;
+
+            // 同一次瀏覽只播一次，重新整理不會重播
+            var seen = false;
+            try { seen = sessionStorage.getItem('introSeen') === '1'; sessionStorage.setItem('introSeen', '1'); } catch (e) {}
+            if (seen) { overlay.parentNode.removeChild(overlay); document.body.classList.remove('intro-playing'); return; }
+
+            // 手機等直向螢幕用直式裁切版，電腦等橫向螢幕用完整版
+            var landscape = window.matchMedia && window.matchMedia('(min-aspect-ratio: 1/1)').matches;
+            video.poster = landscape ? 'intro-poster.jpg' : 'intro-poster-portrait.jpg';
+            video.src = landscape ? 'intro.mp4' : 'intro-portrait.mp4';
+            if (landscape) {
+                bgVideo.src = 'intro.mp4';
+                var bgTry = bgVideo.play();
+                if (bgTry && bgTry.catch) bgTry.catch(function () {});
+            }
+
+            function closeIntro() {
+                if (closed) return;
+                closed = true;
+                overlay.classList.add('hide');
+                document.body.classList.remove('intro-playing');
+                setTimeout(function () { video.pause(); bgVideo.pause(); if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 1100);
+            }
+
+            video.addEventListener('ended', closeIntro);
+            video.addEventListener('error', closeIntro);
+            skip.addEventListener('click', closeIntro);
+            var playTry = video.play();
+            if (playTry && playTry.catch) playTry.catch(function () {}); // 手機省電模式可能擋自動播放，仍可按略過
+            setTimeout(closeIntro, 9000); // 保險：最多 9 秒一定進入首頁
+        })();
+    </script>
 
     <div class="container">
         <header>
@@ -410,42 +450,6 @@
     </script>
     
     <script>
-        // --- 開場動畫控制 ---
-        (function () {
-            const overlay = document.getElementById('intro-overlay');
-            const video = document.getElementById('intro-video');
-            const bgVideo = document.getElementById('intro-bg');
-            const skip = document.getElementById('intro-skip');
-            let closed = false;
-
-            function closeIntro() {
-                if (closed) return;
-                closed = true;
-                overlay.classList.add('hide');
-                document.body.classList.remove('intro-playing');
-                setTimeout(() => { video.pause(); bgVideo.pause(); overlay.remove(); }, 1100);
-            }
-
-            // 同一次瀏覽只播一次，重新整理不會重播
-            let seen = false;
-            try { seen = sessionStorage.getItem('introSeen') === '1'; sessionStorage.setItem('introSeen', '1'); } catch (e) {}
-            if (seen) { overlay.remove(); document.body.classList.remove('intro-playing'); return; }
-
-            video.addEventListener('ended', closeIntro);
-            video.addEventListener('error', closeIntro);
-            skip.addEventListener('click', closeIntro);
-            overlay.addEventListener('click', e => { if (e.target === overlay) closeIntro(); });
-            // 橫向螢幕才載入模糊背景，手機不多下載一次
-            if (window.matchMedia && window.matchMedia('(min-aspect-ratio: 1/1)').matches) {
-                bgVideo.src = video.getAttribute('src');
-                const bgTry = bgVideo.play();
-                if (bgTry && bgTry.catch) bgTry.catch(() => {});
-            }
-            const playTry = video.play();
-            if (playTry && playTry.catch) playTry.catch(() => {}); // 手機省電模式可能擋自動播放，仍可按略過
-            setTimeout(closeIntro, 8000); // 保險：最多 8 秒一定進入首頁
-        })();
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
