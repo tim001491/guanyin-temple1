@@ -110,13 +110,13 @@
         /* --- 菩提光球・線上光明燈 入口 --- */
         #lamp-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
         #lamp-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
-        .lamp-slide { position: relative; max-width: 440px; height: 66px; margin: 0 auto; border-radius: 50px; background-color: #fff; border: 2px solid #a58362; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .lamp-slide { position: relative; max-width: 340px; height: 52px; margin: 0 auto; border-radius: 50px; background-color: #fff; border: 2px solid #a58362; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
         .lamp-slide-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, rgba(243, 213, 142, 0.35), rgba(165, 131, 98, 0.35)); }
-        .lamp-slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 76px; padding-right: 16px; text-align: left; color: #8a6c4c; pointer-events: none; }
-        .lamp-slide-text strong { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
-        .lamp-slide-text small { font-size: 0.9rem; color: #9c897a; }
-        .lamp-slide-text .go { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; letter-spacing: -0.1em; color: #c9ab86; }
-        .lamp-slide-knob { position: absolute; left: 5px; top: 5px; width: 52px; height: 52px; border-radius: 50%; cursor: grab; touch-action: none; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
+        .lamp-slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 60px; padding-right: 14px; text-align: left; color: #8a6c4c; pointer-events: none; }
+        .lamp-slide-text strong { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em; }
+        .lamp-slide-text small { font-size: 0.78rem; color: #9c897a; }
+        .lamp-slide-text .go { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 1rem; letter-spacing: -0.1em; color: #c9ab86; }
+        .lamp-slide-knob { position: absolute; left: 5px; top: 5px; width: 38px; height: 38px; border-radius: 50%; cursor: grab; touch-action: none; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
         .lamp-slide-knob:focus-visible { outline: 2px solid #8a6c4c; outline-offset: 2px; }
         .lamp-slide.back .lamp-slide-knob, .lamp-slide.back .lamp-slide-fill { transition: transform 0.3s ease, width 0.3s ease; }
         .lamp-slide.done { background-color: #a58362; }
@@ -124,9 +124,9 @@
         .lamp-slide.done .lamp-slide-text small { color: rgba(255, 255, 255, 0.85); }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.6rem; }
-        #donate-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 9px 22px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+        #donate-button { font-family: 'Noto Serif TC', serif; font-size: 0.88rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 6px 16px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
         #donate-button:hover, #donate-button:active { background-color: #a58362; color: #fff; }
-        #donate-note { margin-top: 0.5rem; font-size: 0.85rem; color: #9c897a; }
+        #donate-note { margin-top: 0.4rem; font-size: 0.78rem; color: #9c897a; }
         #donate-dialog { position: fixed; inset: 0; z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(61, 44, 29, 0.45); }
         #donate-dialog.show { display: flex; }
         .donate-card { position: relative; width: 100%; max-width: 360px; padding: 2rem 1.6rem 1.6rem; text-align: center; background: #fff; border: 1px solid #ddd8cf; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
