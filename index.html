@@ -417,7 +417,7 @@
             overlay.addEventListener('click', e => { if (e.target === overlay) closeIntro(); });
             const playTry = video.play();
             if (playTry && playTry.catch) playTry.catch(() => {}); // 手機省電模式可能擋自動播放，仍可按略過
-            setTimeout(closeIntro, 13000); // 保險：最多 13 秒一定進入首頁
+            setTimeout(closeIntro, 8000); // 保險：最多 8 秒一定進入首頁
         })();
 
         if ('serviceWorker' in navigator) {
