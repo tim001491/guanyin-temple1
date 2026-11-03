@@ -26,7 +26,7 @@ self.addEventListener('install', event => {
 
 // 網路優先：有網路時永遠拿最新版本，離線時才用快取
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) return;
+  if (event.request.method !== 'GET') return;
   event.respondWith(
     fetch(event.request)
       .then(response => {

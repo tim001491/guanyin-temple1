@@ -69,24 +69,14 @@
         #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #analysis-section { margin-top: 2.5rem; width: 100%; }
-        
-        #question-input { font-family: 'Noto Serif TC', serif; font-size: 1rem; width: 100%; min-height: 100px; padding: 1rem; border: 1px solid #ddd8cf; border-radius: 8px; background-color: #fff; color: #3d2c1d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); resize: vertical; margin-bottom: 1rem; line-height: 1.6; }
-        #question-input::placeholder { color: #b08968; opacity: 0.8; }
-        #question-input:focus { outline: none; border-color: #b08968; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.2); }
-        #analysis-button { font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #fff; background-color: #8a6c4c; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #analysis-button:hover { background-color: #6c584c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        #analysis-button:disabled { background-color: #b0a395; cursor: wait; transform: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        #result-wrapper {
-            background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; 
-            padding: 1.5rem 2rem; margin-top: 1.5rem; text-align: left; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: none;
-        }
-        #ai-analysis-result { line-height: 1.8; font-size: 1.1rem; color: #3d2c1d; white-space: pre-wrap; }
-        #ai-analysis-result p { margin-bottom: 1rem; }
-        
+        #ai-section { margin-top: 2rem; width: 100%; display: none; }
+        #ai-section.show { display: block; animation: fadeIn 0.6s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        #ai-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1.2rem; }
+        #ai-buttons { display: flex; justify-content: center; gap: 0.8rem; }
+        .ai-link { flex: 1; max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: 1.1rem; font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 10px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
+        .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
+        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
         footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
         
         .footer-links {
@@ -122,17 +112,16 @@
                 <p id="poem-content"></p>
             </div>
             <button id="draw-button">誠心抽一籤</button>
-            
-            <div id="analysis-section">
-                
-                <textarea id="question-input" placeholder="抽籤後，請在此輸入您想問的事（例如：工作、感情、健康），AI 將為您解籤..."></textarea>
-                <button id="analysis-button">AI 解籤</button>
-                
-                <div id="result-wrapper">
-                    <div id="ai-analysis-result"></div> 
-                </div>
 
+            <div id="ai-section">
+                <p id="ai-hint">想看這支籤的詳細解釋？點下方按鈕，AI 會直接為您解籤：</p>
+                <div id="ai-buttons">
+                    <a id="google-ai-link" class="ai-link" href="#" target="_blank" rel="noopener">Google AI 解籤</a>
+                    <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
+                </div>
+                <p id="ai-copied"></p>
             </div>
+            
         </main>
         
         <footer>
@@ -221,15 +210,14 @@
         const poemTitleEl = document.getElementById('poem-title');
         const poemContentEl = document.getElementById('poem-content');
         const drawButton = document.getElementById('draw-button');
-        const questionInput = document.getElementById('question-input');
-        const analysisButton = document.getElementById('analysis-button');
-        const resultWrapper = document.getElementById('result-wrapper');
-        const aiResultEl = document.getElementById('ai-analysis-result');
+        const aiSection = document.getElementById('ai-section');
+        const googleAiLink = document.getElementById('google-ai-link');
+        const chatgptLink = document.getElementById('chatgpt-link');
+        const aiCopiedEl = document.getElementById('ai-copied');
         const dateDisplayEl = document.getElementById('date-display');
         const baziDisplayEl = document.getElementById('bazi-display');
         
         let currentPoem = {};
-        let isTyping = false;
         // 【修改】新增全域變數，用於儲存當前的四柱八字資訊
         let currentBaziInfo = {};
 
@@ -255,12 +243,9 @@
         }
 
         function drawLot() {
-            if (isTyping) return;
             drawButton.disabled = true; 
             poemCard.classList.add('drawing');
-            
-            resultWrapper.style.display = 'none';
-            aiResultEl.innerHTML = '';
+            aiSection.classList.remove('show');
 
             let shuffleCount = 0; 
             const shuffleInterval = setInterval(() => {
@@ -273,96 +258,43 @@
                     displayPoem(finalId); 
                     drawButton.disabled = false; 
                     poemCard.classList.remove('drawing');
+                    showAILinks();
                 }
             }, 100);
         }
 
-        async function typewriterEffect(element, paragraphs) {
-            isTyping = true;
-            element.innerHTML = '';
-            for (const pText of paragraphs) {
-                const pElement = document.createElement('p');
-                element.appendChild(pElement);
-                const lines = pText.split('\n');
-                for(let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    for (let j = 0; j < line.length; j++) {
-                        pElement.innerHTML += line.charAt(j);
-                        await new Promise(resolve => setTimeout(resolve, 35));
-                    }
-                    if (i < lines.length - 1) {
-                       pElement.innerHTML += '<br>';
-                    }
-                }
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-            isTyping = false;
+        // 組合要交給 AI 的解籤提問（含籤詩與求籤當下的年月日時干支）
+        function buildAIPrompt() {
+            const b = currentBaziInfo;
+            const timeLine = b.yearPillar
+                ? `求籤時間：${b.gregorian}（${b.yearPillar}年 ${b.monthPillar}月 ${b.dayPillar}日 ${b.hourPillar}時）`
+                : '';
+            return [
+                '請以觀音靈籤解籤師的角度，為我解這支籤：',
+                `觀音靈籤 ${currentPoem.title}`,
+                `籤詩：${currentPoem.text.replace(/\n/g, '')}`,
+                timeLine,
+                '請用白話解釋籤意，結合求籤時間的干支五行，分析事業、感情、健康、財運，最後給我具體建議。'
+            ].filter(Boolean).join('\n');
         }
 
-        async function getAIAnalysis() {
-            if (isTyping) return;
-            
-            const question = questionInput.value.trim();
-            if (!question) { 
-                showCustomAlert("請先輸入您想問的問題。"); 
-                return; 
-            }
-            if (!currentPoem.title || currentPoem.title === '籤頭') { 
-                showCustomAlert("請先誠心抽一籤。"); 
-                return; 
-            }
-
-            resultWrapper.style.display = 'block';
-            aiResultEl.innerHTML = `<p>菩薩慈悲，AI 正在為您解籤，請稍候...</p>`;
-            analysisButton.disabled = true;
-
-            // 【修改】將儲存的 currentBaziInfo 加入到 payload 中
-            const payload = { 
-                question: question, 
-                poemTitle: currentPoem.title, 
-                poemText: currentPoem.text,
-                poemInterpretation: currentPoem.interpretation,
-                bazi: currentBaziInfo // 新增此行，將完整的八字資訊傳遞給後端
-            };
-            
-            try {
-                // 請將 '/api/analyze' 替換成您部署後端的實際 URL
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) { 
-                    const errorText = await response.text();
-                    let errorJson = {};
-                    try {
-                        errorJson = JSON.parse(errorText);
-                    } catch (e) {
-                        console.error("無法解析伺服器錯誤訊息為 JSON:", errorText);
-                    }
-                    const errorMessage = errorJson.error || errorText || '未知錯誤';
-                    throw new Error(`伺服器錯誤: ${response.status} - ${errorMessage}`);
-                }
-
-                const data = await response.json();
-                
-                const cleanText = data.analysis.replace(/\*\*/g, '').replace(/^#+\s*/gm, '');
-                const paragraphs = cleanText.split('\n\n').filter(p => p.trim() !== '');
-                await typewriterEffect(aiResultEl, paragraphs);
-
-            } catch (error) {
-                console.error("AI解析時發生錯誤:", error);
-                aiResultEl.innerHTML = `<p style="color: #c0392b;">無法連接至解析服務，請確認網路連線或稍後再試。(${error.message})</p>`;
-            } finally {
-                analysisButton.disabled = false;
-            }
+        function showAILinks() {
+            const prompt = buildAIPrompt();
+            const q = encodeURIComponent(prompt);
+            googleAiLink.href = `https://www.google.com/search?udm=50&q=${q}`;
+            chatgptLink.href = `https://chatgpt.com/?q=${q}`;
+            aiCopiedEl.textContent = '';
+            aiSection.classList.add('show');
         }
-        
-        function showCustomAlert(message) {
-            console.warn("提示使用者:", message);
-            resultWrapper.style.display = 'block';
-            aiResultEl.innerHTML = `<p style="color: #c0392b; text-align: center;">${message}</p>`;
+
+        // 點按鈕時同時複製提問，萬一 AI 網站沒自動帶入，可直接貼上
+        function copyPromptOnClick() {
+            const prompt = buildAIPrompt();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(prompt)
+                    .then(() => { aiCopiedEl.textContent = '已複製籤詩內容，若 AI 網站沒有自動帶入，可直接貼上。'; })
+                    .catch(() => {});
+            }
         }
 
         function displayVisitorBadges() {
@@ -432,7 +364,8 @@
             displayPoem(0); 
             initializeDateTime();
             drawButton.addEventListener('click', drawLot);
-            analysisButton.addEventListener('click', getAIAnalysis);
+            googleAiLink.addEventListener('click', copyPromptOnClick);
+            chatgptLink.addEventListener('click', copyPromptOnClick);
             displayVisitorBadges();
         });
     </script>
