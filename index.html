@@ -106,6 +106,17 @@
             color: #8a6c4c;
             text-decoration: underline;
         }
+
+        /* --- 菩提光球・線上光明燈 入口 --- */
+        #lamp-option { margin-top: 1.2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
+        #lamp-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
+        .lamp-entry { display: flex; align-items: center; gap: 14px; max-width: 440px; margin: 0 auto; padding: 12px 22px 12px 14px; border-radius: 50px; text-align: left; text-decoration: none; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; transition: all 0.3s ease; }
+        .lamp-entry:hover, .lamp-entry:active { background-color: #a58362; color: #fff; }
+        .lamp-entry-orb { flex: none; width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
+        .lamp-entry strong { display: block; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
+        .lamp-entry small { display: block; margin-top: 2px; font-size: 0.9rem; color: #9c897a; transition: color 0.3s ease; }
+        .lamp-entry:hover small, .lamp-entry:active small { color: rgba(255, 255, 255, 0.85); }
+        .lamp-entry-go { margin-left: auto; font-size: 1.6rem; line-height: 1; }
     </style>
 </head>
 <body class="intro-playing">
@@ -181,6 +192,16 @@
                     <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
                 </div>
                 <p id="ai-copied"></p>
+
+                <!-- 抽完籤後的另一個選擇：為所求之事點一盞光明燈 -->
+                <div id="lamp-option">
+                    <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明燈：</p>
+                    <a class="lamp-entry" href="lamp.html#light">
+                        <span class="lamp-entry-orb" aria-hidden="true"></span>
+                        <span><strong>點一盞光明燈</strong><small>菩提光球・寫下心願，免費點燈</small></span>
+                        <span class="lamp-entry-go" aria-hidden="true">›</span>
+                    </a>
+                </div>
             </div>
             
         </main>
@@ -390,6 +411,21 @@
             aiSection.classList.add('show');
         }
 
+        // 去點光明燈之前記住剛抽到的籤，回來時還看得到（同一個分頁內有效）
+        function rememberLotForLamp() {
+            const poem = poems.find(p => p.title === currentPoem.title);
+            try { if (poem && poem.id) sessionStorage.setItem('returnLot', String(poem.id)); } catch (e) {}
+        }
+
+        function restoreLotAfterLamp() {
+            let id = 0;
+            try { id = Number(sessionStorage.getItem('returnLot')) || 0; sessionStorage.removeItem('returnLot'); } catch (e) {}
+            if (id && poems.some(p => p.id === id)) {
+                displayPoem(id);
+                showAILinks();
+            }
+        }
+
         // 點按鈕時同時複製提問，萬一 AI 網站沒自動帶入，可直接貼上
         function copyPromptOnClick() {
             const prompt = buildAIPrompt();
@@ -469,7 +505,13 @@
             drawButton.addEventListener('click', drawLot);
             googleAiLink.addEventListener('click', copyPromptOnClick);
             chatgptLink.addEventListener('click', copyPromptOnClick);
+            document.querySelector('.lamp-entry').addEventListener('click', rememberLotForLamp);
+            restoreLotAfterLamp();
             displayVisitorBadges();
+        });
+        // 瀏覽器用「上一頁」直接還原畫面時，籤還在，不需要再還原
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) { try { sessionStorage.removeItem('returnLot'); } catch (err) {} }
         });
     </script>
     

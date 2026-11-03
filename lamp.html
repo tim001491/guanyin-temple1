@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>菩提光球・線上光明燈</title>
+<meta name="description" content="寫下心願，點亮一盞光明燈，讓祈願化作光點環繞觀音菩薩流轉。免費點燈，也能為大家隨喜祈福。">
+<meta name="theme-color" content="#090c26">
+<meta property="og:type" content="website">
+<meta property="og:title" content="菩提光球・線上光明燈">
+<meta property="og:description" content="寫下心願，點亮一盞光明燈，讓祈願化作光點環繞觀音菩薩流轉。">
+<meta property="og:image" content="https://xn--dett40e76kpzn.online/lamp/og.jpg">
+<meta property="og:url" content="https://xn--dett40e76kpzn.online/lamp.html">
+<link rel="icon" href="icons/192.png">
+<link rel="apple-touch-icon" href="icons/192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<link rel="preload" as="image" href="lamp/guanyin-orb.webp">
+<style>
+:root {
+  /* 色彩：深夜藍的星空、琉璃金光、薰衣草色的玻璃光暈 */
+  --night: #090c26;
+  --gold: #f4d08a;
+  --glow: #fff3d1;
+  --ink: #f5eedf;
+  --muted: #bcb6d6;
+  --line: rgba(244, 208, 138, 0.28);
+  --display: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
+  --body: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
+  /* 版面：單欄置中，菩提光球是主角，光語牆接在下方；--s 是光球舞台的寬度 */
+  --s: max(260px, min(92vw, 540px, calc(68vh - 60px)));
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--night); overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  font-family: var(--body);
+  color: var(--ink);
+  background: var(--night);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+body.locked { overflow: hidden; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(110% 62% at 50% 34%, rgba(74, 58, 156, 0.55), rgba(28, 28, 88, 0.28) 46%, transparent 74%),
+    radial-gradient(70% 40% at 88% 6%, rgba(116, 72, 176, 0.22), transparent 70%),
+    radial-gradient(60% 40% at 6% 92%, rgba(60, 50, 150, 0.22), transparent 70%),
+    linear-gradient(180deg, #070a20 0%, #0e1340 44%, #0b0f30 72%, #080a22 100%);
+}
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.page { position: relative; z-index: 1; }
+a { color: inherit; }
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+
+/* 頂端 */
+.topbar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 12px) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+}
+.chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1;
+  color: #ddd6ee;
+  text-decoration: none;
+  padding: 9px 15px;
+  border: 1px solid rgba(188, 182, 214, 0.28);
+  border-radius: 999px;
+  background: rgba(12, 14, 42, 0.45);
+  cursor: pointer;
+}
+.chip-link:hover { border-color: var(--line); color: var(--glow); }
+.chip-link .n {
+  min-width: 20px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #3a2508;
+  background: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.preview-note {
+  position: relative;
+  z-index: 5;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  margin: 10px auto 0;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+  color: #ffe7b0;
+  background: rgba(244, 208, 138, 0.1);
+  border: 1px dashed rgba(244, 208, 138, 0.45);
+  border-radius: 12px;
+}
+
+/* 主視覺 */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+  padding: 6px 16px 8px;
+  overflow: hidden;
+  overflow: clip;
+  overflow-y: visible;
+}
+.title {
+  position: relative;
+  z-index: 3;
+  margin-top: 4px;
+  padding-left: 0.2em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(40px, 12vw, 66px);
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  background: linear-gradient(180deg, #fffbe8 0%, #f8dc9a 42%, #e2ab55 76%, #b98238 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(255, 206, 120, 0.45));
+}
+.subtitle {
+  position: relative;
+  z-index: 3;
+  margin-top: 4px;
+  font-size: clamp(14px, 3.9vw, 17px);
+  letter-spacing: 0.12em;
+  color: #ebe3f7;
+  text-wrap: balance;
+}
+.counter {
+  position: relative;
+  z-index: 3;
+  min-height: 1.7em;
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.counter b { color: var(--gold); font-weight: 600; font-size: 15px; }
+
+.stage {
+  position: relative;
+  z-index: 2;
+  width: var(--s);
+  height: calc(var(--s) * 1.12);
+  margin-top: 2px;
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.aura, .rays {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--s) * 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.aura {
+  width: calc(var(--s) * 1.7);
+  height: calc(var(--s) * 1.7);
+  background: radial-gradient(closest-side, rgba(255, 226, 160, 0.42), rgba(255, 196, 120, 0.2) 32%, rgba(150, 120, 230, 0.1) 56%, transparent 78%);
+}
+.rays {
+  width: calc(var(--s) * 2.9);
+  height: calc(var(--s) * 2.9);
+  background:
+    conic-gradient(from 0deg, transparent 0deg 11deg, rgba(255, 214, 140, 0.26) 13deg, transparent 16deg 41deg, rgba(255, 214, 140, 0.2) 43.5deg, transparent 46deg 73deg, rgba(255, 224, 160, 0.24) 75deg, transparent 78deg 104deg, rgba(255, 214, 140, 0.18) 106deg, transparent 109deg 139deg, rgba(255, 224, 160, 0.26) 141deg, transparent 144deg 171deg, rgba(255, 214, 140, 0.2) 173deg, transparent 176deg 203deg, rgba(255, 224, 160, 0.24) 205.5deg, transparent 208deg 236deg, rgba(255, 214, 140, 0.18) 238deg, transparent 241deg 267deg, rgba(255, 224, 160, 0.26) 269deg, transparent 272deg 300deg, rgba(255, 214, 140, 0.2) 302deg, transparent 305deg 331deg, rgba(255, 224, 160, 0.22) 333.5deg, transparent 336deg 360deg),
+    repeating-conic-gradient(from 3deg, rgba(255, 220, 160, 0) 0deg, rgba(255, 220, 160, 0.13) 1.3deg, rgba(255, 220, 160, 0) 3.2deg, rgba(255, 220, 160, 0) 8.6deg),
+    repeating-conic-gradient(from 6deg, rgba(255, 240, 200, 0) 0deg, rgba(255, 240, 200, 0.08) 2.4deg, rgba(255, 240, 200, 0) 5.5deg, rgba(255, 240, 200, 0) 16.6deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent 21%, #000 29%, rgba(0, 0, 0, 0.55) 56%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 21%, #000 29%, rgba(0, 0, 0, 0.55) 56%, transparent 100%);
+  animation: spin 180s linear infinite;
+  transition: opacity 0.9s ease;
+  opacity: 0.85;
+}
+.rays.r2 { animation-duration: 260s; animation-direction: reverse; opacity: 0.45; }
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.stage.flare .rays { opacity: 1; }
+.beam {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--s) * 0.82);
+  width: calc(var(--s) * 0.36);
+  height: calc(var(--s) * 0.22);
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(50% 100% at 50% 0%, rgba(255, 230, 170, 0.4), transparent 75%);
+}
+.pool {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--s) * 1.0);
+  width: calc(var(--s) * 0.9);
+  height: calc(var(--s) * 0.17);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.pool::before {
+  content: "";
+  position: absolute;
+  inset: -30% -8%;
+  background: radial-gradient(closest-side, rgba(255, 220, 150, 0.32), rgba(255, 200, 120, 0.1) 52%, transparent 76%);
+}
+.ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  border: 1.5px solid rgba(255, 214, 140, 0.75);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 200, 120, 0.35), inset 0 0 10px rgba(255, 200, 120, 0.25);
+  transform: translate(-50%, -50%) scale(0.12);
+  opacity: 0;
+  animation: ripple 6.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.ring:nth-child(2) { animation-delay: 1.6s; }
+.ring:nth-child(3) { animation-delay: 3.2s; }
+.ring:nth-child(4) { animation-delay: 4.8s; }
+@keyframes ripple {
+  0% { transform: translate(-50%, -50%) scale(0.12); opacity: 0; }
+  14% { opacity: 0.85; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+.ring.b { animation: none; border-color: rgba(255, 236, 190, 0.95); }
+.pool.bursting .ring.b { animation: burst 1.9s cubic-bezier(0.15, 0.7, 0.3, 1) forwards; }
+.pool.bursting .ring.b:nth-child(6) { animation-delay: 0.28s; }
+.pool.bursting .ring.b:nth-child(7) { animation-delay: 0.56s; }
+@keyframes burst {
+  0% { transform: translate(-50%, -50%) scale(0.05); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
+}
+
+.float { position: absolute; inset: 0; animation: bob 8s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(calc(var(--s) * -0.014)); } }
+canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.orb, .glass {
+  position: absolute;
+  left: calc(var(--s) * 0.08);
+  top: calc(var(--s) * 0.08);
+  width: calc(var(--s) * 0.84);
+  height: calc(var(--s) * 0.84);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.orb {
+  background: radial-gradient(closest-side, rgba(255, 238, 205, 0.16), rgba(160, 140, 230, 0.1) 58%, rgba(196, 178, 255, 0.22) 84%, rgba(255, 230, 248, 0.3) 96%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 0 0 calc(var(--s) * 0.1) rgba(255, 214, 150, 0.28), 0 0 calc(var(--s) * 0.025) rgba(226, 212, 255, 0.45), inset 0 0 calc(var(--s) * 0.05) rgba(220, 205, 255, 0.3);
+}
+.guanyin { position: absolute; left: 9.6%; top: 9.7%; width: 80.9%; height: auto; -webkit-user-drag: none; }
+.orb-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(closest-side, rgba(255, 250, 230, 0.75), rgba(255, 220, 150, 0.35) 45%, transparent 75%);
+}
+.stage.flare .orb-flash { animation: flash 1.5s ease-out; }
+@keyframes flash { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+.rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg, rgba(255, 196, 236, 0.12), rgba(255, 196, 236, 0.62), rgba(178, 160, 255, 0.55), rgba(140, 214, 255, 0.45), rgba(255, 236, 186, 0.6), rgba(255, 170, 214, 0.5), rgba(178, 160, 255, 0.5), rgba(255, 196, 236, 0.12));
+  -webkit-mask-image: radial-gradient(closest-side, transparent 88%, #000 96.5%, rgba(0, 0, 0, 0.6) 99%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 88%, #000 96.5%, rgba(0, 0, 0, 0.6) 99%, transparent 100%);
+  mix-blend-mode: screen;
+  animation: turn 50s linear infinite;
+}
+@keyframes turn { to { transform: rotate(360deg); } }
+.edge { position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32), inset 0 0 calc(var(--s) * 0.035) rgba(232, 222, 255, 0.35); }
+.stage.flare .edge { box-shadow: inset 0 0 0 1.5px rgba(255, 246, 220, 0.8), inset 0 0 calc(var(--s) * 0.06) rgba(255, 230, 180, 0.6), 0 0 calc(var(--s) * 0.12) rgba(255, 220, 150, 0.55); transition: box-shadow 0.3s; }
+.edge { transition: box-shadow 1.2s; }
+.shine { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+.actions {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: calc(var(--s) * -0.03);
+}
+.btn {
+  position: relative;
+  font: 600 17px/1 var(--body);
+  letter-spacing: 0.08em;
+  padding: 15px 28px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-primary {
+  color: #3a2508;
+  background: linear-gradient(180deg, #fff0c8 0%, #f6d185 45%, #e3a94e 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 240, 200, 0.6), 0 8px 28px rgba(255, 190, 90, 0.32), 0 0 36px rgba(255, 200, 110, 0.22);
+}
+.btn-primary:hover { background: linear-gradient(180deg, #fff4d6 0%, #f8d894 45%, #e8b25c 100%); }
+.btn-ghost {
+  color: var(--gold);
+  background: rgba(20, 22, 64, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(244, 208, 138, 0.5);
+}
+.btn-ghost:hover { background: rgba(40, 40, 96, 0.6); color: var(--glow); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+.btn.wide { width: 100%; }
+.btn.small { font-size: 15px; padding: 12px 22px; }
+.hint { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+/* 光語牆 */
+.section { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 44px 16px 8px; }
+.section h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(22px, 6vw, 28px);
+  letter-spacing: 0.1em;
+  text-align: center;
+  color: var(--glow);
+  text-wrap: balance;
+}
+.lead { max-width: 34em; margin: 6px auto 0; text-align: center; font-size: 14px; color: var(--muted); text-wrap: balance; }
+.wall-grid { list-style: none; display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 22px; }
+@media (min-width: 640px) { .wall-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 960px) { .wall-grid { grid-template-columns: repeat(3, 1fr); } }
+.wish-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 12px;
+  padding: 16px 16px 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(32, 34, 90, 0.62), rgba(18, 20, 56, 0.62));
+  border: 1px solid rgba(190, 176, 255, 0.16);
+}
+.wish-card.mine { border-color: rgba(244, 208, 138, 0.42); }
+.dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 36%, #fff 0 18%, var(--c) 42%, transparent 74%);
+  box-shadow: 0 0 12px var(--c);
+}
+.dot.big { width: 34px; height: 34px; margin-top: 2px; box-shadow: 0 0 22px var(--c); }
+.wish-body { display: grid; gap: 4px; min-width: 0; }
+.wish-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.wish-name { font-size: 16px; font-weight: 600; color: var(--ink); }
+.tag {
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: var(--c);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-color: color-mix(in srgb, var(--c) 50%, transparent);
+}
+.demo-tag { font-size: 11px; color: #ffe7b0; border: 1px dashed rgba(244, 208, 138, 0.5); border-radius: 6px; padding: 0 5px; }
+.wish-time { margin-left: auto; font-size: 12px; color: var(--muted); }
+.wish-text { font-size: 15px; line-height: 1.75; color: #ece6f7; overflow-wrap: anywhere; }
+.wish-text.quiet { color: var(--muted); font-size: 14px; }
+.wish-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 13px/1 var(--body);
+  color: var(--gold);
+  background: rgba(244, 208, 138, 0.08);
+  border: 1px solid rgba(244, 208, 138, 0.36);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.mini-btn:hover { background: rgba(244, 208, 138, 0.16); }
+.mini-btn[aria-pressed="true"] { color: var(--glow); background: rgba(244, 208, 138, 0.22); }
+.mini-btn.plain { color: #d9d2ea; border-color: rgba(188, 182, 214, 0.3); background: transparent; }
+.mini-btn svg { width: 15px; height: 15px; flex: none; }
+.empty { margin-top: 18px; text-align: center; font-size: 15px; color: var(--muted); }
+.more-wrap { display: flex; justify-content: center; margin-top: 18px; }
+
+/* 關於 */
+.about-grid { display: grid; gap: 14px; margin-top: 22px; }
+@media (min-width: 780px) { .about-grid { grid-template-columns: 1fr 1fr 1fr; } }
+.about-grid > div { padding: 18px 18px 16px; border-radius: 16px; background: rgba(20, 22, 62, 0.45); border: 1px solid rgba(190, 176, 255, 0.14); }
+.about h3 { margin-bottom: 8px; font-size: 17px; font-weight: 600; letter-spacing: 0.06em; color: var(--gold); }
+.about p, .about li { font-size: 14.5px; line-height: 1.85; color: #ddd6ee; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 26px 1fr; gap: 0 10px; }
+.steps li::before {
+  content: counter(step);
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 2px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a2508;
+  background: linear-gradient(180deg, #fff0c8, #e3a94e);
+}
+.steps b { color: var(--ink); font-weight: 600; }
+.notes { padding-left: 1.1em; display: grid; gap: 6px; }
+
+.footer { position: relative; z-index: 1; padding: 40px 16px calc(28px + env(safe-area-inset-bottom)); text-align: center; font-size: 13px; color: var(--muted); }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-bottom: 8px; }
+.footer-links a { color: #d9d2ea; text-decoration: none; }
+.footer-links a:hover { color: var(--gold); text-decoration: underline; }
+
+/* 對話框 */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(4, 5, 18, 0.58);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.backdrop.open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed;
+  z-index: 41;
+  left: 50%;
+  bottom: 0;
+  width: min(100%, 560px);
+  max-height: 92vh;
+  max-height: 92dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #1c1e56 0%, #121443 100%);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, 104%);
+  visibility: hidden;
+  transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s, visibility 0s 0.42s;
+}
+.sheet.open { transform: translate(-50%, 0); visibility: visible; transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s; }
+.sheet:focus { outline: none; }
+.sheet.modal, .sheet.center { width: min(calc(100% - 28px), 430px); top: 50%; bottom: auto; border-radius: 24px; border-bottom: 1px solid var(--line); padding-bottom: 24px; transform: translate(-50%, -46%) scale(0.97); opacity: 0; }
+.sheet.modal.open, .sheet.center.open { transform: translate(-50%, -50%); opacity: 1; }
+@media (min-width: 720px) {
+  .sheet { top: 50%; bottom: auto; border-radius: 24px; border-bottom: 1px solid var(--line); padding-bottom: 24px; transform: translate(-50%, -46%) scale(0.97); opacity: 0; }
+  .sheet.open { transform: translate(-50%, -50%); opacity: 1; }
+}
+.sheet h3 { font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: 0.08em; color: var(--glow); padding-right: 40px; }
+.sheet h3:focus { outline: none; }
+.sheet-lead { margin-top: 4px; font-size: 14px; color: var(--muted); }
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.close:hover { color: var(--glow); }
+form { display: grid; gap: 14px; margin-top: 16px; }
+.field { display: grid; gap: 8px; min-width: 0; border: 0; }
+.field > label, .field legend, .label-row label { font-size: 14px; letter-spacing: 0.04em; color: #e6def5; }
+.field legend { margin-bottom: 8px; }
+input[type="text"], input[type="password"], textarea {
+  width: 100%;
+  font: 16px/1.6 var(--body);
+  color: var(--ink);
+  background: rgba(8, 10, 34, 0.55);
+  border: 1px solid rgba(190, 176, 255, 0.28);
+  border-radius: 12px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus-visible, textarea:focus-visible { outline: none; }
+input::placeholder, textarea::placeholder { color: rgba(188, 182, 214, 0.6); }
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus { border-color: rgba(244, 208, 138, 0.8); box-shadow: 0 0 0 3px rgba(244, 208, 138, 0.18); }
+textarea { min-height: 68px; resize: none; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: rgba(8, 10, 34, 0.5); border: 1px solid rgba(190, 176, 255, 0.2); }
+.seg label, .cats label { position: relative; display: block; }
+.seg input, .cats input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.seg span { display: block; padding: 9px 4px; border-radius: 10px; text-align: center; font-size: 14px; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s; }
+.seg input:checked + span { color: var(--glow); background: linear-gradient(180deg, rgba(244, 208, 138, 0.3), rgba(244, 208, 138, 0.14)); box-shadow: inset 0 0 0 1px rgba(244, 208, 138, 0.5); }
+.seg input:focus-visible + span, .cats input:focus-visible + span { outline: 2px solid var(--glow); outline-offset: 2px; }
+.preview-name { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.preview-name b { color: var(--gold); font-weight: 600; }
+.cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cats span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 2px 7px;
+  border-radius: 14px;
+  font-size: 14px;
+  color: #ddd6ee;
+  background: rgba(8, 10, 34, 0.45);
+  border: 1px solid rgba(190, 176, 255, 0.18);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.cats i { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 40% 36%, #fff 0 18%, var(--c) 42%, transparent 74%); box-shadow: 0 0 10px var(--c); }
+.cats input:checked + span { color: #fff; background: rgba(255, 255, 255, 0.07); border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c), 0 0 18px -4px var(--c); }
+.label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.suggest { justify-self: start; padding: 2px 0; font: 13px/1.5 var(--body); text-align: left; color: var(--gold); background: none; border: 0; cursor: pointer; }
+.suggest:hover { text-decoration: underline; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.privacy { font-size: 12.5px; line-height: 1.65; color: var(--muted); }
+.form-error { font-size: 14px; color: #ffb9ad; }
+.form-error:empty { display: none; }
+
+.cert { display: grid; justify-items: center; gap: 6px; padding-top: 6px; text-align: center; }
+.cert-orb {
+  width: 76px;
+  height: 76px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #fff 0 14%, var(--c) 36%, rgba(255, 255, 255, 0) 72%);
+  box-shadow: 0 0 46px var(--c), 0 0 12px rgba(255, 255, 255, 0.6);
+}
+.sheet.modal { background: radial-gradient(120% 70% at 50% 0%, rgba(255, 214, 150, 0.16), transparent 60%), linear-gradient(180deg, #1d1f5b, #111341); }
+.cert-kicker { font-size: 13px; letter-spacing: 0.18em; color: var(--gold); }
+.cert h3 { padding: 0; font-size: 26px; }
+.cert-line { width: 120px; height: 1px; margin: 4px 0; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.cert-name { font-size: 21px; font-weight: 600; color: var(--ink); }
+.cert-public { font-size: 12.5px; color: var(--muted); }
+.cert-public:empty { display: none; }
+.cert-wish { max-width: 26em; font-size: 17px; line-height: 1.8; color: #fff3d8; }
+.cert-wish:empty { display: none; }
+.cert-bless { max-width: 26em; font-size: 14.5px; line-height: 1.85; color: #ddd5f0; }
+.cert-bless span { display: block; }
+.cert-date { font-size: 12.5px; color: var(--muted); }
+.cert-actions, .lamp-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+.text-btn { margin-top: 8px; padding: 6px 4px; font: 14px/1.4 var(--body); color: var(--gold); background: none; border: 0; cursor: pointer; }
+.text-btn:hover { text-decoration: underline; }
+.text-btn.danger { color: #ffb9ad; }
+.lamp-head { display: flex; align-items: center; gap: 14px; }
+.lamp-kicker { font-size: 13px; letter-spacing: 0.08em; color: var(--gold); }
+.lamp-wish { margin-top: 14px; font-size: 17px; line-height: 1.85; color: #fff3d8; overflow-wrap: anywhere; }
+.lamp-wish.quiet { font-size: 15px; color: var(--muted); }
+.lamp-meta { margin-top: 6px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lamp-actions { justify-content: flex-start; }
+.my-list { list-style: none; display: grid; gap: 10px; margin-top: 16px; }
+.my-list li { display: grid; grid-template-columns: auto 1fr; gap: 0 12px; padding: 14px; border-radius: 14px; background: rgba(8, 10, 34, 0.4); border: 1px solid rgba(190, 176, 255, 0.16); }
+.my-title { font-size: 15px; font-weight: 600; }
+.my-sub { font-size: 13px; color: var(--muted); }
+.my-list .wish-actions { grid-column: 2; }
+.confirm-text { margin-top: 10px; font-size: 15px; color: #ddd6ee; }
+
+.toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  max-width: calc(100vw - 32px);
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--ink);
+  background: rgba(22, 24, 66, 0.94);
+  border: 1px solid var(--line);
+  transform: translate(-50%, 16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rays, .rim, .float { animation: none; }
+  .ring { animation: none; opacity: 0.3; transform: translate(-50%, -50%) scale(var(--sc, 0.5)); }
+  .ring:nth-child(1) { --sc: 0.35; }
+  .ring:nth-child(2) { --sc: 0.6; }
+  .ring:nth-child(3) { --sc: 0.85; }
+  .ring:nth-child(4) { --sc: 1; }
+  .ring.b { opacity: 0; }
+  .sheet, .backdrop, .toast { transition: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<div class="page">
+  <header class="topbar">
+    <a class="chip-link" id="homeLink" href="index.html">‹ 觀音靈籤</a>
+    <button class="chip-link" id="myBtn" type="button">我的光明燈<span class="n" id="myCount" hidden></span></button>
+  </header>
+  <p class="preview-note" id="previewNote" hidden>預覽模式：光球裡是示範光明燈，您點的燈只存在這台裝置。上線後會連到網站的公開燈牆。</p>
+
+  <section class="hero" aria-labelledby="pageTitle">
+    <h1 class="title" id="pageTitle">菩提光球</h1>
+    <p class="subtitle">點亮一盞光明燈　讓心願化作光　環繞菩薩流轉</p>
+    <p class="counter" id="counter" aria-live="polite">光球正在亮起…</p>
+
+    <div class="stage" id="stage" role="img" aria-label="觀音菩薩坐在蓮花上的水晶光球，信眾點亮的光明燈化成光點環繞流轉">
+      <div class="aura"></div>
+      <div class="rays"></div>
+      <div class="rays r2"></div>
+      <div class="beam"></div>
+      <div class="pool" id="pool"><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring b"></i><i class="ring b"></i><i class="ring b"></i></div>
+      <div class="float" id="float">
+        <canvas class="layer" id="cBack"></canvas>
+        <div class="orb">
+          <img class="guanyin" src="lamp/guanyin-orb.webp" alt="" width="812" height="844" decoding="async" draggable="false">
+          <div class="orb-flash"></div>
+        </div>
+        <canvas class="layer" id="cMid"></canvas>
+        <div class="glass">
+          <div class="rim"></div>
+          <div class="edge"></div>
+          <svg class="shine" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <linearGradient id="hl" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
+                <stop offset="0.45" stop-color="#fff" stop-opacity="0.9"></stop>
+                <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+              </linearGradient>
+              <radialGradient id="soft" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stop-color="#fff" stop-opacity="0.2"></stop>
+                <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+              </radialGradient>
+            </defs>
+            <path d="M 35.3 9.6 A 43 43 0 0 0 9.1 36.7" fill="none" stroke="url(#hl)" stroke-width="1.3" stroke-linecap="round"></path>
+            <path d="M 32.6 17.3 A 37 37 0 0 0 18 31.5" fill="none" stroke="url(#hl)" stroke-width="0.6" stroke-linecap="round" opacity="0.6"></path>
+            <ellipse cx="28" cy="24" rx="16" ry="6" transform="rotate(-38 28 24)" fill="url(#soft)"></ellipse>
+            <path d="M 91.3 65 A 44 44 0 0 1 72 88.1" fill="none" stroke="#e9dcff" stroke-opacity="0.35" stroke-width="0.8" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <canvas class="layer" id="cTop"></canvas>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="lightBtn" type="button">點亮光明燈</button>
+      <button class="btn btn-ghost" id="prayBtn" type="button">為眾生祈福</button>
+    </div>
+    <p class="hint">輕觸光球裡的光點，看看每一份祈願</p>
+  </section>
+
+  <section class="section" id="wall" aria-labelledby="wallTitle">
+    <h2 id="wallTitle">光語・大家的祈願</h2>
+    <p class="lead">看見別人的心願，也送上一份祝福。按下「隨喜」，那盞燈會更明亮。</p>
+    <ul class="wall-grid" id="wallList"></ul>
+    <p class="empty" id="wallEmpty" hidden>光球正在等待第一盞燈，歡迎您成為第一位點燈的人。</p>
+    <div class="more-wrap"><button class="btn btn-ghost small" id="moreBtn" type="button" hidden>看更多祈願</button></div>
+  </section>
+
+  <section class="section about" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">關於線上光明燈</h2>
+    <div class="about-grid">
+      <div>
+        <h3>光明燈的心意</h3>
+        <p>光明燈象徵以智慧之光照亮前路。在菩提光球裡，每一份心願都化作一顆光點，環繞觀音菩薩流轉，也和大家的祝福彼此輝映。</p>
+      </div>
+      <div>
+        <h3>怎麼點燈</h3>
+        <ol class="steps">
+          <li><b>寫下心願</b><span>填上稱呼，選擇祈願類別，也可以寫一句祈願文。</span></li>
+          <li><b>點亮光點</b><span>光點從水面升起，環繞光球一圈，來到菩薩身旁。</span></li>
+          <li><b>分享與隨喜</b><span>把燈分享給家人；看見別人的燈，也能為他隨喜祝福。</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>點燈須知</h3>
+        <ul class="notes">
+          <li>線上點燈免費，誠心最重要。</li>
+          <li>姓名可選擇遮蔽部分或匿名；請勿填寫電話、地址等個人資料。</li>
+          <li>祈願會公開顯示在光球與光語中，不當內容將會移除。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <nav class="footer-links" aria-label="網站連結">
+      <a href="index.html" data-site-link>觀音靈籤</a>
+      <a href="about.html" data-site-link>關於我們</a>
+      <a href="contact.html" data-site-link>聯絡我們</a>
+      <a href="privacy.html" data-site-link>隱私權政策</a>
+    </nav>
+    <p>© 2026 觀音靈籤・心誠則靈</p>
+  </footer>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<section class="sheet" id="lightSheet" role="dialog" aria-modal="true" aria-labelledby="lightTitle" tabindex="-1">
+  <button class="close" type="button" data-close aria-label="關閉">×</button>
+  <h3 id="lightTitle" tabindex="-1">點亮一盞光明燈</h3>
+  <p class="sheet-lead">靜心片刻，寫下您的祈願。</p>
+  <form id="lightForm" novalidate>
+    <div class="field">
+      <label for="fName">姓名或稱呼</label>
+      <input id="fName" name="name" type="text" maxlength="12" autocomplete="name" placeholder="例：王小明" enterkeyhint="next">
+    </div>
+    <fieldset class="field">
+      <legend>光球上顯示</legend>
+      <div class="seg">
+        <label><input type="radio" name="show" id="showMask" value="mask" checked><span>遮蔽部分</span></label>
+        <label><input type="radio" name="show" id="showFull" value="full"><span>完整姓名</span></label>
+        <label><input type="radio" name="show" id="showAnon" value="anon"><span>匿名善信</span></label>
+      </div>
+      <p class="preview-name" id="namePreview"></p>
+    </fieldset>
+    <fieldset class="field">
+      <legend>祈願類別</legend>
+      <div class="cats" id="catGrid"></div>
+    </fieldset>
+    <div class="field">
+      <div class="label-row"><label for="fWish">祈願文（可不填）</label><span class="count" id="wishCount">0/60</span></div>
+      <textarea id="fWish" name="wish" maxlength="60" rows="2" placeholder="例：願家人身體健康、平安喜樂"></textarea>
+      <button type="button" class="suggest" id="suggestBtn">帶入祝福語：<span id="suggestText"></span></button>
+    </div>
+    <input type="text" name="website" id="fWebsite" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="privacy">姓名與祈願會公開顯示在光球上，請勿填寫電話、地址等個人資料。</p>
+    <p class="form-error" id="formError" role="alert"></p>
+    <button class="btn btn-primary wide" id="submitBtn" type="submit">點亮光明燈</button>
+  </form>
+</section>
+
+<section class="sheet modal" id="certSheet" role="dialog" aria-modal="true" aria-labelledby="certTitle" tabindex="-1">
+  <button class="close" type="button" data-close aria-label="關閉">×</button>
+  <div class="cert">
+    <div class="cert-orb" id="certOrb"></div>
+    <p class="cert-kicker" id="certNo"></p>
+    <h3 id="certTitle" tabindex="-1">光明燈已點亮</h3>
+    <div class="cert-line"></div>
+    <p class="cert-name" id="certName"></p>
+    <p class="cert-public" id="certPublic"></p>
+    <p class="cert-wish" id="certWish"></p>
+    <p class="cert-bless" id="certBless"></p>
+    <p class="cert-date" id="certDate"></p>
+    <div class="cert-actions">
+      <button class="btn btn-primary small" id="certShare" type="button">分享給家人</button>
+      <button class="btn btn-ghost small" id="certView" type="button">看我的光點</button>
+    </div>
+    <button class="text-btn" id="certAgain" type="button">為家人再點一盞</button>
+  </div>
+</section>
+
+<section class="sheet" id="lampSheet" role="dialog" aria-modal="true" aria-labelledby="lampName" tabindex="-1">
+  <button class="close" type="button" data-close aria-label="關閉">×</button>
+  <div class="lamp-head">
+    <span class="dot big" id="lampDot" aria-hidden="true"></span>
+    <div>
+      <p class="lamp-kicker" id="lampKicker"></p>
+      <h3 id="lampName" tabindex="-1"></h3>
+    </div>
+  </div>
+  <p class="lamp-wish" id="lampWish"></p>
+  <p class="lamp-meta" id="lampMeta"></p>
+  <div class="lamp-actions">
+    <button class="btn btn-primary small" id="lampBless" type="button">隨喜祝福</button>
+    <button class="btn btn-ghost small" id="lampShare" type="button">分享這盞燈</button>
+  </div>
+  <button class="text-btn" id="lampLight" type="button">我也要點一盞</button>
+  <button class="text-btn danger" id="lampRemove" type="button" hidden>移除這盞燈（管理）</button>
+</section>
+
+<section class="sheet" id="mySheet" role="dialog" aria-modal="true" aria-labelledby="myTitle" tabindex="-1">
+  <button class="close" type="button" data-close aria-label="關閉">×</button>
+  <h3 id="myTitle" tabindex="-1">我的光明燈</h3>
+  <p class="sheet-lead">在這台裝置上點過的燈，換手機或清除瀏覽資料後就看不到了。</p>
+  <ul class="my-list" id="myList"></ul>
+  <p class="empty" id="myEmpty">您還沒有點燈。</p>
+  <div class="more-wrap"><button class="btn btn-primary" id="myLight" type="button">點亮光明燈</button></div>
+</section>
+
+<section class="sheet center" id="adminSheet" role="dialog" aria-modal="true" aria-labelledby="adminTitle" tabindex="-1">
+  <button class="close" type="button" data-close aria-label="關閉">×</button>
+  <h3 id="adminTitle" tabindex="-1">管理模式</h3>
+  <p class="sheet-lead">輸入在 Netlify 設定的 LAMP_ADMIN_KEY，就能移除不當的祈願。</p>
+  <form id="adminForm" novalidate>
+    <div class="field">
+      <label for="fAdmin">管理密碼</label>
+      <input id="fAdmin" type="password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary wide" type="submit">進入管理模式</button>
+  </form>
+</section>
+
+<section class="sheet center" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" tabindex="-1">
+  <h3 id="confirmTitle" tabindex="-1">移除這盞燈？</h3>
+  <p class="confirm-text" id="confirmText"></p>
+  <div class="lamp-actions">
+    <button class="btn btn-primary small" id="confirmYes" type="button">確定移除</button>
+    <button class="btn btn-ghost small" type="button" data-close>取消</button>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="position:relative;z-index:2;text-align:center;padding:16px;color:#fff3d1">請開啟瀏覽器的 JavaScript 才能點燈。</p></noscript>
+
+<script>
+(() => {
+  'use strict';
+
+  // ===== 設定 =====
+  const PREVIEW = false; // 預覽版會改成 true：光明燈只存在這台裝置，並放入示範燈
+  const API = '/api/lamps';
+  const NAME_MAX = 12;
+  const WISH_MAX = 60;
+  const CATS = {
+    '平安': { color: '#ffd27a', wish: '願闔家平安，出入順遂', bless: '心安處處皆光明，願您出入平安、事事順遂。' },
+    '健康': { color: '#8fe3c0', wish: '願身體健康，病苦消除', bless: '願您身心輕安、元氣飽滿，日日神清氣爽。' },
+    '學業': { color: '#8cc8ff', wish: '願學業精進，考試順利', bless: '願您智慧增長、心思澄明，所學皆有所成。' },
+    '事業': { color: '#ffab66', wish: '願工作順利，貴人相助', bless: '願您事業蒸蒸日上，所到之處皆有貴人。' },
+    '財運': { color: '#ffec80', wish: '願財源廣進，衣食無憂', bless: '願您福報綿長、財源廣進，生活豐足安穩。' },
+    '姻緣': { color: '#ff9fc4', wish: '願良緣早到，感情圓滿', bless: '願您良緣相聚、心意相通，感情圓滿美好。' },
+    '闔家': { color: '#c7a6ff', wish: '願家庭和樂，親人安康', bless: '願您家和萬事興，親人安康、笑語滿堂。' },
+    '消災': { color: '#eef0ff', wish: '願消災解厄，逢凶化吉', bless: '願諸事化吉、障礙消散，前路一片光明。' },
+  };
+  const CAT_NAMES = Object.keys(CATS);
+  const LUNAR_DAYS = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+
+  const $ = (sel) => document.querySelector(sel);
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const easeInOut = (k) => (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2);
+  const easeSine = (k) => -(Math.cos(Math.PI * k) - 1) / 2;
+  const smooth = (a, b, x) => { const k = clamp01((x - a) / (b - a)); return k * k * (3 - 2 * k); };
+
+  // ===== 小工具 =====
+  const saved = {
+    get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} },
+  };
+  const session = {
+    get(key) { try { return sessionStorage.getItem(key) || ''; } catch (e) { return ''; } },
+    set(key, value) { try { if (value) sessionStorage.setItem(key, value); else sessionStorage.removeItem(key); } catch (e) {} },
+  };
+  const clean = (s) => String(s || '').normalize('NFC').replace(/[\p{Cc}\p{Cf}]/gu, ' ').replace(/\s+/g, ' ').trim();
+  const charLen = (s) => Array.from(s).length;
+  const fmtNum = (n) => Number(n || 0).toLocaleString('zh-TW');
+
+  function hasContact(text) {
+    const t = text.normalize('NFKC').toLowerCase();
+    if (/(https?:\/\/|www\.|\.(com|net|org|tw|cc|io|me|xyz|top|shop|info|link)\b)/.test(t)) return true;
+    if (/line\s*(id)?\s*[:：]|加賴|加line|@[a-z0-9_.]{3,}/.test(t)) return true;
+    const runs = t.match(/[\d\s\-()+]{9,}/g) || [];
+    return runs.some((r) => (r.match(/\d/g) || []).length >= 9);
+  }
+
+  // 王小明 → 王○明；王明 → 王○；Amy Chen → A** C***
+  function maskName(name) {
+    const s = clean(name);
+    const chars = Array.from(s);
+    if (chars.length <= 1) return s;
+    if (/\p{Script=Han}/u.test(s)) {
+      if (chars.length === 2) return chars[0] + '○';
+      return chars[0] + '○'.repeat(chars.length - 2) + chars[chars.length - 1];
+    }
+    return s.split(' ').map((w) => (w.length > 1 ? w[0] + '*'.repeat(Math.min(3, w.length - 1)) : w)).join(' ');
+  }
+  function displayName(fullName, mode) {
+    if (mode === 'anon' || !fullName) return '善信';
+    return mode === 'full' ? fullName : maskName(fullName);
+  }
+
+  function timeAgo(t) {
+    const s = Math.max(0, (Date.now() - t) / 1000);
+    if (s < 60) return '剛剛';
+    if (s < 3600) return `${Math.floor(s / 60)} 分鐘前`;
+    if (s < 86400) return `${Math.floor(s / 3600)} 小時前`;
+    if (s < 86400 * 7) return `${Math.floor(s / 86400)} 天前`;
+    const d = new Date(t);
+    return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  }
+  function solarDate(t) {
+    const d = new Date(t);
+    return `國曆 ${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+  }
+  function lunarDate(t) {
+    try {
+      const parts = new Intl.DateTimeFormat('zh-TW-u-ca-chinese', { year: 'numeric', month: 'long', day: 'numeric' }).formatToParts(new Date(t));
+      const part = (type) => (parts.find((p) => p.type === type) || {}).value;
+      const yearName = part('yearName');
+      const month = part('month');
+      const day = Number(part('day'));
+      if (!yearName || !month || !day || !LUNAR_DAYS[day - 1]) return '';
+      return `農曆${yearName}年${month}${LUNAR_DAYS[day - 1]}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // 以燈號產生固定的亂數，讓每盞燈在每台裝置上的軌道都一樣
+  function seedOf(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const randomId = () => Array.from({ length: 12 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+
+  // ===== 資料：正式網站連到 /api/lamps；預覽版存在這台裝置 =====
+  async function readJson(res) {
+    let data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok || !data || data.ok === false) {
+      const err = new Error((data && data.error) || '光明燈暫時連不上，請稍後再試');
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+  const remoteApi = {
+    async list() { return readJson(await fetch(API, { headers: { accept: 'application/json' } })); },
+    async get(id) { return readJson(await fetch(`${API}?id=${encodeURIComponent(id)}`, { headers: { accept: 'application/json' } })); },
+    async post(body, headers) {
+      return readJson(await fetch(API, { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, headers || {}), body: JSON.stringify(body) }));
+    },
+  };
+
+  const PREVIEW_KEY = 'bodhi-preview-wall-v1';
+  function demoWall() {
+    const samples = [
+      ['陳○華', '平安', '願爸媽身體健康，出入平安'], ['林○萱', '學業', '願研究所考試順利上榜'], ['善信', '健康', '願阿嬤手術順利，早日康復'],
+      ['張○豪', '事業', '願新工作順利，遇到好同事'], ['黃○婷', '姻緣', '願遇見對的人，好好相愛'], ['王○明', '闔家', '願一家人和樂平安'],
+      ['李○芬', '財運', '願小店生意興隆'], ['善信', '消災', '願今年諸事順利，化險為夷'], ['吳○翰', '學業', '願會考順利，考上理想的學校'],
+      ['蔡○玲', '健康', '願自己睡得好、少煩惱'], ['劉○宏', '平安', '願出差一路平安'], ['鄭○如', '闔家', '願寶寶健康長大'],
+      ['許○傑', '事業', '願創業順利，貴人相助'], ['謝○慧', '平安', '願世界和平，眾生安樂'], ['善信', '姻緣', '願和另一半感情越來越好'],
+      ['楊○婷', '財運', '願早日存到買房頭期款'], ['A**', '學業', '願英文檢定一次通過'], ['郭○廷', '健康', ''],
+      ['洪○雯', '平安', '願家中長輩平安喜樂'], ['曾○凱', '事業', '願面試順利錄取'], ['邱○萍', '闔家', '願全家出遊平安愉快'],
+      ['善信', '平安', ''], ['周○宇', '消災', '願病痛遠離，身體一天比一天好'], ['葉○君', '姻緣', '願早日遇見有緣人'],
+    ];
+    const r = rng(1103);
+    const now = Date.now();
+    const lamps = [];
+    for (let i = 0; i < 48; i++) {
+      const s = samples[i % samples.length];
+      lamps.push({ id: randomId(), no: 48 - i, name: s[0], cat: s[1], wish: i < samples.length ? s[2] : '', t: now - Math.round((i * i * 0.9 + r() * 4 + 0.3) * 3600e3), b: Math.floor(r() * r() * 36), demo: true });
+    }
+    return { total: 48, blessTotal: 286, lamps };
+  }
+  const localApi = {
+    load() {
+      const w = saved.get(PREVIEW_KEY, null);
+      if (w && Array.isArray(w.lamps)) return w;
+      const fresh = demoWall();
+      saved.set(PREVIEW_KEY, fresh);
+      return fresh;
+    },
+    async list() { const w = this.load(); return { ok: true, total: w.total, blessTotal: w.blessTotal, lamps: w.lamps.slice(0, 240) }; },
+    async get(id) {
+      const lamp = this.load().lamps.find((l) => l.id === id);
+      if (!lamp) { const e = new Error('找不到這盞光明燈，可能已被移除'); e.status = 404; throw e; }
+      return { ok: true, lamp };
+    },
+    async post(body, headers) {
+      await new Promise((r) => setTimeout(r, 380));
+      const w = this.load();
+      if (body.action === 'light') {
+        if (!CATS[body.cat]) throw new Error('請選擇祈願類別');
+        w.total += 1;
+        const lamp = { id: randomId(), no: w.total, name: body.name, cat: body.cat, wish: body.wish || '', t: Date.now(), b: 0 };
+        w.lamps.unshift(lamp);
+        saved.set(PREVIEW_KEY, w);
+        return { ok: true, lamp, total: w.total, blessTotal: w.blessTotal };
+      }
+      if (body.action === 'bless' || body.action === 'pray') {
+        let lamp = null;
+        if (body.action === 'bless') {
+          lamp = w.lamps.find((l) => l.id === body.id);
+          if (!lamp) throw new Error('這盞燈已不在光球中');
+          lamp.b = (lamp.b || 0) + 1;
+        }
+        w.blessTotal += 1;
+        saved.set(PREVIEW_KEY, w);
+        return { ok: true, id: body.id, b: lamp ? lamp.b : undefined, blessTotal: w.blessTotal };
+      }
+      if (body.action === 'remove') {
+        if (!headers || !headers['x-admin-key']) throw new Error('管理密碼不正確');
+        w.lamps = w.lamps.filter((l) => l.id !== body.id);
+        saved.set(PREVIEW_KEY, w);
+        return { ok: true, id: body.id };
+      }
+      throw new Error('不支援的動作');
+    },
+  };
+  const api = PREVIEW ? localApi : remoteApi;
+
+  // ===== 狀態 =====
+  const state = {
+    lamps: [],
+    byId: new Map(),
+    total: 0,
+    blessTotal: 0,
+    loading: true,
+    error: null,
+    shown: 12,
+    my: saved.get('bodhi-my-lamps', []),
+    blessed: saved.get('bodhi-blessed', {}),
+    admin: session.get('bodhi-admin'),
+    selected: null,
+    label: null,
+    prayAt: -1e9,
+  };
+
+  function hydrate(raw) {
+    const cat = CATS[raw.cat] ? raw.cat : '平安';
+    return {
+      id: String(raw.id),
+      no: raw.no || 0,
+      name: clean(raw.name) || '善信',
+      cat,
+      wish: clean(raw.wish),
+      t: raw.t || Date.now(),
+      b: raw.b || 0,
+      demo: !!raw.demo,
+      color: CATS[cat].color,
+      orbit: makeOrbit(String(raw.id)),
+    };
+  }
+  const isMine = (id) => state.my.some((m) => m.id === id);
+  function rebuildIndex() { state.byId = new Map(state.lamps.map((l) => [l.id, l])); }
+
+  function mergeLamps(list, initial) {
+    const now = performance.now();
+    const incoming = new Set();
+    const fresh = [];
+    for (const raw of list || []) {
+      if (!raw || !raw.id) continue;
+      incoming.add(String(raw.id));
+      const known = state.byId.get(String(raw.id));
+      if (known) { known.b = Math.max(known.b || 0, raw.b || 0); continue; }
+      const lamp = hydrate(raw);
+      if (!initial) lamp.fadeIn = now;
+      fresh.push(lamp);
+    }
+    // 剛點的燈、從分享連結打開的燈，即使伺服器的清單還沒更新也先留著
+    state.lamps = state.lamps.filter((l) => incoming.has(l.id) || l.keep || (l.local && Date.now() - l.t < 10 * 60e3));
+    state.lamps = fresh.concat(state.lamps).sort((a, b) => b.t - a.t);
+    rebuildIndex();
+  }
+
+  async function load(initial) {
+    try {
+      const data = await api.list();
+      mergeLamps(data.lamps, initial);
+      state.total = Math.max(data.total || 0, state.lamps.length ? state.lamps[0].no || 0 : 0);
+      state.blessTotal = Math.max(data.blessTotal || 0, initial ? 0 : state.blessTotal);
+      state.error = null;
+    } catch (err) {
+      state.error = err;
+      if (initial) setTimeout(() => load(true), 20000);
+    }
+    state.loading = false;
+    renderCounter();
+    renderWall();
+    renderMy();
+  }
+
+  // ===== 光球舞台 =====
+  const stage = $('#stage');
+  const layer = { back: $('#cBack'), mid: $('#cMid'), top: $('#cTop') };
+  const ctx = { back: layer.back.getContext('2d'), mid: layer.mid.getContext('2d'), top: layer.top.getContext('2d') };
+  const geo = { w: 0, h: 0, cx: 0, cy: 0, R: 1, poolY: 1.19, dpr: 1 };
+
+  function makeOrbit(id) {
+    const r = rng(seedOf(id));
+    return {
+      rad: 0.4 + 0.48 * Math.sqrt(r()),
+      incl: (r() * 2 - 1) * 1.25,
+      roll: r() * Math.PI * 2,
+      speed: (0.09 + r() * 0.11) * (r() < 0.5 ? -1 : 1),
+      phase: r() * Math.PI * 2,
+      tw: r() * Math.PI * 2,
+    };
+  }
+  function orbitPos(o, t, out) {
+    const a = o.phase + o.speed * t;
+    const x = Math.cos(a) * o.rad;
+    const z0 = Math.sin(a) * o.rad;
+    const y1 = -z0 * Math.sin(o.incl);
+    const z1 = z0 * Math.cos(o.incl);
+    const cr = Math.cos(o.roll);
+    const sr = Math.sin(o.roll);
+    out.x = x * cr - y1 * sr;
+    out.y = x * sr + y1 * cr;
+    out.z = z1;
+    return out;
+  }
+  function toScreen(p) {
+    const k = 1 + 0.1 * p.z;
+    return { x: geo.cx + p.x * geo.R * k, y: geo.cy + p.y * geo.R * k };
+  }
+  // 依深度決定畫在哪一層：後方（菩薩背後）、玻璃內前方、玻璃外前方
+  function layerFor(p) {
+    if (p.z < 0) return ctx.back;
+    return p.x * p.x + p.y * p.y + p.z * p.z < 0.96 ? ctx.mid : ctx.top;
+  }
+
+  function resize() {
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    geo.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    geo.w = w;
+    geo.h = h;
+    geo.cx = w / 2;
+    geo.cy = w * 0.5;
+    geo.R = w * 0.42;
+    geo.poolY = (w * 1.0 - geo.cy) / geo.R;
+    for (const k of ['back', 'mid', 'top']) {
+      layer[k].width = Math.round(w * geo.dpr);
+      layer[k].height = Math.round(h * geo.dpr);
+      ctx[k].setTransform(geo.dpr, 0, 0, geo.dpr, 0, 0);
+    }
+    resizeSky();
+  }
+
+  // 預先畫好光點圖樣，每一格動畫直接貼上，手機也跑得順
+  const sprites = new Map();
+  function hexRgb(hex) { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  function sprite(hex) {
+    if (sprites.has(hex)) return sprites.get(hex);
+    const S = 96;
+    const c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const [r, gr, b] = hexRgb(hex);
+    const m = S / 2;
+    const grd = g.createRadialGradient(m, m, 0, m, m, m);
+    grd.addColorStop(0, 'rgba(255,255,255,1)');
+    grd.addColorStop(0.11, 'rgba(255,252,238,1)');
+    grd.addColorStop(0.23, `rgba(${r},${gr},${b},0.96)`);
+    grd.addColorStop(0.44, `rgba(${r},${gr},${b},0.34)`);
+    grd.addColorStop(0.7, `rgba(${r},${gr},${b},0.08)`);
+    grd.addColorStop(1, `rgba(${r},${gr},${b},0)`);
+    g.fillStyle = grd;
+    g.fillRect(0, 0, S, S);
+    sprites.set(hex, c);
+    return c;
+  }
+  function makeSparkle() {
+    const S = 128;
+    const c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const m = S / 2;
+    const glow = g.createRadialGradient(m, m, 0, m, m, m * 0.5);
+    glow.addColorStop(0, 'rgba(255,250,230,1)');
+    glow.addColorStop(0.22, 'rgba(255,230,170,0.55)');
+    glow.addColorStop(1, 'rgba(255,220,150,0)');
+    g.fillStyle = glow;
+    g.fillRect(0, 0, S, S);
+    const ray = (len, wid, rot) => {
+      g.save();
+      g.translate(m, m);
+      g.rotate(rot);
+      const lg = g.createLinearGradient(-len, 0, len, 0);
+      lg.addColorStop(0, 'rgba(255,240,200,0)');
+      lg.addColorStop(0.5, 'rgba(255,252,240,1)');
+      lg.addColorStop(1, 'rgba(255,240,200,0)');
+      g.fillStyle = lg;
+      g.beginPath();
+      g.moveTo(-len, 0);
+      g.quadraticCurveTo(0, -wid, len, 0);
+      g.quadraticCurveTo(0, wid, -len, 0);
+      g.fill();
+      g.restore();
+    };
+    ray(m, 3.4, 0);
+    ray(m, 3.4, Math.PI / 2);
+    ray(m * 0.42, 1.6, Math.PI / 4);
+    ray(m * 0.42, 1.6, -Math.PI / 4);
+    return c;
+  }
+  const sparkle = makeSparkle();
+  const GOLD = '#ffdc96';
+
+  const dust = Array.from({ length: 64 }, (_, i) => {
+    const r = rng(seedOf('dust' + i));
+    return { o: makeOrbit('dust-' + i), s: 0.025 + r() * 0.035, a: 0.25 + r() * 0.45, warm: r() < 0.6 };
+  });
+  const rings = [
+    { rad: 1.09, incl: 0.27, roll: -0.2, speed: 0.11, beads: 3, alpha: 0.55 },
+    { rad: 0.97, incl: 0.5, roll: 0.62, speed: -0.07, beads: 2, alpha: 0.32 },
+  ];
+  const particles = [];
+  const tmp = { x: 0, y: 0, z: 0 };
+
+  function drawWire(g, t) {
+    const R = geo.R * 0.985;
+    g.save();
+    g.translate(geo.cx, geo.cy);
+    g.rotate(-0.18);
+    g.strokeStyle = 'rgba(214, 204, 255, 0.09)';
+    g.lineWidth = 1;
+    for (let k = 0; k < 6; k++) {
+      const lam = (k / 6) * Math.PI + t * 0.03;
+      g.beginPath();
+      g.ellipse(0, 0, Math.max(0.5, Math.abs(Math.cos(lam)) * R), R, 0, 0, Math.PI * 2);
+      g.stroke();
+    }
+    for (const lat of [-0.62, -0.32, 0, 0.32, 0.62]) {
+      const rx = Math.cos(lat) * R;
+      g.beginPath();
+      g.ellipse(0, Math.sin(lat) * R, rx, rx * 0.16, 0, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.restore();
+  }
+
+  function drawRings(t) {
+    for (const ring of rings) {
+      const o = { rad: ring.rad, incl: ring.incl, roll: ring.roll, speed: 0, phase: 0 };
+      const N = 120;
+      let prev = null;
+      for (let i = 0; i <= N; i++) {
+        o.phase = (i / N) * Math.PI * 2;
+        const p = orbitPos(o, 0, { x: 0, y: 0, z: 0 });
+        const s = toScreen(p);
+        if (prev) {
+          const g = layerFor({ x: (p.x + prev.p.x) / 2, y: (p.y + prev.p.y) / 2, z: (p.z + prev.p.z) / 2 });
+          const depth = (p.z / ring.rad + 1) / 2;
+          g.strokeStyle = `rgba(255, 222, 160, ${(ring.alpha * (0.35 + 0.65 * depth)).toFixed(3)})`;
+          g.lineWidth = 0.8 + depth * 0.9;
+          g.beginPath();
+          g.moveTo(prev.s.x, prev.s.y);
+          g.lineTo(s.x, s.y);
+          g.stroke();
+        }
+        prev = { p, s };
+      }
+      for (let k = 0; k < ring.beads; k++) {
+        o.phase = t * ring.speed + (k / ring.beads) * Math.PI * 2;
+        const p = orbitPos(o, 0, { x: 0, y: 0, z: 0 });
+        const s = toScreen(p);
+        const size = geo.R * (0.07 + 0.04 * (p.z + 1) / 2);
+        const g = layerFor(p);
+        g.globalAlpha = 0.55 + 0.4 * (p.z / ring.rad + 1) / 2;
+        g.drawImage(sprite(GOLD), s.x - size / 2, s.y - size / 2, size, size);
+        g.globalAlpha = 1;
+      }
+    }
+  }
+
+  function drawDust(t) {
+    for (const d of dust) {
+      orbitPos(d.o, t * 0.8, tmp);
+      const s = toScreen(tmp);
+      const g = tmp.z < 0 ? ctx.back : ctx.mid;
+      const size = geo.R * d.s * (0.8 + 0.4 * (tmp.z + 1) / 2);
+      g.globalAlpha = d.a * (0.6 + 0.4 * Math.sin(t * 1.7 + d.o.tw));
+      g.drawImage(sprite(d.warm ? GOLD : '#e6e0ff'), s.x - size / 2, s.y - size / 2, size, size);
+    }
+    ctx.back.globalAlpha = 1;
+    ctx.mid.globalAlpha = 1;
+  }
+
+  function prayBoost(now) {
+    const k = (now - state.prayAt) / 2600;
+    return k > 0 && k < 1 ? Math.sin(k * Math.PI) * 0.55 : 0;
+  }
+
+  function drawLamps(t, now) {
+    const back = [];
+    const front = [];
+    for (const L of state.lamps) {
+      if (L.hideUntil && now < L.hideUntil) { L._sx = null; continue; }
+      orbitPos(L.orbit, t, tmp);
+      let { x, y, z } = tmp;
+      if (L.arrive) {
+        const k = clamp01((now - L.arrive.start) / L.arrive.dur);
+        if (k < 1) {
+          const e = easeInOut(k);
+          x = lerp(L.arrive.x, x, e);
+          y = lerp(L.arrive.y, y, e);
+          z = lerp(L.arrive.z, z, e);
+        } else L.arrive = null;
+      }
+      const k = 1 + 0.1 * z;
+      L._sx = geo.cx + x * geo.R * k;
+      L._sy = geo.cy + y * geo.R * k;
+      L._z = z;
+      (z < 0 ? back : front).push(L);
+    }
+    back.sort((a, b) => a._z - b._z);
+    front.sort((a, b) => a._z - b._z);
+    const boost = prayBoost(now);
+    paintLamps(ctx.back, back, t, now, true, boost);
+    paintLamps(ctx.mid, front, t, now, false, boost);
+  }
+
+  function paintLamps(g, list, t, now, behind, boost) {
+    for (const L of list) {
+      const depth = clamp01((L._z + 0.9) / 1.8);
+      let size = geo.R * 0.2 * (0.68 + 0.5 * depth) * (1 + Math.min(0.6, Math.log2(1 + (L.b || 0)) * 0.12)) * (1 + boost);
+      let alpha = (behind ? 0.5 + 0.35 * depth : 0.84 + 0.16 * depth) * (0.86 + 0.14 * Math.sin(t * 2.1 + L.orbit.tw));
+      if (L.pulse) {
+        const k = (now - L.pulse) / 1700;
+        if (k > 0 && k < 1) { size *= 1 + 0.95 * Math.sin(k * Math.PI); alpha = Math.min(1, alpha + 0.3); } else if (k >= 1) L.pulse = 0;
+      }
+      if (L.fadeIn) {
+        const k = (now - L.fadeIn) / 1400;
+        if (k < 1) {
+          alpha *= clamp01(k);
+          if (!L.sparked && k > 0.05) { L.sparked = true; burst(L._sx, L._sy, L.color, 14, 0.7); }
+        } else L.fadeIn = 0;
+      }
+      g.globalAlpha = Math.min(1, alpha);
+      g.drawImage(sprite(L.color), L._sx - size / 2, L._sy - size / 2, size, size);
+      if (L === state.selected || isMine(L.id)) {
+        const sel = L === state.selected;
+        g.globalAlpha = sel ? 0.95 : 0.5 * (behind ? 0.6 : 1);
+        g.strokeStyle = sel ? '#fff3d1' : 'rgba(255, 222, 160, 0.9)';
+        g.lineWidth = sel ? 1.6 : 1;
+        g.beginPath();
+        g.arc(L._sx, L._sy, size * (sel ? 0.42 + 0.05 * Math.sin(now / 180) : 0.36), 0, Math.PI * 2);
+        g.stroke();
+      }
+    }
+    g.globalAlpha = 1;
+  }
+
+  function burst(x, y, color, n, power) {
+    if (x == null || reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const v = geo.R * (0.35 + Math.random() * 0.9) * (power || 1);
+      particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 0.7 + Math.random() * 0.8, s: geo.R * (0.03 + Math.random() * 0.05), color: Math.random() < 0.5 ? color : GOLD });
+    }
+  }
+  function drawParticles(dt) {
+    const g = ctx.top;
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.life += dt;
+      if (p.life >= p.max) { particles.splice(i, 1); continue; }
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vx *= 0.94;
+      p.vy = p.vy * 0.94 - geo.R * 0.15 * dt;
+      g.globalAlpha = 1 - p.life / p.max;
+      g.drawImage(sprite(p.color), p.x - p.s, p.y - p.s, p.s * 2, p.s * 2);
+    }
+    g.globalAlpha = 1;
+  }
+
+  function drawPrayWave(now) {
+    const k = (now - state.prayAt) / 2200;
+    if (k <= 0 || k >= 1) return;
+    const g = ctx.top;
+    const r = geo.R * (0.25 + 1.45 * easeSine(k));
+    g.save();
+    g.strokeStyle = `rgba(255, 228, 170, ${(0.55 * (1 - k)).toFixed(3)})`;
+    g.lineWidth = 6;
+    g.beginPath();
+    g.arc(geo.cx, geo.cy, r, 0, Math.PI * 2);
+    g.stroke();
+    g.strokeStyle = `rgba(255, 248, 225, ${(0.85 * (1 - k)).toFixed(3)})`;
+    g.lineWidth = 1.4;
+    g.stroke();
+    g.restore();
+  }
+
+  function drawLabel(now) {
+    const lab = state.label;
+    if (!lab) return;
+    if (now > lab.until) { state.label = null; return; }
+    const L = lab.lamp;
+    if (L._sx == null) return;
+    const g = ctx.top;
+    const fade = Math.min(clamp01((now - lab.from) / 400), clamp01((lab.until - now) / 600));
+    const text = lab.text;
+    g.save();
+    g.globalAlpha = fade;
+    g.font = `600 ${Math.max(12, Math.round(geo.R * 0.085))}px "Noto Serif TC", "Songti TC", serif`;
+    const tw = g.measureText(text).width;
+    const padX = 10;
+    const bh = Math.max(24, geo.R * 0.15);
+    const bw = tw + padX * 2;
+    let dx = L._sx - geo.cx;
+    let dy = L._sy - geo.cy;
+    const dl = Math.hypot(dx, dy);
+    if (dl < geo.R * 0.15) { dx = -0.6; dy = -0.8; } else { dx /= dl; dy /= dl; }
+    const ax = L._sx + dx * geo.R * 0.36;
+    const ay = L._sy + dy * geo.R * 0.36;
+    const bx = Math.max(4, Math.min(geo.w - bw - 4, ax - bw / 2));
+    const by = Math.max(4, Math.min(geo.h - bh - 4, ay - bh / 2));
+    const lx = Math.max(bx, Math.min(bx + bw, L._sx));
+    const ly = Math.max(by, Math.min(by + bh, L._sy));
+    g.strokeStyle = 'rgba(255, 236, 190, 0.8)';
+    g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(L._sx + (lx - L._sx) * 0.25, L._sy + (ly - L._sy) * 0.25);
+    g.lineTo(lx, ly);
+    g.stroke();
+    g.fillStyle = 'rgba(20, 20, 60, 0.82)';
+    roundRect(g, bx, by, bw, bh, bh / 2);
+    g.fill();
+    g.stroke();
+    g.fillStyle = '#fff3d1';
+    g.textBaseline = 'middle';
+    g.fillText(text, bx + padX, by + bh / 2 + 1);
+    g.beginPath();
+    g.arc(L._sx, L._sy, geo.R * (0.075 + 0.015 * Math.sin(now / 160)), 0, Math.PI * 2);
+    g.stroke();
+    g.restore();
+  }
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+
+  // ===== 點燈儀式：光點從水面升起，環繞光球一圈後進入菩薩身旁 =====
+  let ceremony = null;
+  const T_BIRTH = 0.55;
+  const T_RISE = 3.35;
+  const T_DIVE = 3.95;
+
+  function seedPosition(c, tau, t) {
+    if (tau < T_BIRTH) return { x: 0, y: geo.poolY, z: 0 };
+    if (tau < T_RISE) {
+      const u = (tau - T_BIRTH) / (T_RISE - T_BIRTH);
+      const th = Math.PI / 2 + Math.PI * 2 * easeInOut(u);
+      const rho = 1.13 * smooth(0, 0.16, u) - 0.06 * u;
+      return { x: rho * Math.cos(th), y: lerp(geo.poolY, -1.06, easeSine(u)), z: rho * Math.sin(th) };
+    }
+    const v = easeInOut(clamp01((tau - T_RISE) / (T_DIVE - T_RISE)));
+    const a = { x: 0, y: -1.06, z: 1.07 };
+    const ctrl = { x: 0, y: -0.92, z: 0.55 };
+    const b = orbitPos(c.lamp.orbit, t, { x: 0, y: 0, z: 0 });
+    const q = (p0, p1, p2) => (1 - v) * (1 - v) * p0 + 2 * (1 - v) * v * p1 + v * v * p2;
+    return { x: q(a.x, ctrl.x, b.x), y: q(a.y, ctrl.y, b.y), z: q(a.z, ctrl.z, b.z) };
+  }
+
+  function drawCeremony(t, now) {
+    const c = ceremony;
+    if (!c) return;
+    const tau = (now - c.start) / 1000;
+    if (tau >= T_DIVE) { ceremony = null; return; }
+    const p = seedPosition(c, tau, t);
+    const s = toScreen(p);
+    c.trail.push({ s, p });
+    if (c.trail.length > 38) c.trail.shift();
+    const grow = tau < T_BIRTH ? smooth(0, 1, tau / T_BIRTH) : 1;
+    const persp = 1 + 0.22 * p.z;
+    const size = geo.R * 0.5 * grow * persp;
+    const behind = p.z < 0;
+    const n = c.trail.length;
+    for (let i = 0; i < n - 1; i++) {
+      const q = c.trail[i];
+      const k = i / n;
+      const g = layerFor(q.p);
+      const ts = geo.R * 0.28 * k * (1 + 0.22 * q.p.z) * grow;
+      g.globalAlpha = 0.7 * k * (q.p.z < 0 ? 0.7 : 1);
+      g.drawImage(sprite(c.lamp.color), q.s.x - ts / 2, q.s.y - ts / 2, ts, ts);
+    }
+    const g = layerFor(p);
+    g.globalAlpha = behind ? 0.75 : 1;
+    g.drawImage(sprite(c.lamp.color), s.x - size / 2, s.y - size / 2, size, size);
+    const core = size * 0.42;
+    g.drawImage(sprite('#fff8e6'), s.x - core / 2, s.y - core / 2, core, core);
+    const sp = size * 1.5;
+    g.save();
+    g.translate(s.x, s.y);
+    g.rotate(now / 900);
+    g.globalAlpha = (behind ? 0.45 : 0.9) * grow;
+    g.drawImage(sparkle, -sp / 2, -sp / 2, sp, sp);
+    g.restore();
+    ctx.back.globalAlpha = 1;
+    ctx.mid.globalAlpha = 1;
+    ctx.top.globalAlpha = 1;
+  }
+
+  function startCeremony(lamp, fullName) {
+    const begin = () => {
+      const now = performance.now();
+      addLamp(lamp);
+      if (reduceMotion) {
+        lamp.fadeIn = now;
+        flare();
+        showLabel(lamp, '您的光明燈', 6000);
+        setTimeout(() => openCert(lamp, fullName), 900);
+        return;
+      }
+      lamp.hideUntil = now + T_DIVE * 1000;
+      ceremony = { lamp, start: now, trail: [] };
+      const pool = $('#pool');
+      pool.classList.remove('bursting');
+      void pool.offsetWidth;
+      pool.classList.add('bursting');
+      setTimeout(() => {
+        flare();
+        burst(lamp._sx, lamp._sy, lamp.color, 36, 1);
+        showLabel(lamp, '您的光明燈', 7000);
+        if (navigator.vibrate) { try { navigator.vibrate(25); } catch (e) {} }
+      }, T_DIVE * 1000);
+      setTimeout(() => openCert(lamp, fullName), T_DIVE * 1000 + 1100);
+    };
+    const rect = stage.getBoundingClientRect();
+    const visible = rect.top > -rect.height * 0.25 && rect.bottom < window.innerHeight + rect.height * 0.25;
+    if (!visible) {
+      stage.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      setTimeout(begin, 650);
+    } else begin();
+  }
+  function flare() {
+    stage.classList.remove('flare');
+    void stage.offsetWidth;
+    stage.classList.add('flare');
+    clearTimeout(flare.timer);
+    flare.timer = setTimeout(() => stage.classList.remove('flare'), 1600);
+  }
+  function showLabel(lamp, text, ms) {
+    const now = performance.now();
+    state.label = { lamp, text, from: now, until: now + ms };
+  }
+  function addLamp(lamp) {
+    if (state.byId.has(lamp.id)) return;
+    state.lamps.unshift(lamp);
+    state.lamps.sort((a, b) => b.t - a.t);
+    rebuildIndex();
+  }
+
+  // ===== 星空 =====
+  const sky = $('#sky');
+  const skyCtx = sky.getContext('2d');
+  let skyW = 0;
+  let skyH = 0;
+  let stars = [];
+  let twinkles = [];
+  let shooting = null;
+  let nextShoot = 6;
+  function resizeSky() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    skyW = window.innerWidth;
+    skyH = window.innerHeight;
+    sky.width = Math.round(skyW * dpr);
+    sky.height = Math.round(skyH * dpr);
+    skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = rng(20261103);
+    const n = Math.min(260, Math.round((skyW * skyH) / 2300));
+    stars = Array.from({ length: n }, () => ({ x: r() * skyW, y: r() * skyH, s: 0.5 + r() * r() * 1.7, a: 0.25 + r() * 0.6, tw: r() * 6.28, sp: 0.4 + r() * 1.6, warm: r() < 0.35 }));
+    twinkles = Array.from({ length: Math.max(6, Math.min(16, Math.round(skyW / 80))) }, () => ({ x: r() * skyW, y: r() * skyH * 0.92, s: 9 + r() * 17, tw: r() * 6.28, sp: 0.5 + r() }));
+  }
+  function drawSky(t, dt) {
+    skyCtx.clearRect(0, 0, skyW, skyH);
+    for (const s of stars) {
+      skyCtx.globalAlpha = s.a * (0.62 + 0.38 * Math.sin(t * s.sp + s.tw));
+      skyCtx.fillStyle = s.warm ? '#ffe9c0' : '#e8e6ff';
+      skyCtx.fillRect(s.x, s.y, s.s, s.s);
+    }
+    for (const p of twinkles) {
+      const k = 0.5 + 0.5 * Math.sin(t * p.sp + p.tw);
+      const size = p.s * (0.7 + 0.3 * k);
+      skyCtx.globalAlpha = 0.3 + 0.6 * k;
+      skyCtx.drawImage(sparkle, p.x - size / 2, p.y - size / 2, size, size);
+    }
+    if (!reduceMotion) {
+      nextShoot -= dt;
+      if (!shooting && nextShoot <= 0) {
+        const fromLeft = Math.random() < 0.5;
+        shooting = { x: fromLeft ? Math.random() * skyW * 0.4 : skyW * (0.6 + Math.random() * 0.4), y: Math.random() * skyH * 0.35, vx: (fromLeft ? 1 : -1) * skyW * 0.55, vy: skyH * 0.22, life: 0 };
+        nextShoot = 9 + Math.random() * 9;
+      }
+      if (shooting) {
+        shooting.life += dt;
+        const k = shooting.life / 0.9;
+        if (k >= 1) shooting = null;
+        else {
+          const x = shooting.x + shooting.vx * shooting.life;
+          const y = shooting.y + shooting.vy * shooting.life;
+          const tail = 0.12;
+          const grd = skyCtx.createLinearGradient(x - shooting.vx * tail, y - shooting.vy * tail, x, y);
+          grd.addColorStop(0, 'rgba(255,240,210,0)');
+          grd.addColorStop(1, 'rgba(255,245,225,0.9)');
+          skyCtx.globalAlpha = Math.sin(k * Math.PI);
+          skyCtx.strokeStyle = grd;
+          skyCtx.lineWidth = 1.4;
+          skyCtx.beginPath();
+          skyCtx.moveTo(x - shooting.vx * tail, y - shooting.vy * tail);
+          skyCtx.lineTo(x, y);
+          skyCtx.stroke();
+        }
+      }
+    }
+    skyCtx.globalAlpha = 1;
+  }
+
+  // ===== 動畫主迴圈 =====
+  let heroVisible = true;
+  let lastFrame = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000);
+    lastFrame = now;
+    const t = (now / 1000) * (reduceMotion ? 0.25 : 1);
+    drawSky(t, dt);
+    if (heroVisible) {
+      ctx.back.clearRect(0, 0, geo.w, geo.h);
+      ctx.mid.clearRect(0, 0, geo.w, geo.h);
+      ctx.top.clearRect(0, 0, geo.w, geo.h);
+      drawWire(ctx.back, t);
+      drawRings(t);
+      drawDust(t);
+      drawLamps(t, now);
+      drawCeremony(t, now);
+      drawPrayWave(now);
+      drawParticles(dt);
+      drawLabel(now);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // 點光球裡的光點，打開那盞燈
+  stage.addEventListener('click', (e) => {
+    const rect = layer.top.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) * geo.w) / rect.width;
+    const y = ((e.clientY - rect.top) * geo.h) / rect.height;
+    let best = null;
+    let bestD = Math.max(22, geo.R * 0.13);
+    for (const L of state.lamps) {
+      if (L._sx == null) continue;
+      const d = Math.hypot(L._sx - x, L._sy - y) - (L._z > 0 ? 4 : 0);
+      if (d < bestD) { bestD = d; best = L; }
+    }
+    if (best) { openLamp(best); return; }
+    if (Math.hypot(x - geo.cx, y - geo.cy) < geo.R) burst(x, y, GOLD, 8, 0.45);
+  });
+
+  // ===== 畫面：統計、光語牆、我的燈 =====
+  const LOTUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4c2 2.2 3 4.6 3 7.2 0 2.3-1.1 4.3-3 5.8-1.9-1.5-3-3.5-3-5.8C9 8.6 10 6.2 12 4z" fill="currentColor"/><path d="M3.5 9.6c2.7.2 4.8 1.5 6.2 3.7.7 1.1 1.1 2.4 1.2 3.9-2.8-.2-4.9-1.5-6.2-3.6-.8-1.2-1.2-2.5-1.2-4zM20.5 9.6c0 1.5-.4 2.8-1.2 4-1.3 2.1-3.4 3.4-6.2 3.6.1-1.5.5-2.8 1.2-3.9 1.4-2.2 3.5-3.5 6.2-3.7z" fill="currentColor" opacity=".6"/><path d="M5 19.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderCounter() {
+    const c = $('#counter');
+    c.replaceChildren();
+    if (state.loading) { c.textContent = '光球正在亮起…'; return; }
+    if (state.error && !state.lamps.length) { c.textContent = '光球暫時連不上，稍後會自動重試'; return; }
+    if (!state.total) { c.textContent = '光球正在等待第一盞燈'; return; }
+    c.append('已點亮 ', el('b', null, fmtNum(state.total)), ' 盞光明燈・收到 ', el('b', null, fmtNum(state.blessTotal)), ' 次祈福');
+  }
+
+  function blessButton(L) {
+    const btn = el('button', 'mini-btn');
+    btn.type = 'button';
+    btn.dataset.bless = L.id;
+    paintBless(btn, L);
+    btn.addEventListener('click', () => bless(L));
+    return btn;
+  }
+  function paintBless(btn, L) {
+    const done = !!state.blessed[L.id];
+    btn.setAttribute('aria-pressed', done ? 'true' : 'false');
+    btn.innerHTML = LOTUS;
+    btn.append(`${done ? '已隨喜' : '隨喜'} ${fmtNum(L.b || 0)}`);
+    btn.setAttribute('aria-label', `${done ? '已隨喜' : '隨喜祝福'}，目前 ${L.b || 0} 次`);
+  }
+
+  function wishCard(L) {
+    const li = el('li', 'wish-card' + (isMine(L.id) ? ' mine' : ''));
+    li.style.setProperty('--c', L.color);
+    li.dataset.id = L.id;
+    const dot = el('span', 'dot');
+    dot.setAttribute('aria-hidden', 'true');
+    const body = el('div', 'wish-body');
+    const meta = el('div', 'wish-meta');
+    meta.append(el('span', 'wish-name', L.name), el('span', 'tag', L.cat));
+    if (L.demo) meta.append(el('span', 'demo-tag', '示範'));
+    meta.append(el('span', 'wish-time', timeAgo(L.t)));
+    const text = L.wish ? el('p', 'wish-text', L.wish) : el('p', 'wish-text quiet', `默默許下一份${L.cat}的心願`);
+    const actions = el('div', 'wish-actions');
+    const view = el('button', 'mini-btn plain', '看光點');
+    view.type = 'button';
+    view.addEventListener('click', () => focusLamp(L));
+    actions.append(blessButton(L), view);
+    body.append(meta, text, actions);
+    li.append(dot, body);
+    return li;
+  }
+
+  function renderWall() {
+    const list = $('#wallList');
+    list.replaceChildren(...state.lamps.slice(0, state.shown).map(wishCard));
+    $('#wallEmpty').hidden = state.loading || state.lamps.length > 0;
+    $('#moreBtn').hidden = state.lamps.length <= state.shown;
+  }
+
+  function renderMy() {
+    const count = $('#myCount');
+    count.hidden = state.my.length === 0;
+    count.textContent = String(state.my.length);
+    const list = $('#myList');
+    list.replaceChildren();
+    $('#myEmpty').hidden = state.my.length > 0;
+    for (const m of state.my) {
+      const L = state.byId.get(m.id) || hydrate(m);
+      const li = el('li');
+      li.style.setProperty('--c', L.color);
+      const dot = el('span', 'dot');
+      dot.setAttribute('aria-hidden', 'true');
+      const body = el('div', 'wish-body');
+      body.append(
+        el('p', 'my-title', `${m.fullName || L.name}・${L.cat}`),
+        el('p', 'my-sub', `光明燈 第 ${fmtNum(L.no)} 盞・${timeAgo(L.t)}點亮${L.wish ? '・' + L.wish : ''}`)
+      );
+      const actions = el('div', 'wish-actions');
+      const view = el('button', 'mini-btn', '看光點');
+      view.type = 'button';
+      view.addEventListener('click', () => focusLamp(L));
+      const card = el('button', 'mini-btn plain', '祝福卡');
+      card.type = 'button';
+      card.addEventListener('click', () => openCert(L, m.fullName));
+      const share = el('button', 'mini-btn plain', '分享');
+      share.type = 'button';
+      share.addEventListener('click', () => shareLamp(L, true));
+      actions.append(view, card, share);
+      li.append(dot, body, actions);
+      list.append(li);
+    }
+  }
+
+  function refreshLampViews(L) {
+    document.querySelectorAll(`[data-bless="${L.id}"]`).forEach((b) => paintBless(b, L));
+    if (state.selected === L && openId === 'lampSheet') fillLampSheet(L);
+    renderCounter();
+  }
+
+  // ===== 隨喜與祈福 =====
+  async function bless(L) {
+    if (state.blessed[L.id]) { toast('您已經為這盞燈隨喜過了'); return; }
+    state.blessed[L.id] = Date.now();
+    saved.set('bodhi-blessed', state.blessed);
+    L.b = (L.b || 0) + 1;
+    state.blessTotal += 1;
+    L.pulse = performance.now();
+    burst(L._sx, L._sy, L.color, 12, 0.6);
+    refreshLampViews(L);
+    try {
+      const res = await api.post({ action: 'bless', id: L.id });
+      if (typeof res.b === 'number') L.b = Math.max(L.b, res.b);
+      if (typeof res.blessTotal === 'number') state.blessTotal = Math.max(state.blessTotal, res.blessTotal);
+      refreshLampViews(L);
+    } catch (err) {
+      delete state.blessed[L.id];
+      saved.set('bodhi-blessed', state.blessed);
+      L.b = Math.max(0, L.b - 1);
+      state.blessTotal = Math.max(0, state.blessTotal - 1);
+      refreshLampViews(L);
+      toast(err.message);
+    }
+  }
+
+  async function pray() {
+    const now = Date.now();
+    state.prayAt = performance.now();
+    flare();
+    const pool = $('#pool');
+    pool.classList.remove('bursting');
+    void pool.offsetWidth;
+    pool.classList.add('bursting');
+    toast('願一切眾生離苦得樂、平安吉祥');
+    const last = saved.get('bodhi-last-pray', 0);
+    if (now - last < 30000) return;
+    saved.set('bodhi-last-pray', now);
+    state.blessTotal += 1;
+    renderCounter();
+    try {
+      const res = await api.post({ action: 'pray' });
+      if (typeof res.blessTotal === 'number') state.blessTotal = Math.max(state.blessTotal, res.blessTotal);
+      renderCounter();
+    } catch (err) {
+      state.blessTotal = Math.max(0, state.blessTotal - 1);
+      renderCounter();
+    }
+  }
+
+  // ===== 對話框 =====
+  const backdrop = $('#backdrop');
+  let openId = null;
+  let lastFocus = null;
+  function openSheet(id) {
+    if (openId === id) return;
+    if (openId) $('#' + openId).classList.remove('open');
+    else lastFocus = document.activeElement;
+    openId = id;
+    const sheet = $('#' + id);
+    sheet.classList.add('open');
+    backdrop.classList.add('open');
+    document.body.classList.add('locked');
+    setTimeout(() => { const h = sheet.querySelector('h3'); (h || sheet).focus({ preventScroll: true }); }, 80);
+  }
+  function closeSheet() {
+    if (!openId) return;
+    const sheet = $('#' + openId);
+    sheet.classList.remove('open');
+    if (openId === 'lampSheet') state.selected = null;
+    openId = null;
+    backdrop.classList.remove('open');
+    document.body.classList.remove('locked');
+    if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+  }
+  backdrop.addEventListener('click', closeSheet);
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', closeSheet));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+  let toastTimer = 0;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ===== 點燈表單 =====
+  const form = $('#lightForm');
+  const nameInput = $('#fName');
+  const wishInput = $('#fWish');
+  const catGrid = $('#catGrid');
+  for (const name of CAT_NAMES) {
+    const label = el('label');
+    const input = el('input');
+    input.type = 'radio';
+    input.name = 'cat';
+    input.value = name;
+    input.id = 'cat-' + CAT_NAMES.indexOf(name);
+    if (name === '平安') input.checked = true;
+    const span = el('span');
+    span.style.setProperty('--c', CATS[name].color);
+    span.append(el('i'), name);
+    label.append(input, span);
+    catGrid.append(label);
+  }
+  const currentCat = () => (form.querySelector('input[name="cat"]:checked') || {}).value || '平安';
+  const currentShow = () => (form.querySelector('input[name="show"]:checked') || {}).value || 'mask';
+  const savedShow = saved.get('bodhi-show', 'mask');
+  if (['mask', 'full', 'anon'].includes(savedShow)) form.querySelector(`input[name="show"][value="${savedShow}"]`).checked = true;
+
+  function updateFormPreview() {
+    const shown = displayName(clean(nameInput.value), currentShow());
+    const p = $('#namePreview');
+    p.replaceChildren('光球上會顯示：', el('b', null, nameInput.value.trim() || currentShow() === 'anon' ? shown : '—'));
+    $('#suggestText').textContent = CATS[currentCat()].wish;
+    $('#wishCount').textContent = `${charLen(wishInput.value)}/${WISH_MAX}`;
+  }
+  form.addEventListener('input', updateFormPreview);
+  form.addEventListener('change', updateFormPreview);
+  $('#suggestBtn').addEventListener('click', () => { wishInput.value = CATS[currentCat()].wish; updateFormPreview(); wishInput.focus(); });
+
+  function openLightSheet(forFamily) {
+    $('#formError').textContent = '';
+    if (forFamily) { nameInput.value = ''; wishInput.value = ''; }
+    updateFormPreview();
+    openSheet('lightSheet');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('#formError');
+    err.textContent = '';
+    const show = currentShow();
+    const fullName = clean(nameInput.value);
+    const wish = clean(wishInput.value);
+    const cat = currentCat();
+    if (!fullName && show !== 'anon') { err.textContent = '請填寫姓名或稱呼，或選擇「匿名善信」。'; nameInput.focus(); return; }
+    if (charLen(fullName) > NAME_MAX) { err.textContent = `姓名或稱呼請在 ${NAME_MAX} 字以內。`; return; }
+    if (charLen(wish) > WISH_MAX) { err.textContent = `祈願文請在 ${WISH_MAX} 字以內。`; return; }
+    if (hasContact(fullName) || hasContact(wish)) { err.textContent = '為了保護您的隱私，請不要填寫網址、電話或聯絡帳號。'; return; }
+    const btn = $('#submitBtn');
+    btn.disabled = true;
+    btn.textContent = '點燈中…';
+    try {
+      const res = await api.post({ action: 'light', name: displayName(fullName, show), cat, wish, website: $('#fWebsite').value });
+      const lamp = hydrate(res.lamp);
+      lamp.local = true;
+      state.total = Math.max(state.total + 1, res.total || 0);
+      if (typeof res.blessTotal === 'number') state.blessTotal = Math.max(state.blessTotal, res.blessTotal);
+      state.my.unshift({ id: lamp.id, no: lamp.no, name: lamp.name, cat: lamp.cat, wish: lamp.wish, t: lamp.t, fullName: fullName || '善信' });
+      saved.set('bodhi-my-lamps', state.my.slice(0, 50));
+      saved.set('bodhi-show', show);
+      wishInput.value = '';
+      closeSheet();
+      startCeremony(lamp, fullName || '善信');
+      renderCounter();
+      renderWall();
+      renderMy();
+    } catch (error) {
+      err.textContent = error.message || '點燈沒有成功，請再試一次。';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '點亮光明燈';
+    }
+  });
+
+  // ===== 祝福卡與單盞燈 =====
+  function openCert(L, fullName) {
+    $('#certOrb').style.setProperty('--c', L.color);
+    $('#certNo').textContent = `光明燈 第 ${fmtNum(L.no)} 盞・${L.cat}`;
+    const own = clean(fullName) || L.name;
+    $('#certName').textContent = own;
+    $('#certPublic').textContent = own !== L.name ? `光球上顯示為「${L.name}」` : '';
+    $('#certWish').textContent = L.wish ? `「${L.wish}」` : '';
+    $('#certBless').replaceChildren(el('span', null, CATS[L.cat].bless), el('span', null, '觀音菩薩慈光加被，所願皆圓滿。'));
+    const lunar = lunarDate(L.t);
+    $('#certDate').textContent = lunar ? `${solarDate(L.t)}・${lunar}` : solarDate(L.t);
+    $('#certShare').onclick = () => shareLamp(L, true);
+    $('#certView').onclick = () => focusLamp(L);
+    openSheet('certSheet');
+  }
+
+  function fillLampSheet(L) {
+    $('#lampDot').style.setProperty('--c', L.color);
+    $('#lampKicker').textContent = `光明燈 第 ${fmtNum(L.no)} 盞・${L.cat}${L.demo ? '・示範' : ''}`;
+    $('#lampName').textContent = L.name;
+    const w = $('#lampWish');
+    w.className = L.wish ? 'lamp-wish' : 'lamp-wish quiet';
+    w.textContent = L.wish ? `「${L.wish}」` : `默默許下一份${L.cat}的心願`;
+    $('#lampMeta').textContent = `${timeAgo(L.t)}點亮・收到 ${fmtNum(L.b || 0)} 次隨喜`;
+    const done = !!state.blessed[L.id];
+    const b = $('#lampBless');
+    b.textContent = done ? '已隨喜祝福' : '隨喜祝福';
+    b.disabled = done;
+    $('#lampRemove').hidden = !state.admin;
+  }
+  function openLamp(L) {
+    state.selected = L;
+    L.pulse = performance.now();
+    fillLampSheet(L);
+    $('#lampBless').onclick = () => bless(L);
+    $('#lampShare').onclick = () => shareLamp(L, isMine(L.id));
+    $('#lampRemove').onclick = () => askRemove(L);
+    openSheet('lampSheet');
+  }
+  function focusLamp(L) {
+    closeSheet();
+    if (!state.byId.has(L.id)) { L.keep = true; addLamp(L); }
+    const target = state.byId.get(L.id) || L;
+    stage.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    setTimeout(() => {
+      target.pulse = performance.now();
+      showLabel(target, isMine(target.id) ? '您的光明燈' : `${target.name}的光明燈`, 5000);
+    }, 350);
+  }
+
+  async function shareLamp(L, mine) {
+    if (PREVIEW) { toast('上線後，這裡會分享這盞燈的專屬連結'); return; }
+    const url = `${location.origin}${location.pathname}#l-${L.id}`;
+    const text = mine ? `我在菩提光球點亮了一盞光明燈，祈願${L.cat}。邀請你一起隨喜祝福：` : `菩提光球裡有一盞祈願${L.cat}的光明燈，一起來隨喜祝福：`;
+    if (navigator.share) {
+      try { await navigator.share({ title: '菩提光球・線上光明燈', text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(text + url);
+      toast('已複製連結，可以貼到 LINE 給家人');
+    } catch (e) {
+      const ta = el('textarea');
+      ta.value = text + url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.append(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (err) {}
+      ta.remove();
+      toast(ok ? '已複製連結，可以貼到 LINE 給家人' : url);
+    }
+  }
+
+  // ===== 管理：移除不當的祈願 =====
+  $('#adminForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const key = $('#fAdmin').value.trim();
+    if (!key) return;
+    state.admin = key;
+    session.set('bodhi-admin', key);
+    closeSheet();
+    toast('已進入管理模式：點光點或光語就能移除');
+  });
+  let removing = null;
+  function askRemove(L) {
+    removing = L;
+    $('#confirmText').textContent = `「${L.name}」的光明燈將從光球與光語中移除，無法復原。`;
+    openSheet('confirmSheet');
+  }
+  $('#confirmYes').addEventListener('click', async () => {
+    const L = removing;
+    if (!L) return;
+    try {
+      await api.post({ action: 'remove', id: L.id }, { 'x-admin-key': state.admin });
+      state.lamps = state.lamps.filter((l) => l.id !== L.id);
+      rebuildIndex();
+      closeSheet();
+      renderWall();
+      toast('已移除這盞燈');
+    } catch (err) {
+      if (err.status === 403) { state.admin = ''; session.set('bodhi-admin', ''); }
+      closeSheet();
+      toast(err.message);
+    }
+  });
+
+  // ===== 分享連結：#l-燈號 =====
+  async function route() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h === 'admin') { openSheet('adminSheet'); return; }
+    if (h === 'light') {
+      openLightSheet(false);
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+      return;
+    }
+    if (!h.startsWith('l-')) return;
+    const id = h.slice(2);
+    let L = state.byId.get(id);
+    if (!L) {
+      try {
+        const res = await api.get(id);
+        L = hydrate(res.lamp);
+        L.keep = true;
+        addLamp(L);
+        renderWall();
+      } catch (err) {
+        toast(err.message || '找不到這盞光明燈');
+        return;
+      }
+    }
+    openLamp(L);
+    setTimeout(() => showLabel(L, `${L.name}的光明燈`, 6000), 300);
+  }
+
+  // ===== 按鈕 =====
+  // 從首頁抽完籤過來的人，按「‹ 觀音靈籤」直接回到剛剛抽到的籤詩
+  $('#homeLink').addEventListener('click', (e) => {
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (ref && ref.origin === location.origin && /^\/(index\.html)?$/.test(ref.pathname) && history.length > 1) {
+        e.preventDefault();
+        history.back();
+      }
+    } catch (err) {}
+  });
+  $('#lightBtn').addEventListener('click', () => openLightSheet(false));
+  $('#prayBtn').addEventListener('click', pray);
+  $('#myBtn').addEventListener('click', () => { renderMy(); openSheet('mySheet'); });
+  $('#myLight').addEventListener('click', () => openLightSheet(false));
+  $('#lampLight').addEventListener('click', () => openLightSheet(true));
+  $('#certAgain').addEventListener('click', () => openLightSheet(true));
+  $('#moreBtn').addEventListener('click', () => { state.shown += 12; renderWall(); });
+
+  // ===== 啟動 =====
+  if (PREVIEW) $('#previewNote').hidden = false;
+  resize();
+  window.addEventListener('resize', () => { clearTimeout(resize.timer); resize.timer = setTimeout(resize, 120); });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => { heroVisible = entries[0].isIntersecting; }, { rootMargin: '80px' }).observe(stage);
+  }
+  updateFormPreview();
+  renderCounter();
+  renderMy();
+  requestAnimationFrame(frame);
+  load(true).then(route);
+  window.addEventListener('hashchange', route);
+  setInterval(() => { if (!document.hidden && !ceremony) load(false); }, 45000);
+})();
+</script>
+</body>
+</html>

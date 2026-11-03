@@ -1,3 +1,8 @@
-# Netlify 建置設定（純靜態網站，AI 解籤改為連到 Google AI / ChatGPT，不需要後端）
+# Netlify 建置設定
+# 網站本身是純靜態網頁；AI 解籤連到 Google AI / ChatGPT。
+# 線上光明燈（lamp.html）的公開燈牆使用 netlify/functions/lamps.mjs，資料存在 Netlify Blobs。
 [build]
   publish = "."
+
+[functions]
+  directory = "netlify/functions"

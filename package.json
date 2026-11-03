@@ -1,0 +1,8 @@
+{
+  "name": "guanyin-temple1",
+  "private": true,
+  "description": "觀音靈籤網站：靜態網頁＋菩提光球線上光明燈（Netlify Functions + Netlify Blobs）",
+  "dependencies": {
+    "@netlify/blobs": "^10.0.0"
+  }
+}
