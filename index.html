@@ -280,7 +280,9 @@
 
         function showAILinks() {
             // Google：只送短關鍵字，看起來像一般搜尋，避免跳出「要繼續搜尋嗎？」確認視窗
-            const googleQuery = `觀音靈籤 ${currentPoem.title} 解籤 白話解釋`;
+            const b = currentBaziInfo;
+            const ganzhi = b.yearPillar ? ` ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時 干支五行` : '';
+            const googleQuery = `觀音靈籤 ${currentPoem.title} 解籤 白話解釋${ganzhi}`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
             // ChatGPT：送完整提問（含籤詩與年月日時干支）
             chatgptLink.href = `https://chatgpt.com/?q=${encodeURIComponent(buildAIPrompt())}`;
