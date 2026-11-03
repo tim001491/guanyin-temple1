@@ -108,15 +108,34 @@
         }
 
         /* --- 菩提光球・線上光明燈 入口 --- */
-        #lamp-option { margin-top: 1.2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
+        #lamp-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
         #lamp-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
-        .lamp-entry { display: flex; align-items: center; gap: 14px; max-width: 440px; margin: 0 auto; padding: 12px 22px 12px 14px; border-radius: 50px; text-align: left; text-decoration: none; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; transition: all 0.3s ease; }
-        .lamp-entry:hover, .lamp-entry:active { background-color: #a58362; color: #fff; }
-        .lamp-entry-orb { flex: none; width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
-        .lamp-entry strong { display: block; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
-        .lamp-entry small { display: block; margin-top: 2px; font-size: 0.9rem; color: #9c897a; transition: color 0.3s ease; }
-        .lamp-entry:hover small, .lamp-entry:active small { color: rgba(255, 255, 255, 0.85); }
-        .lamp-entry-go { margin-left: auto; font-size: 1.6rem; line-height: 1; }
+        .lamp-slide { position: relative; max-width: 440px; height: 66px; margin: 0 auto; border-radius: 50px; background-color: #fff; border: 2px solid #a58362; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .lamp-slide-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, rgba(243, 213, 142, 0.35), rgba(165, 131, 98, 0.35)); }
+        .lamp-slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 76px; padding-right: 16px; text-align: left; color: #8a6c4c; pointer-events: none; }
+        .lamp-slide-text strong { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
+        .lamp-slide-text small { font-size: 0.9rem; color: #9c897a; }
+        .lamp-slide-text .go { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; letter-spacing: -0.1em; color: #c9ab86; }
+        .lamp-slide-knob { position: absolute; left: 5px; top: 5px; width: 52px; height: 52px; border-radius: 50%; cursor: grab; touch-action: none; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
+        .lamp-slide-knob:focus-visible { outline: 2px solid #8a6c4c; outline-offset: 2px; }
+        .lamp-slide.back .lamp-slide-knob, .lamp-slide.back .lamp-slide-fill { transition: transform 0.3s ease, width 0.3s ease; }
+        .lamp-slide.done { background-color: #a58362; }
+        .lamp-slide.done .lamp-slide-text { color: #fff; }
+        .lamp-slide.done .lamp-slide-text small { color: rgba(255, 255, 255, 0.85); }
+        /* --- 贊助網站維護 --- */
+        #donate-option { margin-top: 1.6rem; }
+        #donate-button { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 9px 22px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+        #donate-button:hover, #donate-button:active { background-color: #a58362; color: #fff; }
+        #donate-note { margin-top: 0.5rem; font-size: 0.85rem; color: #9c897a; }
+        #donate-dialog { position: fixed; inset: 0; z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(61, 44, 29, 0.45); }
+        #donate-dialog.show { display: flex; }
+        .donate-card { position: relative; width: 100%; max-width: 360px; padding: 2rem 1.6rem 1.6rem; text-align: center; background: #fff; border: 1px solid #ddd8cf; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
+        .donate-card h2 { font-size: 1.4rem; font-weight: 600; color: #8a6c4c; margin-bottom: 0.6rem; }
+        .donate-card p { font-size: 0.98rem; line-height: 1.8; color: #6c584c; }
+        .donate-qr { display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; margin: 1.2rem auto 0.8rem; border: 1px dashed #c9b49c; border-radius: 10px; color: #9c897a; font-size: 0.95rem; background: #faf7f1; }
+        .donate-qr img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
+        .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
+        #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
     </style>
 </head>
 <body class="intro-playing">
@@ -192,16 +211,21 @@
                     <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
                 </div>
                 <p id="ai-copied"></p>
+            </div>
 
-                <!-- 抽完籤後的另一個選擇：為所求之事點一盞光明燈 -->
-                <div id="lamp-option">
-                    <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明燈：</p>
-                    <a class="lamp-entry" href="lamp.html#light">
-                        <span class="lamp-entry-orb" aria-hidden="true"></span>
-                        <span><strong>點一盞光明燈</strong><small>菩提光球・寫下心願，免費點燈</small></span>
-                        <span class="lamp-entry-go" aria-hidden="true">›</span>
-                    </a>
+            <!-- 光明燈：一進首頁就看得到，把金色光球由左往右滑過去就能點燈 -->
+            <div id="lamp-option">
+                <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明燈：</p>
+                <div class="lamp-slide" id="lamp-slide">
+                    <div class="lamp-slide-fill" id="lamp-slide-fill"></div>
+                    <div class="lamp-slide-text"><strong>向右滑動，點一盞光明燈</strong><small>菩提光球・寫下心願，免費點燈</small><span class="go" aria-hidden="true">›››</span></div>
+                    <div class="lamp-slide-knob" id="lamp-slide-knob" role="slider" tabindex="0" aria-label="把光球向右滑動，前往點光明燈" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
                 </div>
+
+            <div id="donate-option">
+                <button id="donate-button" type="button">隨喜贊助・網站維護</button>
+                <p id="donate-note">網站免費使用，歡迎隨喜贊助維護費用</p>
+            </div>
             </div>
             
         </main>
@@ -220,6 +244,42 @@
 
         </footer>
     </div>
+
+    <div id="donate-dialog" role="dialog" aria-modal="true" aria-labelledby="donate-title">
+        <div class="donate-card">
+            <button id="donate-close" type="button" aria-label="關閉">×</button>
+            <h2 id="donate-title">隨喜贊助・網站維護</h2>
+            <p>感謝您的心意。贊助將用於網站主機與維護，讓更多人能免費抽籤、點光明燈。</p>
+            <div class="donate-qr" id="donate-qr">收款方式準備中</div>
+            <p class="donate-small">請用 LINE Pay 掃描 QR Code，金額隨喜。<br>本贊助為支持網站營運，非寺廟捐款，無法開立收據。</p>
+        </div>
+    </div>
+
+    <script>
+        // 贊助視窗：把收款 QR Code 存成 donate-qr.png 放到網站根目錄就會自動顯示
+        (function () {
+            const dialog = document.getElementById('donate-dialog');
+            const qr = document.getElementById('donate-qr');
+            function open() {
+                if (!qr.dataset.tried) {
+                    qr.dataset.tried = '1';
+                    const img = new Image();
+                    img.alt = '贊助收款 QR Code';
+                    img.onload = () => { qr.textContent = ''; qr.appendChild(img); };
+                    img.src = 'donate-qr.png';
+                }
+                dialog.classList.add('show');
+            }
+            function close() { dialog.classList.remove('show'); }
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('donate-button').addEventListener('click', open);
+                document.getElementById('donate-close').addEventListener('click', close);
+                dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+                if (location.hash === '#donate') open();
+            });
+        })();
+    </script>
 
     <script>
         const poems = [
@@ -417,6 +477,47 @@
             try { if (poem && poem.id) sessionStorage.setItem('returnLot', String(poem.id)); } catch (e) {}
         }
 
+        // 滑動點燈：把光球拖到右邊盡頭就前往光明燈頁
+        function setupLampSlide() {
+            const track = document.getElementById('lamp-slide');
+            const knob = document.getElementById('lamp-slide-knob');
+            const fill = document.getElementById('lamp-slide-fill');
+            let startX = 0, x = 0, dragging = false, done = false;
+            const maxX = () => track.clientWidth - knob.offsetWidth - 10;
+            const place = (v) => {
+                x = Math.max(0, Math.min(maxX(), v));
+                knob.style.transform = `translateX(${x}px)`;
+                fill.style.width = x > 0 ? `${x + knob.offsetWidth / 2 + 5}px` : '0';
+                knob.setAttribute('aria-valuenow', String(Math.round((x / maxX()) * 100)));
+            };
+            const go = () => {
+                done = true;
+                place(maxX());
+                track.classList.add('done');
+                rememberLotForLamp();
+                setTimeout(() => { location.href = 'lamp.html#light'; }, 250);
+            };
+            knob.addEventListener('pointerdown', (e) => {
+                if (done) return;
+                dragging = true;
+                startX = e.clientX - x;
+                track.classList.remove('back');
+                try { knob.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+            knob.addEventListener('pointermove', (e) => { if (dragging) place(e.clientX - startX); });
+            const end = () => {
+                if (!dragging) return;
+                dragging = false;
+                if (x >= maxX() * 0.85) go();
+                else { track.classList.add('back'); place(0); }
+            };
+            knob.addEventListener('pointerup', end);
+            knob.addEventListener('pointercancel', end);
+            knob.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); go(); } });
+            // 從光明燈頁按「上一頁」回來時，光球回到起點
+            window.addEventListener('pageshow', () => { done = false; track.classList.remove('done'); place(0); });
+        }
+
         function restoreLotAfterLamp() {
             let id = 0;
             try { id = Number(sessionStorage.getItem('returnLot')) || 0; sessionStorage.removeItem('returnLot'); } catch (e) {}
@@ -505,7 +606,7 @@
             drawButton.addEventListener('click', drawLot);
             googleAiLink.addEventListener('click', copyPromptOnClick);
             chatgptLink.addEventListener('click', copyPromptOnClick);
-            document.querySelector('.lamp-entry').addEventListener('click', rememberLotForLamp);
+            setupLampSlide();
             restoreLotAfterLamp();
             displayVisitorBadges();
         });
