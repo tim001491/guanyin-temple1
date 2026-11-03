@@ -266,22 +266,27 @@
         // 組合要交給 AI 的解籤提問（含籤詩與求籤當下的年月日時干支）
         function buildAIPrompt() {
             const b = currentBaziInfo;
+            const lotGanzhi = currentPoem.title.split(' ').pop(); // 本籤干支，例如「丁酉」
             const timeLine = b.yearPillar
                 ? `求籤時間：${b.gregorian}（${b.yearPillar}年 ${b.monthPillar}月 ${b.dayPillar}日 ${b.hourPillar}時）`
                 : '';
             return [
                 '請以觀音靈籤解籤師的角度，為我解這支籤：',
-                `觀音靈籤 ${currentPoem.title}`,
+                `觀音靈籤 ${currentPoem.title}（本籤干支：${lotGanzhi}）`,
                 `籤詩：${currentPoem.text.replace(/\n/g, '')}`,
                 timeLine,
-                '請用白話解釋籤意，結合求籤時間的干支五行，分析事業、感情、健康、財運，最後給我具體建議。'
+                '請將籤詩與求籤時間的年月日時天干地支互相參照來解籤：',
+                '1. 白話解釋籤詩含意',
+                `2. 比對本籤干支「${lotGanzhi}」與求籤四柱（尤其日柱、時柱）的五行生剋、合沖，說明對籤意是加強還是化解`,
+                '3. 綜合籤詩與干支，分析事業、感情、健康、財運',
+                '4. 給我具體建議'
             ].filter(Boolean).join('\n');
         }
 
         function showAILinks() {
             // Google：只送短關鍵字，看起來像一般搜尋，避免跳出「要繼續搜尋嗎？」確認視窗
             const b = currentBaziInfo;
-            const ganzhi = b.yearPillar ? ` ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時 干支五行` : '';
+            const ganzhi = b.yearPillar ? ` 籤詩干支與${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時 五行生剋互相參照` : '';
             const googleQuery = `觀音靈籤 ${currentPoem.title} 解籤 白話解釋${ganzhi}`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
             // ChatGPT：送完整提問（含籤詩與年月日時干支）
