@@ -107,7 +107,7 @@
             text-decoration: underline;
         }
 
-        /* --- 菩提光球・線上光明燈 入口 --- */
+        /* --- 菩提光球・線上光明球燈 入口 --- */
         #lamp-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
         #lamp-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
         .lamp-slide { position: relative; max-width: 340px; height: 52px; margin: 0 auto; border-radius: 50px; background-color: #fff; border: 2px solid #a58362; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
@@ -213,13 +213,13 @@
                 <p id="ai-copied"></p>
             </div>
 
-            <!-- 光明燈：一進首頁就看得到，把金色光球由左往右滑過去就能點燈 -->
+            <!-- 光明球燈：一進首頁就看得到，把金色光球由左往右滑過去就能點燈 -->
             <div id="lamp-option">
-                <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明燈：</p>
+                <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明球燈：</p>
                 <div class="lamp-slide" id="lamp-slide">
                     <div class="lamp-slide-fill" id="lamp-slide-fill"></div>
-                    <div class="lamp-slide-text"><strong>向右滑動，點一盞光明燈</strong><small>菩提光球・寫下心願，免費點燈</small><span class="go" aria-hidden="true">›››</span></div>
-                    <div class="lamp-slide-knob" id="lamp-slide-knob" role="slider" tabindex="0" aria-label="把光球向右滑動，前往點光明燈" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                    <div class="lamp-slide-text"><strong>向右滑動，點一盞光明球燈</strong><small>菩提光球・寫下心願，免費點燈</small><span class="go" aria-hidden="true">›››</span></div>
+                    <div class="lamp-slide-knob" id="lamp-slide-knob" role="slider" tabindex="0" aria-label="把光球向右滑動，前往點光明球燈" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
                 </div>
             </div>
             
@@ -249,7 +249,7 @@
         <div class="donate-card">
             <button id="donate-close" type="button" aria-label="關閉">×</button>
             <h2 id="donate-title">隨喜贊助・網站維護</h2>
-            <p>感謝您的心意。贊助將用於網站主機與維護，讓更多人能免費抽籤、點光明燈。</p>
+            <p>感謝您的心意。贊助將用於網站主機與維護，讓更多人能免費抽籤、點光明球燈。</p>
             <div class="donate-qr" id="donate-qr">收款方式準備中</div>
             <p class="donate-small">請用 LINE Pay 掃描 QR Code，金額隨喜。<br>本贊助為支持網站營運，非寺廟捐款，無法開立收據。</p>
         </div>
@@ -472,13 +472,13 @@
             aiSection.classList.add('show');
         }
 
-        // 去點光明燈之前記住剛抽到的籤，回來時還看得到（同一個分頁內有效）
+        // 去點光明球燈之前記住剛抽到的籤，回來時還看得到（同一個分頁內有效）
         function rememberLotForLamp() {
             const poem = poems.find(p => p.title === currentPoem.title);
             try { if (poem && poem.id) sessionStorage.setItem('returnLot', String(poem.id)); } catch (e) {}
         }
 
-        // 滑動點燈：把光球拖到右邊盡頭就前往光明燈頁
+        // 滑動點燈：把光球拖到右邊盡頭就前往光明球燈頁
         function setupLampSlide() {
             const track = document.getElementById('lamp-slide');
             const knob = document.getElementById('lamp-slide-knob');
@@ -515,7 +515,7 @@
             knob.addEventListener('pointerup', end);
             knob.addEventListener('pointercancel', end);
             knob.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); go(); } });
-            // 從光明燈頁按「上一頁」回來時，光球回到起點
+            // 從光明球燈頁按「上一頁」回來時，光球回到起點
             window.addEventListener('pageshow', () => { done = false; track.classList.remove('done'); place(0); });
         }
 

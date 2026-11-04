@@ -1,7 +1,7 @@
-// 菩提光球・線上光明燈 API
+// 菩提光球・線上光明球燈 API
 // 用 Netlify Functions + Netlify Blobs 存放大家點的燈，不需要另外申請資料庫。
 //
-//   GET  /api/lamps           取得光球裡最新的光明燈與統計數字
+//   GET  /api/lamps           取得光球裡最新的光明球燈與統計數字
 //   GET  /api/lamps?id=燈號    取得單一盞燈（分享連結用）
 //   POST /api/lamps           { action: "light" | "bless" | "pray" | "remove", ... }
 //
@@ -137,7 +137,7 @@ async function handleGet(req) {
     const wall = await store.get(WALL_KEY, { type: "json" });
     let lamp = wall?.lamps?.find((l) => l.id === id);
     if (!lamp) lamp = await store.get(`lamp/${id}`, { type: "json" });
-    if (!lamp) return fail(404, "找不到這盞光明燈，可能已被移除");
+    if (!lamp) return fail(404, "找不到這盞光明球燈，可能已被移除");
     return json({ ok: true, lamp });
   }
 
@@ -292,6 +292,6 @@ export default async (req, context) => {
   } catch (err) {
     console.error("lamps api error", err);
     if (err && err.message === "wall-busy") return fail(503, "點燈的人太多了，請再按一次");
-    return fail(500, "光明燈暫時無法連線，請稍後再試");
+    return fail(500, "光明球燈暫時無法連線，請稍後再試");
   }
 };

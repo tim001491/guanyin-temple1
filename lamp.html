@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>菩提光球・線上光明燈</title>
-<meta name="description" content="寫下心願，點亮一盞光明燈，讓祈願化作光點環繞觀音菩薩流轉。免費點燈，也能為大家隨喜祈福。">
+<title>菩提光球・線上光明球燈</title>
+<meta name="description" content="寫下心願，點亮一盞光明球燈，讓祈願化作光點環繞觀音菩薩流轉。免費點燈，也能為大家隨喜祈福。">
 <meta name="theme-color" content="#090c26">
 <meta property="og:type" content="website">
-<meta property="og:title" content="菩提光球・線上光明燈">
-<meta property="og:description" content="寫下心願，點亮一盞光明燈，讓祈願化作光點環繞觀音菩薩流轉。">
+<meta property="og:title" content="菩提光球・線上光明球燈">
+<meta property="og:description" content="寫下心願，點亮一盞光明球燈，讓祈願化作光點環繞觀音菩薩流轉。">
 <meta property="og:image" content="https://xn--dett40e76kpzn.online/lamp/og.jpg">
 <meta property="og:url" content="https://xn--dett40e76kpzn.online/lamp.html">
 <link rel="icon" href="icons/192.png">
@@ -655,11 +655,11 @@ textarea { min-height: 68px; resize: none; }
 <canvas id="sky" aria-hidden="true"></canvas>
 
 <div class="page">
-  <p class="preview-note" id="previewNote" hidden>預覽模式：光球裡是示範光明燈，您點的燈只存在這台裝置。上線後會連到網站的公開燈牆。</p>
+  <p class="preview-note" id="previewNote" hidden>預覽模式：光球裡是示範光明球燈，您點的燈只存在這台裝置。上線後會連到網站的公開燈牆。</p>
 
   <section class="hero" aria-labelledby="pageTitle">
     <div class="orb-screen">
-    <div class="stage" id="stage" role="img" aria-label="觀音菩薩坐在蓮花上的水晶光球，信眾點亮的光明燈化成光點環繞流轉">
+    <div class="stage" id="stage" role="img" aria-label="觀音菩薩坐在蓮花上的水晶光球，信眾點亮的光明球燈化成光點環繞流轉">
       <div class="aura"></div>
       <div class="rays"></div>
       <div class="rays r2"></div>
@@ -698,18 +698,18 @@ textarea { min-height: 68px; resize: none; }
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="lightBtn" type="button">點亮光明燈</button>
+      <button class="btn btn-primary" id="lightBtn" type="button">點亮光明球燈</button>
       <button class="btn btn-ghost" id="prayBtn" type="button">為眾生祈福</button>
     </div>
     </div>
     <h1 class="title" id="pageTitle">菩提光球</h1>
-    <p class="subtitle">點亮一盞光明燈　讓心願化作光　環繞菩薩流轉</p>
+    <p class="subtitle">點亮一盞光明球燈　讓心願化作光　環繞菩薩流轉</p>
     <p class="counter" id="counter" aria-live="polite">光球正在亮起…</p>
 
     <p class="hint">輕觸光球裡的光點，看看每一份祈願</p>
     <nav class="topbar" aria-label="頁面連結">
       <a class="chip-link" id="homeLink" href="index.html">‹ 觀音靈籤</a>
-      <button class="chip-link" id="myBtn" type="button">我的光明燈<span class="n" id="myCount" hidden></span></button>
+      <button class="chip-link" id="myBtn" type="button">我的光明球燈<span class="n" id="myCount" hidden></span></button>
     </nav>
   </section>
 
@@ -722,11 +722,11 @@ textarea { min-height: 68px; resize: none; }
   </section>
 
   <section class="section about" aria-labelledby="aboutTitle">
-    <h2 id="aboutTitle">關於線上光明燈</h2>
+    <h2 id="aboutTitle">關於線上光明球燈</h2>
     <div class="about-grid">
       <div>
-        <h3>光明燈的心意</h3>
-        <p>光明燈象徵以智慧之光照亮前路。在菩提光球裡，每一份心願都化作一顆光點，環繞觀音菩薩流轉，也和大家的祝福彼此輝映。</p>
+        <h3>光明球燈的心意</h3>
+        <p>光明球燈象徵以智慧之光照亮前路。在菩提光球裡，每一份心願都化作一顆光點，環繞觀音菩薩流轉，也和大家的祝福彼此輝映。</p>
       </div>
       <div>
         <h3>怎麼點燈</h3>
@@ -763,7 +763,7 @@ textarea { min-height: 68px; resize: none; }
 
 <section class="sheet" id="lightSheet" role="dialog" aria-modal="true" aria-labelledby="lightTitle" tabindex="-1">
   <button class="close" type="button" data-close aria-label="關閉">×</button>
-  <h3 id="lightTitle" tabindex="-1">點亮一盞光明燈</h3>
+  <h3 id="lightTitle" tabindex="-1">點亮一盞光明球燈</h3>
   <p class="sheet-lead">靜心片刻，寫下您的祈願。</p>
   <form id="lightForm" novalidate>
     <div class="field">
@@ -793,7 +793,7 @@ textarea { min-height: 68px; resize: none; }
     </div>
     <input type="text" name="website" id="fWebsite" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="form-error" id="formError" role="alert"></p>
-    <button class="btn btn-primary wide" id="submitBtn" type="submit">點亮光明燈</button>
+    <button class="btn btn-primary wide" id="submitBtn" type="submit">點亮光明球燈</button>
   </form>
 </section>
 
@@ -802,7 +802,7 @@ textarea { min-height: 68px; resize: none; }
   <div class="cert">
     <div class="cert-orb" id="certOrb"></div>
     <p class="cert-kicker" id="certNo"></p>
-    <h3 id="certTitle" tabindex="-1">光明燈已點亮</h3>
+    <h3 id="certTitle" tabindex="-1">光明球燈已點亮</h3>
     <div class="cert-line"></div>
     <p class="cert-name" id="certName"></p>
     <p class="cert-public" id="certPublic"></p>
@@ -838,11 +838,11 @@ textarea { min-height: 68px; resize: none; }
 
 <section class="sheet" id="mySheet" role="dialog" aria-modal="true" aria-labelledby="myTitle" tabindex="-1">
   <button class="close" type="button" data-close aria-label="關閉">×</button>
-  <h3 id="myTitle" tabindex="-1">我的光明燈</h3>
+  <h3 id="myTitle" tabindex="-1">我的光明球燈</h3>
   <p class="sheet-lead">在這台裝置上點過的燈，換手機或清除瀏覽資料後就看不到了。</p>
   <ul class="my-list" id="myList"></ul>
   <p class="empty" id="myEmpty">您還沒有點燈。</p>
-  <div class="more-wrap"><button class="btn btn-primary" id="myLight" type="button">點亮光明燈</button></div>
+  <div class="more-wrap"><button class="btn btn-primary" id="myLight" type="button">點亮光明球燈</button></div>
 </section>
 
 <section class="sheet center" id="adminSheet" role="dialog" aria-modal="true" aria-labelledby="adminTitle" tabindex="-1">
@@ -875,7 +875,7 @@ textarea { min-height: 68px; resize: none; }
   'use strict';
 
   // ===== 設定 =====
-  const PREVIEW = false; // 預覽版會改成 true：光明燈只存在這台裝置，並放入示範燈
+  const PREVIEW = false; // 預覽版會改成 true：光明球燈只存在這台裝置，並放入示範燈
   const API = '/api/lamps';
   const NAME_MAX = 12;
   const WISH_MAX = 60;
@@ -986,7 +986,7 @@ textarea { min-height: 68px; resize: none; }
     let data = null;
     try { data = await res.json(); } catch (e) {}
     if (!res.ok || !data || data.ok === false) {
-      const err = new Error((data && data.error) || '光明燈暫時連不上，請稍後再試');
+      const err = new Error((data && data.error) || '光明球燈暫時連不上，請稍後再試');
       err.status = res.status;
       throw err;
     }
@@ -1032,7 +1032,7 @@ textarea { min-height: 68px; resize: none; }
     async list() { const w = this.load(); return { ok: true, total: w.total, blessTotal: w.blessTotal, lamps: w.lamps.slice(0, 240) }; },
     async get(id) {
       const lamp = this.load().lamps.find((l) => l.id === id);
-      if (!lamp) { const e = new Error('找不到這盞光明燈，可能已被移除'); e.status = 404; throw e; }
+      if (!lamp) { const e = new Error('找不到這盞光明球燈，可能已被移除'); e.status = 404; throw e; }
       return { ok: true, lamp };
     },
     async post(body, headers) {
@@ -1578,7 +1578,7 @@ textarea { min-height: 68px; resize: none; }
       if (reduceMotion) {
         lamp.fadeIn = now;
         flare();
-        showLabel(lamp, '您的光明燈', 6000);
+        showLabel(lamp, '您的光明球燈', 6000);
         setTimeout(() => openCert(lamp, fullName), 900);
         return;
       }
@@ -1591,7 +1591,7 @@ textarea { min-height: 68px; resize: none; }
       setTimeout(() => {
         flare();
         burst(lamp._sx, lamp._sy, lamp.color, 36, 1);
-        showLabel(lamp, '您的光明燈', 7000);
+        showLabel(lamp, '您的光明球燈', 7000);
         if (navigator.vibrate) { try { navigator.vibrate(25); } catch (e) {} }
       }, T_DIVE * 1000);
       setTimeout(() => openCert(lamp, fullName), T_DIVE * 1000 + 1100);
@@ -1741,7 +1741,7 @@ textarea { min-height: 68px; resize: none; }
     if (state.loading) { c.textContent = '光球正在亮起…'; return; }
     if (state.error && !state.lamps.length) { c.textContent = '光球暫時連不上，稍後會自動重試'; return; }
     if (!state.total) { c.textContent = '光球正在等待第一盞燈'; return; }
-    c.append('已點亮 ', el('b', null, fmtNum(state.total)), ' 盞光明燈・收到 ', el('b', null, fmtNum(state.blessTotal)), ' 次祈福');
+    c.append('已點亮 ', el('b', null, fmtNum(state.total)), ' 盞光明球燈・收到 ', el('b', null, fmtNum(state.blessTotal)), ' 次祈福');
   }
 
   function blessButton(L) {
@@ -1805,7 +1805,7 @@ textarea { min-height: 68px; resize: none; }
       const body = el('div', 'wish-body');
       body.append(
         el('p', 'my-title', `${m.fullName || L.name}・${L.cat}`),
-        el('p', 'my-sub', `光明燈 第 ${fmtNum(L.no)} 盞・${timeAgo(L.t)}點亮${L.wish ? '・' + L.wish : ''}`)
+        el('p', 'my-sub', `光明球燈 第 ${fmtNum(L.no)} 盞・${timeAgo(L.t)}點亮${L.wish ? '・' + L.wish : ''}`)
       );
       const actions = el('div', 'wish-actions');
       const view = el('button', 'mini-btn', '看光點');
@@ -2010,14 +2010,14 @@ textarea { min-height: 68px; resize: none; }
       err.textContent = error.message || '點燈沒有成功，請再試一次。';
     } finally {
       btn.disabled = false;
-      btn.textContent = '點亮光明燈';
+      btn.textContent = '點亮光明球燈';
     }
   });
 
   // ===== 祝福卡與單盞燈 =====
   function openCert(L, fullName) {
     $('#certOrb').style.setProperty('--c', L.color);
-    $('#certNo').textContent = `光明燈 第 ${fmtNum(L.no)} 盞・${L.cat}`;
+    $('#certNo').textContent = `光明球燈 第 ${fmtNum(L.no)} 盞・${L.cat}`;
     const own = clean(fullName) || L.name;
     $('#certName').textContent = own;
     $('#certPublic').textContent = own !== L.name ? `光球上顯示為「${L.name}」` : '';
@@ -2032,7 +2032,7 @@ textarea { min-height: 68px; resize: none; }
 
   function fillLampSheet(L) {
     $('#lampDot').style.setProperty('--c', L.color);
-    $('#lampKicker').textContent = `光明燈 第 ${fmtNum(L.no)} 盞・${L.cat}${L.demo ? '・示範' : ''}`;
+    $('#lampKicker').textContent = `光明球燈 第 ${fmtNum(L.no)} 盞・${L.cat}${L.demo ? '・示範' : ''}`;
     $('#lampName').textContent = L.name;
     const w = $('#lampWish');
     w.className = L.wish ? 'lamp-wish' : 'lamp-wish quiet';
@@ -2060,16 +2060,16 @@ textarea { min-height: 68px; resize: none; }
     stage.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
     setTimeout(() => {
       target.pulse = performance.now();
-      showLabel(target, isMine(target.id) ? '您的光明燈' : `${target.name}的光明燈`, 5000);
+      showLabel(target, isMine(target.id) ? '您的光明球燈' : `${target.name}的光明球燈`, 5000);
     }, 350);
   }
 
   async function shareLamp(L, mine) {
     if (PREVIEW) { toast('上線後，這裡會分享這盞燈的專屬連結'); return; }
     const url = `${location.origin}${location.pathname}#l-${L.id}`;
-    const text = mine ? `我在菩提光球點亮了一盞光明燈，祈願${L.cat}。邀請你一起隨喜祝福：` : `菩提光球裡有一盞祈願${L.cat}的光明燈，一起來隨喜祝福：`;
+    const text = mine ? `我在菩提光球點亮了一盞光明球燈，祈願${L.cat}。邀請你一起隨喜祝福：` : `菩提光球裡有一盞祈願${L.cat}的光明球燈，一起來隨喜祝福：`;
     if (navigator.share) {
-      try { await navigator.share({ title: '菩提光球・線上光明燈', text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+      try { await navigator.share({ title: '菩提光球・線上光明球燈', text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
     }
     try {
       await navigator.clipboard.writeText(text + url);
@@ -2105,7 +2105,7 @@ textarea { min-height: 68px; resize: none; }
     removing = L;
     confirmAction = removeAsAdmin;
     $('#confirmTitle').textContent = '移除這盞燈？';
-    $('#confirmText').textContent = `「${L.name}」的光明燈將從光球與光語中移除，無法復原。`;
+    $('#confirmText').textContent = `「${L.name}」的光明球燈將從光球與光語中移除，無法復原。`;
     $('#confirmYes').textContent = '確定移除';
     openSheet('confirmSheet');
   }
@@ -2124,7 +2124,7 @@ textarea { min-height: 68px; resize: none; }
       if (!m.token) {
         dropLocal(m.id);
         closeSheet();
-        toast('已從我的光明燈移除。這盞燈是之前點的，若要從光球移除，請透過「聯絡我們」告訴我們');
+        toast('已從我的光明球燈移除。這盞燈是之前點的，若要從光球移除，請透過「聯絡我們」告訴我們');
         return;
       }
       try {
@@ -2134,9 +2134,9 @@ textarea { min-height: 68px; resize: none; }
       }
       dropLocal(m.id);
       closeSheet();
-      toast('已刪除這盞光明燈');
+      toast('已刪除這盞光明球燈');
     };
-    $('#confirmTitle').textContent = '刪除這盞光明燈？';
+    $('#confirmTitle').textContent = '刪除這盞光明球燈？';
     $('#confirmText').textContent = `「${m.fullName || L.name}・${L.cat}」第 ${fmtNum(L.no)} 盞將從光球與光語中刪除，無法復原。`;
     $('#confirmYes').textContent = '確定刪除';
     openSheet('confirmSheet');
@@ -2179,12 +2179,12 @@ textarea { min-height: 68px; resize: none; }
         addLamp(L);
         renderWall();
       } catch (err) {
-        toast(err.message || '找不到這盞光明燈');
+        toast(err.message || '找不到這盞光明球燈');
         return;
       }
     }
     openLamp(L);
-    setTimeout(() => showLabel(L, `${L.name}的光明燈`, 6000), 300);
+    setTimeout(() => showLabel(L, `${L.name}的光明球燈`, 6000), 300);
   }
 
   // ===== 按鈕 =====
