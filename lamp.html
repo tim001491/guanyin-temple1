@@ -568,6 +568,11 @@ textarea { min-height: 68px; resize: none; }
 .cats input:checked + span { color: #fff; background: rgba(255, 255, 255, 0.07); border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c), 0 0 18px -4px var(--c); }
 .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.suggest-title { font-size: 14px; letter-spacing: 0.04em; color: #e6def5; }
+.suggest-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.suggest-chip { padding: 7px 12px; font: 14px/1.4 var(--body); text-align: left; color: var(--gold); background: rgba(244, 208, 138, 0.08); border: 1px solid rgba(244, 208, 138, 0.35); border-radius: 999px; cursor: pointer; }
+.suggest-chip:hover { background: rgba(244, 208, 138, 0.16); }
+.suggest-chip[aria-pressed="true"] { color: #3a2508; background: linear-gradient(180deg, #fff0c8, #e9b863); border-color: transparent; }
 .suggest { justify-self: start; padding: 2px 0; font: 13px/1.5 var(--body); text-align: left; color: var(--gold); background: none; border: 0; cursor: pointer; }
 .suggest:hover { text-decoration: underline; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
@@ -779,9 +784,12 @@ textarea { min-height: 68px; resize: none; }
       <div class="cats" id="catGrid"></div>
     </fieldset>
     <div class="field">
+      <p class="suggest-title">帶入祝福語（點一下就會填入祈願文）</p>
+      <div class="suggest-list" id="suggestList"></div>
+    </div>
+    <div class="field">
       <div class="label-row"><label for="fWish">祈願文（可不填）</label><span class="count" id="wishCount">0/60</span></div>
       <textarea id="fWish" name="wish" maxlength="60" rows="2" placeholder="例：願家人身體健康、平安喜樂"></textarea>
-      <button type="button" class="suggest" id="suggestBtn">帶入祝福語：<span id="suggestText"></span></button>
     </div>
     <input type="text" name="website" id="fWebsite" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="privacy">姓名與祈願會公開顯示在光球上，請勿填寫電話、地址等個人資料。</p>
@@ -873,14 +881,14 @@ textarea { min-height: 68px; resize: none; }
   const NAME_MAX = 12;
   const WISH_MAX = 60;
   const CATS = {
-    '平安': { color: '#ffd27a', wish: '願闔家平安，出入順遂', bless: '心安處處皆光明，願您出入平安、事事順遂。' },
-    '健康': { color: '#8fe3c0', wish: '願身體健康，病苦消除', bless: '願您身心輕安、元氣飽滿，日日神清氣爽。' },
-    '學業': { color: '#8cc8ff', wish: '願學業精進，考試順利', bless: '願您智慧增長、心思澄明，所學皆有所成。' },
-    '事業': { color: '#ffab66', wish: '願工作順利，貴人相助', bless: '願您事業蒸蒸日上，所到之處皆有貴人。' },
-    '財運': { color: '#ffec80', wish: '願財源廣進，衣食無憂', bless: '願您福報綿長、財源廣進，生活豐足安穩。' },
-    '姻緣': { color: '#ff9fc4', wish: '願良緣早到，感情圓滿', bless: '願您良緣相聚、心意相通，感情圓滿美好。' },
-    '闔家': { color: '#c7a6ff', wish: '願家庭和樂，親人安康', bless: '願您家和萬事興，親人安康、笑語滿堂。' },
-    '消災': { color: '#eef0ff', wish: '願消災解厄，逢凶化吉', bless: '願諸事化吉、障礙消散，前路一片光明。' },
+    '平安': { color: '#ffd27a', wishes: ['願闔家平安，出入順遂', '願身心安穩，事事順心', '願一路平安，逢凶化吉', '願家人健康平安，喜樂常在', '願煩惱消散，心安自在'], bless: '心安處處皆光明，願您出入平安、事事順遂。' },
+    '健康': { color: '#8fe3c0', wishes: ['願身體健康，病苦消除', '願早日康復，元氣滿滿', '願父母身體安康，福壽綿長', '願睡得安穩，精神飽滿', '願手術順利，平安康復'], bless: '願您身心輕安、元氣飽滿，日日神清氣爽。' },
+    '學業': { color: '#8cc8ff', wishes: ['願學業精進，考試順利', '願金榜題名，考上理想學校', '願專心向學，智慧增長', '願證照考試一次通過', '願孩子學習順利，健康快樂'], bless: '願您智慧增長、心思澄明，所學皆有所成。' },
+    '事業': { color: '#ffab66', wishes: ['願工作順利，貴人相助', '願事業蒸蒸日上，步步高升', '願面試順利，找到好工作', '願生意興隆，客源廣進', '願同事和睦，工作順心'], bless: '願您事業蒸蒸日上，所到之處皆有貴人。' },
+    '財運': { color: '#ffec80', wishes: ['願財源廣進，衣食無憂', '願正財穩定，收入豐足', '願投資順利，收支平衡', '願早日存到心中的目標', '願福報綿長，豐衣足食'], bless: '願您福報綿長、財源廣進，生活豐足安穩。' },
+    '姻緣': { color: '#ff9fc4', wishes: ['願良緣早到，感情圓滿', '願遇見對的人，相知相惜', '願夫妻和睦，白頭偕老', '願感情順利，有情人終成眷屬', '願婚事順利，幸福美滿'], bless: '願您良緣相聚、心意相通，感情圓滿美好。' },
+    '闔家': { color: '#c7a6ff', wishes: ['願家庭和樂，親人安康', '願家人平安，笑口常開', '願子孫孝順，家業興旺', '願家和萬事興', '願長輩健康長壽，孩子平安長大'], bless: '願您家和萬事興，親人安康、笑語滿堂。' },
+    '消災': { color: '#eef0ff', wishes: ['願消災解厄，逢凶化吉', '願障礙消除，諸事順利', '願小人遠離，貴人相助', '願病痛遠離，平安無事', '願化解厄運，否極泰來'], bless: '願諸事化吉、障礙消散，前路一片光明。' },
   };
   const CAT_NAMES = Object.keys(CATS);
   const LUNAR_DAYS = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
@@ -1940,12 +1948,27 @@ textarea { min-height: 68px; resize: none; }
     const shown = displayName(clean(nameInput.value), currentShow());
     const p = $('#namePreview');
     p.replaceChildren('光球上會顯示：', el('b', null, nameInput.value.trim() || currentShow() === 'anon' ? shown : '—'));
-    $('#suggestText').textContent = CATS[currentCat()].wish;
+    renderSuggestions();
     $('#wishCount').textContent = `${charLen(wishInput.value)}/${WISH_MAX}`;
   }
   form.addEventListener('input', updateFormPreview);
   form.addEventListener('change', updateFormPreview);
-  $('#suggestBtn').addEventListener('click', () => { wishInput.value = CATS[currentCat()].wish; updateFormPreview(); wishInput.focus(); });
+  // 每個祈願類別有 5 句祝福語可以選
+  let suggestCat = '';
+  function renderSuggestions() {
+    const list = $('#suggestList');
+    const cat = currentCat();
+    if (suggestCat !== cat) {
+      suggestCat = cat;
+      list.replaceChildren(...CATS[cat].wishes.map((text) => {
+        const b = el('button', 'suggest-chip', text);
+        b.type = 'button';
+        b.addEventListener('click', () => { wishInput.value = text; updateFormPreview(); });
+        return b;
+      }));
+    }
+    list.querySelectorAll('.suggest-chip').forEach((b) => b.setAttribute('aria-pressed', b.textContent === clean(wishInput.value) ? 'true' : 'false'));
+  }
 
   function openLightSheet(forFamily) {
     $('#formError').textContent = '';
