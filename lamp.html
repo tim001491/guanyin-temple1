@@ -217,7 +217,8 @@ button { font-family: inherit; }
 }
 .rays.r2 { animation-duration: 260s; animation-direction: reverse; opacity: 0.45; }
 @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-.stage.flare .rays { opacity: 1; }
+.stage.flare .rays, .stage.rising .rays { opacity: 1; }
+.stage.rising .aura { opacity: 1.0; filter: brightness(1.25); transition: filter 1s; }
 .beam {
   position: absolute;
   left: 50%;
@@ -297,7 +298,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
   opacity: 0;
   background: radial-gradient(closest-side, rgba(255, 250, 230, 0.75), rgba(255, 220, 150, 0.35) 45%, transparent 75%);
 }
-.stage.flare .orb-flash { animation: flash 1.5s ease-out; }
+.stage.flare .orb-flash { animation: flash 2.4s ease-out; }
 @keyframes flash { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
 .rim {
   position: absolute;
@@ -1512,21 +1513,23 @@ textarea { min-height: 68px; resize: none; }
 
   // ===== 點燈儀式：光點從水面升起，環繞光球一圈後進入菩薩身旁 =====
   let ceremony = null;
-  const T_BIRTH = 0.55;
-  const T_RISE = 3.35;
-  const T_DIVE = 3.95;
+  // 儀式時間（秒）：水面凝聚光點 → 繞光球兩圈上升 → 進入菩薩身旁
+  const T_BIRTH = 1.2;
+  const T_RISE = 5.8;
+  const T_DIVE = 6.9;
+  const TOP_Y = -0.86; // 光點最高到這裡，不會跑出畫面上緣
 
   function seedPosition(c, tau, t) {
     if (tau < T_BIRTH) return { x: 0, y: geo.poolY, z: 0 };
     if (tau < T_RISE) {
       const u = (tau - T_BIRTH) / (T_RISE - T_BIRTH);
-      const th = Math.PI / 2 + Math.PI * 2 * easeInOut(u);
-      const rho = 1.13 * smooth(0, 0.16, u) - 0.06 * u;
-      return { x: rho * Math.cos(th), y: lerp(geo.poolY, -1.06, easeSine(u)), z: rho * Math.sin(th) };
+      const th = Math.PI / 2 + Math.PI * 4 * easeInOut(u);
+      const rho = 1.06 * smooth(0, 0.14, u) - 0.05 * u;
+      return { x: rho * Math.cos(th), y: lerp(geo.poolY, TOP_Y, easeSine(u)), z: rho * Math.sin(th) };
     }
     const v = easeInOut(clamp01((tau - T_RISE) / (T_DIVE - T_RISE)));
-    const a = { x: 0, y: -1.06, z: 1.07 };
-    const ctrl = { x: 0, y: -0.92, z: 0.55 };
+    const a = { x: 0, y: TOP_Y, z: 1.01 };
+    const ctrl = { x: 0, y: TOP_Y + 0.06, z: 0.5 };
     const b = orbitPos(c.lamp.orbit, t, { x: 0, y: 0, z: 0 });
     const q = (p0, p1, p2) => (1 - v) * (1 - v) * p0 + 2 * (1 - v) * v * p1 + v * v * p2;
     return { x: q(a.x, ctrl.x, b.x), y: q(a.y, ctrl.y, b.y), z: q(a.z, ctrl.z, b.z) };
@@ -1540,17 +1543,36 @@ textarea { min-height: 68px; resize: none; }
     const p = seedPosition(c, tau, t);
     const s = toScreen(p);
     c.trail.push({ s, p });
-    if (c.trail.length > 38) c.trail.shift();
+    if (c.trail.length > 60) c.trail.shift();
+    // 沿路灑落金色光屑
+    if (!reduceMotion && p.z > -0.2 && Math.random() < 0.7) {
+      const a = Math.random() * Math.PI * 2;
+      particles.push({ x: s.x, y: s.y, vx: Math.cos(a) * geo.R * 0.12, vy: Math.sin(a) * geo.R * 0.12 + geo.R * 0.1, life: 0, max: 0.8 + Math.random() * 0.7, s: geo.R * (0.015 + Math.random() * 0.025), color: Math.random() < 0.5 ? c.lamp.color : GOLD });
+    }
+    // 水面凝聚時，光點周圍有一圈圈光環收攏
+    if (tau < T_BIRTH) {
+      const g0 = ctx.top;
+      for (let k = 0; k < 3; k++) {
+        const ph = (tau / T_BIRTH + k / 3) % 1;
+        g0.globalAlpha = 0.6 * (1 - ph);
+        g0.strokeStyle = 'rgba(255, 236, 190, 0.9)';
+        g0.lineWidth = 1.5;
+        g0.beginPath();
+        g0.ellipse(s.x, s.y, geo.R * 0.5 * (1 - ph), geo.R * 0.12 * (1 - ph), 0, 0, Math.PI * 2);
+        g0.stroke();
+      }
+      g0.globalAlpha = 1;
+    }
     const grow = tau < T_BIRTH ? smooth(0, 1, tau / T_BIRTH) : 1;
     const persp = 1 + 0.22 * p.z;
-    const size = geo.R * 0.5 * grow * persp;
+    const size = geo.R * (0.5 + 0.06 * Math.sin(now / 140)) * grow * persp;
     const behind = p.z < 0;
     const n = c.trail.length;
     for (let i = 0; i < n - 1; i++) {
       const q = c.trail[i];
       const k = i / n;
       const g = layerFor(q.p);
-      const ts = geo.R * 0.28 * k * (1 + 0.22 * q.p.z) * grow;
+      const ts = geo.R * 0.32 * k * (1 + 0.22 * q.p.z) * grow;
       g.globalAlpha = 0.7 * k * (q.p.z < 0 ? 0.7 : 1);
       g.drawImage(sprite(c.lamp.color), q.s.x - ts / 2, q.s.y - ts / 2, ts, ts);
     }
@@ -1588,18 +1610,22 @@ textarea { min-height: 68px; resize: none; }
       pool.classList.remove('bursting');
       void pool.offsetWidth;
       pool.classList.add('bursting');
+      stage.classList.add('rising');
       setTimeout(() => {
+        stage.classList.remove('rising');
         flare();
-        burst(lamp._sx, lamp._sy, lamp.color, 36, 1);
-        showLabel(lamp, '您的光明球燈', 7000);
-        if (navigator.vibrate) { try { navigator.vibrate(25); } catch (e) {} }
+        burst(lamp._sx, lamp._sy, lamp.color, 70, 1.4);
+        burst(geo.cx, geo.cy, GOLD, 40, 1.8);
+        state.prayAt = performance.now(); // 光波擴散、所有光點一起亮起
+        showLabel(lamp, '您的光明球燈', 9000);
+        if (navigator.vibrate) { try { navigator.vibrate([30, 60, 30]); } catch (e) {} }
       }, T_DIVE * 1000);
-      setTimeout(() => openCert(lamp, fullName), T_DIVE * 1000 + 1100);
+      setTimeout(() => openCert(lamp, fullName), T_DIVE * 1000 + 2300);
     };
     const rect = stage.getBoundingClientRect();
     const visible = rect.top > -rect.height * 0.25 && rect.bottom < window.innerHeight + rect.height * 0.25;
-    if (!visible) {
-      stage.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    if (!visible || window.scrollY > 10) {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       setTimeout(begin, 650);
     } else begin();
   }
@@ -1608,7 +1634,7 @@ textarea { min-height: 68px; resize: none; }
     void stage.offsetWidth;
     stage.classList.add('flare');
     clearTimeout(flare.timer);
-    flare.timer = setTimeout(() => stage.classList.remove('flare'), 1600);
+    flare.timer = setTimeout(() => stage.classList.remove('flare'), 2500);
   }
   function showLabel(lamp, text, ms) {
     const now = performance.now();
