@@ -325,11 +325,9 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
   gap: 12px;
   margin-top: 14px;
 }
-/* 三顆按鈕：點亮光明球燈在上，兩個祈福並排在下 */
-.actions { flex-direction: column; align-items: center; }
-.actions > .btn-primary { width: min(100%, 340px); }
-.actions-row { display: flex; gap: 12px; width: min(100%, 340px); }
-.actions-row .btn { flex: 1; padding-left: 10px; padding-right: 10px; }
+/* 三顆按鈕排成一列，不擋住背景 */
+.actions { flex-wrap: nowrap; gap: 8px; width: min(100%, 520px); margin-left: auto; margin-right: auto; }
+.actions .btn { flex: 1 1 0; min-width: 0; padding: 13px 4px; font-size: clamp(13px, 3.7vw, 16px); letter-spacing: 0.02em; white-space: nowrap; }
 .btn {
   position: relative;
   font: 600 17px/1 var(--body);
@@ -706,10 +704,8 @@ textarea { min-height: 68px; resize: none; }
 
     <div class="actions">
       <button class="btn btn-primary" id="lightBtn" type="button">點亮光明球燈</button>
-      <div class="actions-row">
-        <button class="btn btn-ghost" id="selfPrayBtn" type="button">為自己祈福</button>
-        <button class="btn btn-ghost" id="prayBtn" type="button">為眾生祈福</button>
-      </div>
+      <button class="btn btn-ghost" id="selfPrayBtn" type="button">為自己祈福</button>
+      <button class="btn btn-ghost" id="prayBtn" type="button">為眾生祈福</button>
     </div>
     </div>
     <h1 class="title" id="pageTitle">菩提光球</h1>
