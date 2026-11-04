@@ -75,10 +75,10 @@ button { font-family: inherit; }
   position: relative;
   z-index: 5;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: calc(env(safe-area-inset-top) + 30px) max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
+  margin-top: 16px;
 }
 .chip-link {
   display: inline-flex;
@@ -128,7 +128,7 @@ button { font-family: inherit; }
   align-items: center;
   text-align: center;
   z-index: 1;
-  padding: 6px 16px 8px;
+  padding: calc(env(safe-area-inset-top) + 18px) 16px 8px;
   overflow: hidden;
   overflow: clip;
   overflow-y: visible;
@@ -631,10 +631,6 @@ textarea { min-height: 68px; resize: none; }
 <canvas id="sky" aria-hidden="true"></canvas>
 
 <div class="page">
-  <header class="topbar">
-    <a class="chip-link" id="homeLink" href="index.html">‹ 觀音靈籤</a>
-    <button class="chip-link" id="myBtn" type="button">我的光明燈<span class="n" id="myCount" hidden></span></button>
-  </header>
   <p class="preview-note" id="previewNote" hidden>預覽模式：光球裡是示範光明燈，您點的燈只存在這台裝置。上線後會連到網站的公開燈牆。</p>
 
   <section class="hero" aria-labelledby="pageTitle">
@@ -685,6 +681,10 @@ textarea { min-height: 68px; resize: none; }
       <button class="btn btn-ghost" id="prayBtn" type="button">為眾生祈福</button>
     </div>
     <p class="hint">輕觸光球裡的光點，看看每一份祈願</p>
+    <nav class="topbar" aria-label="頁面連結">
+      <a class="chip-link" id="homeLink" href="index.html">‹ 觀音靈籤</a>
+      <button class="chip-link" id="myBtn" type="button">我的光明燈<span class="n" id="myCount" hidden></span></button>
+    </nav>
   </section>
 
   <section class="section" id="wall" aria-labelledby="wallTitle">
