@@ -1780,11 +1780,9 @@ textarea { min-height: 68px; resize: none; }
     return btn;
   }
   function paintBless(btn, L) {
-    const done = !!state.blessed[L.id];
-    btn.setAttribute('aria-pressed', done ? 'true' : 'false');
     btn.innerHTML = LOTUS;
-    btn.append(`${done ? '已祝福' : '祝福'} ${fmtNum(L.b || 0)}`);
-    btn.setAttribute('aria-label', `${done ? '已送上祝福' : '送上祝福'}，目前 ${L.b || 0} 次`);
+    btn.append(`祝福 ${fmtNum(L.b || 0)}`);
+    btn.setAttribute('aria-label', `送上祝福，目前 ${L.b || 0} 次`);
   }
 
   function wishCard(L) {
@@ -1861,9 +1859,10 @@ textarea { min-height: 68px; resize: none; }
 
   // ===== 祝福與祈福 =====
   async function bless(L) {
-    if (state.blessed[L.id]) { toast('您已經為這盞燈送過祝福了'); return; }
-    state.blessed[L.id] = Date.now();
-    saved.set('bodhi-blessed', state.blessed);
+    // 每個人都可以一直送祝福；只擋掉一秒內連按
+    const nowMs = Date.now();
+    if (L.lastBless && nowMs - L.lastBless < 1200) return;
+    L.lastBless = nowMs;
     L.b = (L.b || 0) + 1;
     state.blessTotal += 1;
     refreshLampViews(L);
@@ -1874,8 +1873,6 @@ textarea { min-height: 68px; resize: none; }
       if (typeof res.blessTotal === 'number') state.blessTotal = Math.max(state.blessTotal, res.blessTotal);
       refreshLampViews(L);
     } catch (err) {
-      delete state.blessed[L.id];
-      saved.set('bodhi-blessed', state.blessed);
       L.b = Math.max(0, L.b - 1);
       state.blessTotal = Math.max(0, state.blessTotal - 1);
       refreshLampViews(L);
@@ -2082,10 +2079,9 @@ textarea { min-height: 68px; resize: none; }
     w.className = L.wish ? 'lamp-wish' : 'lamp-wish quiet';
     w.textContent = L.wish ? `「${L.wish}」` : `默默許下一份${L.cat}的心願`;
     $('#lampMeta').textContent = `${timeAgo(L.t)}點亮・收到 ${fmtNum(L.b || 0)} 次祝福`;
-    const done = !!state.blessed[L.id];
     const b = $('#lampBless');
-    b.textContent = done ? '已送上祝福' : '送上祝福';
-    b.disabled = done;
+    b.textContent = '送上祝福';
+    b.disabled = false;
     $('#lampRemove').hidden = !state.admin;
   }
   function openLamp(L) {

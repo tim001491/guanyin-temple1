@@ -19,7 +19,7 @@ const WALL_MAX = 600; // 光球保留最新的燈數（更早的燈仍可用分�
 const LIST_MAX = 240; // 每次傳給網頁的燈數
 const LIMITS = {
   light: { max: 8, windowMs: 60 * 60 * 1000 }, // 同一個網路來源一小時最多點 8 盞
-  bless: { max: 60, windowMs: 10 * 60 * 1000 }, // 隨喜／祈福十分鐘最多 60 次
+  bless: { max: 120, windowMs: 10 * 60 * 1000 }, // 祝福／祈福十分鐘最多 120 次
 };
 // 不適合公開的字詞，可以自行增加
 const BLOCKED_WORDS = [
