@@ -29,7 +29,9 @@ const BLOCKED_WORDS = [
 
 const WALL_KEY = "wall";
 const ID_RE = /^[a-f0-9]{12}$/;
-const STORE_NAME = "guangming-lamps";
+// 換一個名稱就等於清空光球重新開始（舊資料仍保留在原本的名稱下）
+const STORE_NAME = "guangming-lamps-v2";
+const WALL_EPOCH = 2;
 const RATE_STORE_NAME = "guangming-rate";
 
 function env(name) {
@@ -146,6 +148,7 @@ async function handleGet(req) {
       total: wall.total || 0,
       blessTotal: wall.blessTotal || 0,
       lamps: (wall.lamps || []).slice(0, LIST_MAX),
+      epoch: WALL_EPOCH,
       now: Date.now(),
     },
     200,

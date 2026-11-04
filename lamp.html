@@ -1103,6 +1103,14 @@ textarea { min-height: 68px; resize: none; }
   async function load(initial) {
     try {
       const data = await api.list();
+      // 光球清空重來後，手機裡記著的舊燈也一起清掉
+      if (data.epoch && saved.get('bodhi-epoch', 0) !== data.epoch) {
+        state.my = [];
+        state.blessed = {};
+        saved.set('bodhi-my-lamps', []);
+        saved.set('bodhi-blessed', {});
+        saved.set('bodhi-epoch', data.epoch);
+      }
       mergeLamps(data.lamps, initial);
       state.total = Math.max(data.total || 0, state.lamps.length ? state.lamps[0].no || 0 : 0);
       state.blessTotal = Math.max(data.blessTotal || 0, initial ? 0 : state.blessTotal);
