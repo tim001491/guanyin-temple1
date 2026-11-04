@@ -192,7 +192,10 @@ async function handleLight(body, ip) {
 
   // 每盞燈另外存一份，光球滿了以後，分享連結仍然找得到
   await store.setJSON(`lamp/${lamp.id}`, lamp, { onlyIfNew: true });
-  return json({ ok: true, lamp, total: wall.total, blessTotal: wall.blessTotal || 0 });
+  // 刪除用的密碼只交給點燈的人，伺服器只存它的雜湊值
+  const token = crypto.randomUUID().replace(/-/g, "");
+  await store.set(`owner/${lamp.id}`, await sha256(token));
+  return json({ ok: true, lamp, token, total: wall.total, blessTotal: wall.blessTotal || 0 });
 }
 
 async function handleBless(body, ip, { forAll }) {
@@ -214,6 +217,34 @@ async function handleBless(body, ip, { forAll }) {
   return json({ ok: true, id, b: blessed ? blessed.b : undefined, blessTotal: wall.blessTotal });
 }
 
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function removeLamp(store, id) {
+  await updateWall(store, (w) => {
+    const before = w.lamps.length;
+    w.lamps = w.lamps.filter((l) => l.id !== id);
+    if (w.lamps.length === before) return false;
+  });
+  await store.delete(`lamp/${id}`);
+  await store.delete(`owner/${id}`);
+}
+
+// 點燈的人刪除自己的燈：要拿點燈時拿到的刪除密碼
+async function handleDelete(body) {
+  const id = clean(body.id);
+  const token = typeof body.token === "string" ? body.token : "";
+  if (!ID_RE.test(id) || !/^[a-f0-9]{32}$/.test(token)) return fail(400, "無法刪除這盞燈");
+  const store = getStore({ name: STORE_NAME, consistency: "strong" });
+  const saved = await store.get(`owner/${id}`);
+  if (!saved) return fail(404, "這盞燈已經不在光球中");
+  if (saved !== (await sha256(token))) return fail(403, "只有點燈的人可以刪除這盞燈");
+  await removeLamp(store, id);
+  return json({ ok: true, id });
+}
+
 async function handleRemove(req, body) {
   const adminKey = env("LAMP_ADMIN_KEY");
   if (!adminKey) return fail(403, "尚未在 Netlify 設定 LAMP_ADMIN_KEY");
@@ -222,12 +253,7 @@ async function handleRemove(req, body) {
   if (!ID_RE.test(id)) return fail(400, "燈號格式不正確");
 
   const store = getStore({ name: STORE_NAME, consistency: "strong" });
-  await updateWall(store, (w) => {
-    const before = w.lamps.length;
-    w.lamps = w.lamps.filter((l) => l.id !== id);
-    if (w.lamps.length === before) return false;
-  });
-  await store.delete(`lamp/${id}`);
+  await removeLamp(store, id);
   return json({ ok: true, id });
 }
 
@@ -253,6 +279,8 @@ export default async (req, context) => {
         return await handleBless(body, ip, { forAll: false });
       case "pray":
         return await handleBless(body, ip, { forAll: true });
+      case "delete":
+        return await handleDelete(body);
       case "remove":
         return await handleRemove(req, body);
       default:

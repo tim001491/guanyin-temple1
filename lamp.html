@@ -410,6 +410,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 .mini-btn:hover { background: rgba(244, 208, 138, 0.16); }
 .mini-btn[aria-pressed="true"] { color: var(--glow); background: rgba(244, 208, 138, 0.22); }
 .mini-btn.plain { color: #d9d2ea; border-color: rgba(188, 182, 214, 0.3); background: transparent; }
+.mini-btn.danger { color: #ffb9ad; border-color: rgba(255, 185, 173, 0.4); }
 .mini-btn svg { width: 15px; height: 15px; flex: none; }
 .empty { margin-top: 18px; text-align: center; font-size: 15px; color: var(--muted); }
 .more-wrap { display: flex; justify-content: center; margin-top: 18px; }
@@ -1016,7 +1017,7 @@ textarea { min-height: 68px; resize: none; }
         const lamp = { id: randomId(), no: w.total, name: body.name, cat: body.cat, wish: body.wish || '', t: Date.now(), b: 0 };
         w.lamps.unshift(lamp);
         saved.set(PREVIEW_KEY, w);
-        return { ok: true, lamp, total: w.total, blessTotal: w.blessTotal };
+        return { ok: true, lamp, token: randomId() + randomId() + randomId().slice(0, 8), total: w.total, blessTotal: w.blessTotal };
       }
       if (body.action === 'bless' || body.action === 'pray') {
         let lamp = null;
@@ -1028,6 +1029,11 @@ textarea { min-height: 68px; resize: none; }
         w.blessTotal += 1;
         saved.set(PREVIEW_KEY, w);
         return { ok: true, id: body.id, b: lamp ? lamp.b : undefined, blessTotal: w.blessTotal };
+      }
+      if (body.action === 'delete') {
+        w.lamps = w.lamps.filter((l) => l.id !== body.id);
+        saved.set(PREVIEW_KEY, w);
+        return { ok: true, id: body.id };
       }
       if (body.action === 'remove') {
         if (!headers || !headers['x-admin-key']) throw new Error('管理密碼不正確');
@@ -1776,7 +1782,10 @@ textarea { min-height: 68px; resize: none; }
       const share = el('button', 'mini-btn plain', '分享');
       share.type = 'button';
       share.addEventListener('click', () => shareLamp(L, true));
-      actions.append(view, card, share);
+      const del = el('button', 'mini-btn plain danger', '刪除');
+      del.type = 'button';
+      del.addEventListener('click', () => askDeleteMine(m, L));
+      actions.append(view, card, share, del);
       li.append(dot, body, actions);
       list.append(li);
     }
@@ -1938,7 +1947,7 @@ textarea { min-height: 68px; resize: none; }
       lamp.local = true;
       state.total = Math.max(state.total + 1, res.total || 0);
       if (typeof res.blessTotal === 'number') state.blessTotal = Math.max(state.blessTotal, res.blessTotal);
-      state.my.unshift({ id: lamp.id, no: lamp.no, name: lamp.name, cat: lamp.cat, wish: lamp.wish, t: lamp.t, fullName: fullName || '善信' });
+      state.my.unshift({ id: lamp.id, no: lamp.no, name: lamp.name, cat: lamp.cat, wish: lamp.wish, t: lamp.t, fullName: fullName || '善信', token: res.token || '' });
       saved.set('bodhi-my-lamps', state.my.slice(0, 50));
       saved.set('bodhi-show', show);
       wishInput.value = '';
@@ -2041,12 +2050,49 @@ textarea { min-height: 68px; resize: none; }
     toast('已進入管理模式：點光點或光語就能移除');
   });
   let removing = null;
+  let confirmAction = null;
   function askRemove(L) {
     removing = L;
+    confirmAction = removeAsAdmin;
+    $('#confirmTitle').textContent = '移除這盞燈？';
     $('#confirmText').textContent = `「${L.name}」的光明燈將從光球與光語中移除，無法復原。`;
+    $('#confirmYes').textContent = '確定移除';
     openSheet('confirmSheet');
   }
-  $('#confirmYes').addEventListener('click', async () => {
+  // 刪除自己點的燈
+  function dropLocal(id) {
+    state.my = state.my.filter((x) => x.id !== id);
+    saved.set('bodhi-my-lamps', state.my);
+    state.lamps = state.lamps.filter((l) => l.id !== id);
+    rebuildIndex();
+    renderWall();
+    renderMy();
+    renderCounter();
+  }
+  function askDeleteMine(m, L) {
+    confirmAction = async () => {
+      if (!m.token) {
+        dropLocal(m.id);
+        closeSheet();
+        toast('已從我的光明燈移除。這盞燈是之前點的，若要從光球移除，請透過「聯絡我們」告訴我們');
+        return;
+      }
+      try {
+        await api.post({ action: 'delete', id: m.id, token: m.token });
+      } catch (err) {
+        if (err.status !== 404) { closeSheet(); toast(err.message); return; }
+      }
+      dropLocal(m.id);
+      closeSheet();
+      toast('已刪除這盞光明燈');
+    };
+    $('#confirmTitle').textContent = '刪除這盞光明燈？';
+    $('#confirmText').textContent = `「${m.fullName || L.name}・${L.cat}」第 ${fmtNum(L.no)} 盞將從光球與光語中刪除，無法復原。`;
+    $('#confirmYes').textContent = '確定刪除';
+    openSheet('confirmSheet');
+  }
+  $('#confirmYes').addEventListener('click', () => { if (confirmAction) confirmAction(); });
+  async function removeAsAdmin() {
     const L = removing;
     if (!L) return;
     try {
@@ -2061,7 +2107,7 @@ textarea { min-height: 68px; resize: none; }
       closeSheet();
       toast(err.message);
     }
-  });
+  }
 
   // ===== 分享連結：#l-燈號 =====
   async function route() {
