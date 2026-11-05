@@ -429,10 +429,16 @@
             showAILinks();
         }
 
-        // 籤號（例如「第三十一籤」）。籤名後面的干支（例如「己丑」）只是籤的代號，
-        // 與求籤時間的干支沒有關係，所以不送給 AI，避免被拿去做生剋合沖。
+        // 籤號（例如「第三十一籤」）。
         function getLotNumber() {
             return currentPoem.title.split(' ')[0];
+        }
+
+        // 籤名後面的干支（例如「壬辰」）只是籤的排序代號，與籤詩內容、求籤時間都無關。
+        // AI 會用籤詩上網查到這個代號，以及籤譜依代號附註的「屬水，利在冬天，宜其北方」等，
+        // 再拿去和求籤時間做生剋，所以要明白告訴 AI：這個代號與附註一律不採用。
+        function getLotCode() {
+            return (currentPoem.title.split(' ')[1] || '').trim();
         }
 
         function getPoemText() {
@@ -486,29 +492,36 @@
                 ? `求籤時間：${b.gregorian}（${b.yearPillar}年 ${b.monthPillar}月 ${b.dayPillar}日 ${b.hourPillar}時）`
                 : '';
             const up = b.upcoming;
+            const code = getLotCode();
             return [
                 '請以觀音靈籤解籤師的角度，為我解這支籤：',
                 `觀音靈籤 ${getLotNumber()}`,
                 `籤詩：${getPoemText()}`,
                 timeLine,
+                code
+                    ? `重要：「${code}」只是這支籤在籤譜上的排序代號，就像編號一樣，不代表籤詩的五行；籤譜依這個代號附註的五行、季節、方位（例如「屬○，利在○天，宜其○方」）也只是編號附註。請不要採用、不要提到，也不要拿來和求籤時間做生剋合沖。籤詩的五行只從詩句本身的意象判斷。`
+                    : '',
                 '請以「籤詩內容」與「求籤時間的年月日時天干地支」互相參照來解籤：',
                 '1. 白話解釋籤詩含意',
-                '2. 從籤詩的意象（如草木屬木、日屬火、山屬土、金銀屬金、月與江水屬水，以及季節、時機用語）看出籤詩的五行與氣象，再與求籤時間四柱的天干地支五行互相參照，說明時機是有利還是需要謹慎',
+                '2. 只從籤詩詩句的意象（如草木屬木、日屬火、山屬土、金銀屬金、月與江水屬水，以及季節、時機用語）看出籤詩的五行與氣象，再與求籤時間四柱的天干地支五行互相參照，說明時機是有利還是需要謹慎',
                 '3. 綜合以上，分析事業、感情、健康、財運',
                 '4. 給我具體建議',
                 '5. 推算撥雲見日的時間點：因為是以求籤當下的年月日時起八字，應期較短，請以一個月內或三個月內為主。依籤詩意象透露的時機（季節、月令、日月、草木榮枯等）與求籤時間四柱的干支五行生剋合沖，推算運勢何時可望撥雲見日：一個月內的請具體到哪幾天（附日干支），一到三個月的請具體到哪個節氣之後、哪個月（附月干支），並說明推算理由；若三個月內轉機不明顯，請直說並指出其中相對較好的時間點；若籤詩本身已是好時機，也請說明這段好運大約持續到何時',
                 up ? '日期干支請直接對照下表，不要自行換算：' : '',
                 up ? `未來三個月節氣換月：${up.months}` : '',
                 up ? `未來一個月日干支：${up.days}` : '',
-                '註：籤號只是編號，籤號或籤名所附的干支不列入生剋合沖分析。'
+                '再次提醒：籤號、籤序代號的干支，以及依代號附註的五行、季節、方位，一律不列入分析。'
             ].filter(Boolean).join('\n');
         }
 
         function showAILinks() {
             // Google：送簡短查詢（籤詩全文＋求籤時間干支），不放指令句，避免跳出「要繼續搜尋嗎？」確認視窗
+            // 籤序代號用短語註明「只是編號、不論屬性」，免得 Google 查到「屬水」等附註後拿去做生剋
             const b = currentBaziInfo;
             const timePart = b.yearPillar ? ` 求籤時間 ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時` : '';
-            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤 推算一個月內或三個月內何時撥雲見日`;
+            const code = getLotCode();
+            const codePart = code ? ` 籤序${code}只是編號 不論籤序的五行屬性季節方位` : '';
+            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照${codePart} 白話解籤 推算一個月內或三個月內何時撥雲見日`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
             // ChatGPT：送完整提問
             chatgptLink.href = `https://chatgpt.com/?q=${encodeURIComponent(buildAIPrompt())}`;
