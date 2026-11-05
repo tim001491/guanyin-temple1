@@ -439,12 +439,53 @@
             return currentPoem.text.replace(/\n/g, '');
         }
 
+        // 以求籤當下的年月日時起八字，應期較短：算出未來三個月的節氣換月（月干支）與未來一個月每天的日干支，
+        // 放進提問讓 AI 推算撥雲見日時直接查表（AI 自己換算日期干支常會算錯）
+        function getUpcomingGanZhi(now) {
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+            const oneMonthLater = new Date(start);
+            oneMonthLater.setMonth(start.getMonth() + 1);
+            const threeMonthsLater = new Date(start);
+            threeMonthsLater.setMonth(start.getMonth() + 3);
+            const traditional = { '惊蛰': '驚蟄', '芒种': '芒種' };
+            // 日期寫成「11/6」，跨年後的第一筆加上年份（例如「2027/1/5」）
+            const makeLabel = () => {
+                let lastYear = start.getFullYear();
+                return (d) => {
+                    const y = d.getFullYear();
+                    const label = (y !== lastYear ? `${y}/` : '') + `${d.getMonth() + 1}/${d.getDate()}`;
+                    lastYear = y;
+                    return label;
+                };
+            };
+            const dayLabel = makeLabel();
+            const monthLabel = makeLabel();
+            const days = [];
+            const months = [];
+            let prev = Lunar.fromDate(start);
+            for (let i = 1; ; i++) {
+                const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i, 12);
+                if (d > threeMonthsLater) break;
+                const lunar = Lunar.fromDate(d);
+                if (d <= oneMonthLater) days.push(dayLabel(d) + lunar.getDayInGanZhi());
+                if (lunar.getMonthInGanZhi() !== prev.getMonthInGanZhi()) {
+                    const year = lunar.getYearInGanZhiByLiChun();
+                    const newYear = year !== prev.getYearInGanZhiByLiChun() ? `${year}年` : '';
+                    const jie = lunar.getJie();
+                    months.push(`${monthLabel(d)}${traditional[jie] || jie}起${newYear}${lunar.getMonthInGanZhi()}月`);
+                }
+                prev = lunar;
+            }
+            return { months: months.join('、'), days: days.join(' ') };
+        }
+
         // 組合要交給 ChatGPT 的完整解籤提問：以「籤詩內容」與「求籤時間的年月日時干支」互相參照
         function buildAIPrompt() {
             const b = currentBaziInfo;
             const timeLine = b.yearPillar
                 ? `求籤時間：${b.gregorian}（${b.yearPillar}年 ${b.monthPillar}月 ${b.dayPillar}日 ${b.hourPillar}時）`
                 : '';
+            const up = b.upcoming;
             return [
                 '請以觀音靈籤解籤師的角度，為我解這支籤：',
                 `觀音靈籤 ${getLotNumber()}`,
@@ -455,7 +496,10 @@
                 '2. 從籤詩的意象（如草木屬木、日屬火、山屬土、金銀屬金、月與江水屬水，以及季節、時機用語）看出籤詩的五行與氣象，再與求籤時間四柱的天干地支五行互相參照，說明時機是有利還是需要謹慎',
                 '3. 綜合以上，分析事業、感情、健康、財運',
                 '4. 給我具體建議',
-                '5. 推算撥雲見日的時間點：依籤詩意象透露的時機（季節、月令、日月、草木榮枯等）與求籤時間四柱的干支五行生剋，推算未來哪個時間點運勢可望撥雲見日，盡量具體到哪一年、哪個農曆月份或節氣（可附上該月的干支），並說明推算理由；若籤詩本身已是好時機，也請說明好運大約持續到何時',
+                '5. 推算撥雲見日的時間點：因為是以求籤當下的年月日時起八字，應期較短，請以一個月內或三個月內為主。依籤詩意象透露的時機（季節、月令、日月、草木榮枯等）與求籤時間四柱的干支五行生剋合沖，推算運勢何時可望撥雲見日：一個月內的請具體到哪幾天（附日干支），一到三個月的請具體到哪個節氣之後、哪個月（附月干支），並說明推算理由；若三個月內轉機不明顯，請直說並指出其中相對較好的時間點；若籤詩本身已是好時機，也請說明這段好運大約持續到何時',
+                up ? '日期干支請直接對照下表，不要自行換算：' : '',
+                up ? `未來三個月節氣換月：${up.months}` : '',
+                up ? `未來一個月日干支：${up.days}` : '',
                 '註：籤號只是編號，籤號或籤名所附的干支不列入生剋合沖分析。'
             ].filter(Boolean).join('\n');
         }
@@ -464,7 +508,7 @@
             // Google：送簡短查詢（籤詩全文＋求籤時間干支），不放指令句，避免跳出「要繼續搜尋嗎？」確認視窗
             const b = currentBaziInfo;
             const timePart = b.yearPillar ? ` 求籤時間 ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時` : '';
-            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤 推算何時撥雲見日`;
+            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照 白話解籤 推算一個月內或三個月內何時撥雲見日`;
             googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
             // ChatGPT：送完整提問
             chatgptLink.href = `https://chatgpt.com/?q=${encodeURIComponent(buildAIPrompt())}`;
@@ -572,7 +616,8 @@
                 // 【修改處】使用 innerHTML 和 <br> 來換行
                 dateDisplayEl.innerHTML = `今天是：${gregorianStr}<br>（${lunarStr}）`;
 
-                const yearPillar = lunar.getYearInGanZhi();
+                // 八字的年柱以立春換年（不是農曆正月初一），才會和月柱一致
+                const yearPillar = lunar.getYearInGanZhiByLiChun();
                 const monthPillar = lunar.getMonthInGanZhi();
                 const dayPillar = lunar.getDayInGanZhi();
                 const hourPillar = lunar.getTimeInGanZhi();
@@ -585,6 +630,8 @@
                     dayPillar: dayPillar,
                     hourPillar: hourPillar
                 };
+                // 未來三個月的節氣換月與未來一個月的日干支，給 AI 推算撥雲見日時查表用
+                try { currentBaziInfo.upcoming = getUpcomingGanZhi(today); } catch (e) { console.warn('無法計算未來干支', e); }
 
                 const pillars = { '年': yearPillar, '月': monthPillar, '日': dayPillar, '時': hourPillar };
                 let baziHTML = '';
