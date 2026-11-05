@@ -122,6 +122,17 @@
         .lamp-slide.done { background-color: #a58362; }
         .lamp-slide.done .lamp-slide-text { color: #fff; }
         .lamp-slide.done .lamp-slide-text small { color: rgba(255, 255, 255, 0.85); }
+        /* --- 觀瀑一息・一分鐘靜心呼吸短劇 入口 --- */
+        #breathe-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
+        #breathe-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
+        .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: #fff; border: 2px solid #a58362; border-radius: 16px; text-decoration: none; text-align: left; transition: all 0.3s ease; }
+        .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+        .breathe-card img { flex: none; width: 54px; height: 96px; object-fit: cover; border-radius: 10px; }
+        .breathe-text { flex: 1; display: flex; flex-direction: column; gap: 4px; color: #8a6c4c; }
+        .breathe-text strong { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em; }
+        .breathe-text small { font-size: 0.78rem; line-height: 1.5; color: #9c897a; }
+        .breathe-play { position: relative; flex: none; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
+        .breathe-play::after { content: ''; position: absolute; left: 15px; top: 12px; border-left: 11px solid #8a6c4c; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.2rem; }
         #donate-button { font-family: 'Noto Serif TC', serif; font-size: 0.88rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 6px 16px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
@@ -222,7 +233,17 @@
                     <div class="lamp-slide-knob" id="lamp-slide-knob" role="slider" tabindex="0" aria-label="把光球向右滑動，前往點光明球燈" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
                 </div>
             </div>
-            
+
+            <!-- 觀瀑一息：一分鐘水墨短劇，跟著師父學數息呼吸 -->
+            <div id="breathe-option">
+                <p id="breathe-hint">心靜不下來嗎？先跟著師父，靜心呼吸一分鐘：</p>
+                <a class="breathe-card" href="breathe.html">
+                    <img src="breathe/thumb.jpg" alt="《觀瀑一息》短劇畫面" width="54" height="96" loading="lazy">
+                    <span class="breathe-text"><strong>觀瀑一息・靜心呼吸短劇</strong><small>1 分鐘，學會吸 4 秒、吐 6 秒的數息法</small></span>
+                    <span class="breathe-play" aria-hidden="true"></span>
+                </a>
+            </div>
+
         </main>
         
         <footer>
