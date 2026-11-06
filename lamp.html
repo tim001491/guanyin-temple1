@@ -46,8 +46,8 @@ body {
 }
 body.locked { overflow: hidden; }
 /* 背景：瀑布實景影片（循環播放）。光球在上方，瀑布從光球正下方流出來 */
-body { --photo-w: 140vw; --photo-top: calc(var(--s) * 0.97 - var(--photo-w) * 0.34); }
-@media (min-aspect-ratio: 1/1) { body { --photo-w: 120vw; } }
+body { --photo-w: 140vw; --photo-top: calc(var(--s) * 0.97 - var(--photo-w) * 0.333); }
+@media (min-aspect-ratio: 1/1) { body { --photo-w: 100vw; } }
 body::before {
   content: "";
   position: fixed;
@@ -59,8 +59,7 @@ body::before {
 .bg-video {
   position: fixed;
   z-index: 0;
-  /* 影片裡的瀑布偏左，往右挪讓瀑布正對光球 */
-  left: calc(50% - var(--photo-w) * 0.42);
+  left: calc(50% - var(--photo-w) / 2);
   top: var(--photo-top);
   width: var(--photo-w);
   height: auto;
