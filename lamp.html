@@ -139,7 +139,7 @@ button { font-family: inherit; }
   align-items: center;
   text-align: center;
   z-index: 1;
-  padding: calc(env(safe-area-inset-top) + var(--s) * 0.2) 16px 8px;
+  padding: calc(env(safe-area-inset-top) + var(--s) * 0.14) 16px 8px;
   overflow: hidden;
   overflow: clip;
   overflow-y: visible;
@@ -183,8 +183,8 @@ button { font-family: inherit; }
 /* 第一個畫面只有光球和背景，文字與按鈕要往下滑才看到 */
 .orb-screen {
   width: 100%;
-  min-height: calc(100vh - env(safe-area-inset-top) - var(--s) * 0.2);
-  min-height: calc(100svh - env(safe-area-inset-top) - var(--s) * 0.2);
+  min-height: calc(100vh - env(safe-area-inset-top) - var(--s) * 0.14);
+  min-height: calc(100svh - env(safe-area-inset-top) - var(--s) * 0.14);
 }
 .orb-screen { display: flex; flex-direction: column; padding-bottom: calc(env(safe-area-inset-bottom) + 28px); }
 .orb-screen > .stage { flex: none; margin-left: calc(50% - var(--s) / 2); }
@@ -287,10 +287,14 @@ button { font-family: inherit; }
 
 .wave { position: absolute; left: 50%; top: calc(var(--s) * 0.5); width: calc(var(--s) * 0.84); height: calc(var(--s) * 0.84); transform: translate(-50%, -50%); pointer-events: none; z-index: 3; }
 .wave i { position: absolute; inset: 0; border-radius: 50%; opacity: 0; border: 2px solid rgba(255, 240, 205, 0.9); box-shadow: 0 0 18px rgba(255, 214, 140, 0.6), inset 0 0 18px rgba(255, 214, 140, 0.45); }
-.wave.go i { animation: wave-out 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) forwards; }
-.wave.go i:nth-child(2) { animation-delay: 0.35s; }
-.wave.go i:nth-child(3) { animation-delay: 0.7s; }
-@keyframes wave-out { 0% { transform: scale(0.9); opacity: 0; } 12% { opacity: 0.95; } 100% { transform: scale(2.6); opacity: 0; } }
+.wave.go i { animation: wave-out 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards; }
+.wave.go i:nth-child(2) { animation-delay: 0.9s; }
+@keyframes wave-out {
+  0% { transform: scale(0.95); opacity: 0; }
+  15% { opacity: 0.9; }
+  70% { opacity: 0.45; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) { .wave.go i { animation-duration: 0.01s; } }
 .float { position: absolute; inset: 0; animation: bob 8s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(calc(var(--s) * -0.014)); } }
@@ -689,7 +693,7 @@ textarea { min-height: 68px; resize: none; }
       <div class="rays"></div>
       <div class="rays r2"></div>
       <div class="beam"></div>
-      <div class="wave" id="wave" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="wave" id="wave" aria-hidden="true"><i></i><i></i></div>
       <div class="pool" id="pool"><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring b"></i><i class="ring b"></i><i class="ring b"></i></div>
       <div class="float" id="float">
         <canvas class="layer" id="cBack"></canvas>
