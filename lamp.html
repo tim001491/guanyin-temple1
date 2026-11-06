@@ -1789,9 +1789,12 @@ textarea { min-height: 68px; resize: none; }
     sky.height = Math.round(skyH * dpr);
     skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const r = rng(20261103);
-    const n = Math.min(260, Math.round((skyW * skyH) / 2300));
-    stars = Array.from({ length: n }, () => ({ x: r() * skyW, y: r() * skyH, s: 0.5 + r() * r() * 1.7, a: 0.25 + r() * 0.6, tw: r() * 6.28, sp: 0.4 + r() * 1.6, warm: r() < 0.35 }));
-    twinkles = Array.from({ length: Math.max(6, Math.min(16, Math.round(skyW / 80))) }, () => ({ x: r() * skyW, y: r() * skyH * 0.92, s: 9 + r() * 17, tw: r() * 6.28, sp: 0.5 + r() }));
+    // 星星與星芒只留在光球上半部的天空，下方的山林瀑布不放
+    const stageTop = stage.getBoundingClientRect().top + (window.scrollY || 0);
+    const skyLimit = Math.max(80, Math.min(skyH * 0.9, stageTop + stage.clientWidth * 0.5));
+    const n = Math.min(260, Math.round((skyW * skyLimit) / 2300));
+    stars = Array.from({ length: n }, () => ({ x: r() * skyW, y: r() * skyLimit, s: 0.5 + r() * r() * 1.7, a: 0.25 + r() * 0.6, tw: r() * 6.28, sp: 0.4 + r() * 1.6, warm: r() < 0.35 }));
+    twinkles = Array.from({ length: Math.max(4, Math.min(10, Math.round(skyW / 100))) }, () => ({ x: r() * skyW, y: r() * skyLimit * 0.9, s: 9 + r() * 17, tw: r() * 6.28, sp: 0.5 + r() }));
   }
   function drawSky(t, dt) {
     skyCtx.clearRect(0, 0, skyW, skyH);
