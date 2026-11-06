@@ -52,6 +52,8 @@ body::before {
   z-index: 0;
   pointer-events: none;
   /* 背景：金色山林瀑布。光球在上方的金光裡，瀑布從光球正下方流出來 */
+  --photo-w: 140vw;
+  --photo-top: calc(var(--s) * 0.97 - var(--photo-w) * 0.333);
   background:
     radial-gradient(58% 34% at 50% 22%, rgba(30, 18, 40, 0.5), rgba(30, 18, 40, 0) 72%),
     linear-gradient(180deg, rgba(26, 18, 40, 0.58) 0%, rgba(26, 18, 40, 0.34) 45%, rgba(22, 16, 36, 0.46) 72%, rgba(14, 10, 28, 0.88) 100%),
@@ -59,34 +61,9 @@ body::before {
     url("lamp/bg-waterfall.webp") 50% var(--photo-top) / var(--photo-w) auto no-repeat,
     linear-gradient(180deg, #d9b47a 0%, rgb(238, 212, 168) var(--photo-top), #3a2a1c 100%);
 }
-body { --photo-w: 140vw; --photo-top: calc(var(--s) * 0.97 - var(--photo-w) * 0.333); }
 @media (min-aspect-ratio: 1/1) {
-  body { --photo-w: 100vw; }
+  body::before { --photo-w: 100vw; }
 }
-/* 瀑布流動：在照片的兩段瀑布上疊一層往下流的水紋 */
-.falls {
-  position: fixed;
-  left: calc(50% - var(--photo-w) / 2);
-  top: var(--photo-top);
-  width: var(--photo-w);
-  height: calc(var(--photo-w) * 1.75);
-  z-index: 0;
-  pointer-events: none;
-}
-.fall {
-  position: absolute;
-  background: url("lamp/fall-streaks.png") repeat;
-  background-size: 48px 160px;
-  mix-blend-mode: screen;
-  opacity: 0.45;
-  animation: fall-flow 1.3s linear infinite;
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
-}
-.fall.upper { left: 35%; top: 17.5%; width: 15%; height: 25%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent), linear-gradient(180deg, transparent, #000 12%, #000 85%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent), linear-gradient(180deg, transparent, #000 12%, #000 85%, transparent); mask-composite: intersect; }
-.fall.lower { left: 51.5%; top: 49%; width: 10%; height: 20%; transform: rotate(-17deg); transform-origin: 50% 50%; animation-duration: 1.1s; -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent), linear-gradient(180deg, transparent, #000 12%, #000 85%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent), linear-gradient(180deg, transparent, #000 12%, #000 85%, transparent); mask-composite: intersect; }
-@keyframes fall-flow { to { background-position: 0 160px; } }
-@media (prefers-reduced-motion: reduce) { .fall { animation: none; } }
 #sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .page { position: relative; z-index: 1; }
 a { color: inherit; }
@@ -680,7 +657,6 @@ textarea { min-height: 68px; resize: none; }
 </style>
 </head>
 <body>
-<div class="falls" aria-hidden="true"><div class="fall upper"></div><div class="fall lower"></div></div>
 <canvas id="sky" aria-hidden="true"></canvas>
 
 <div class="page">
