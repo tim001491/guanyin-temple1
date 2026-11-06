@@ -29,7 +29,7 @@
   --display: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
   --body: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
   /* 版面：單欄置中，菩提光球是主角，光語牆接在下方；--s 是光球舞台的寬度 */
-  --s: max(260px, min(106vw, 620px, calc(70vh - 60px)));
+  --s: max(240px, min(84vw, 520px, calc(60vh - 60px)));
   color-scheme: dark;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -139,7 +139,7 @@ button { font-family: inherit; }
   align-items: center;
   text-align: center;
   z-index: 1;
-  padding: calc(env(safe-area-inset-top) + 18px) 16px 8px;
+  padding: calc(env(safe-area-inset-top) + var(--s) * 0.2) 16px 8px;
   overflow: hidden;
   overflow: clip;
   overflow-y: visible;
@@ -183,8 +183,8 @@ button { font-family: inherit; }
 /* 第一個畫面只有光球和背景，文字與按鈕要往下滑才看到 */
 .orb-screen {
   width: 100%;
-  min-height: calc(100vh - env(safe-area-inset-top) - 18px);
-  min-height: calc(100svh - env(safe-area-inset-top) - 18px);
+  min-height: calc(100vh - env(safe-area-inset-top) - var(--s) * 0.2);
+  min-height: calc(100svh - env(safe-area-inset-top) - var(--s) * 0.2);
 }
 .orb-screen { display: flex; flex-direction: column; padding-bottom: calc(env(safe-area-inset-bottom) + 28px); }
 .orb-screen > .stage { flex: none; margin-left: calc(50% - var(--s) / 2); }
