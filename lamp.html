@@ -285,6 +285,13 @@ button { font-family: inherit; }
   100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
 }
 
+.wave { position: absolute; left: 50%; top: calc(var(--s) * 0.5); width: calc(var(--s) * 0.84); height: calc(var(--s) * 0.84); transform: translate(-50%, -50%); pointer-events: none; z-index: 3; }
+.wave i { position: absolute; inset: 0; border-radius: 50%; opacity: 0; border: 2px solid rgba(255, 240, 205, 0.9); box-shadow: 0 0 18px rgba(255, 214, 140, 0.6), inset 0 0 18px rgba(255, 214, 140, 0.45); }
+.wave.go i { animation: wave-out 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) forwards; }
+.wave.go i:nth-child(2) { animation-delay: 0.35s; }
+.wave.go i:nth-child(3) { animation-delay: 0.7s; }
+@keyframes wave-out { 0% { transform: scale(0.9); opacity: 0; } 12% { opacity: 0.95; } 100% { transform: scale(2.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .wave.go i { animation-duration: 0.01s; } }
 .float { position: absolute; inset: 0; animation: bob 8s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(calc(var(--s) * -0.014)); } }
 canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -682,6 +689,7 @@ textarea { min-height: 68px; resize: none; }
       <div class="rays"></div>
       <div class="rays r2"></div>
       <div class="beam"></div>
+      <div class="wave" id="wave" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="pool" id="pool"><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring b"></i><i class="ring b"></i><i class="ring b"></i></div>
       <div class="float" id="float">
         <canvas class="layer" id="cBack"></canvas>
@@ -1644,7 +1652,7 @@ textarea { min-height: 68px; resize: none; }
         flare();
         burst(lamp._sx, lamp._sy, lamp.color, 70, 1.4);
         burst(geo.cx, geo.cy, GOLD, 40, 1.8);
-        state.prayAt = performance.now(); // 光波擴散、所有光點一起亮起
+        state.prayAt = performance.now(); waveOut(); // 光波擴散、所有光點一起亮起
         showLabel(lamp, '您的光明球燈', 9000);
         if (navigator.vibrate) { try { navigator.vibrate([30, 60, 30]); } catch (e) {} }
       }, T_DIVE * 1000);
@@ -1656,6 +1664,14 @@ textarea { min-height: 68px; resize: none; }
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       setTimeout(begin, 650);
     } else begin();
+  }
+  // 圓形光波由光球向外擴散（用 CSS 畫，才不會被畫布邊緣切掉）
+  function waveOut() {
+    const w = document.getElementById('wave');
+    if (!w) return;
+    w.classList.remove('go');
+    void w.offsetWidth;
+    w.classList.add('go');
   }
   function flare() {
     stage.classList.remove('flare');
@@ -1757,7 +1773,6 @@ textarea { min-height: 68px; resize: none; }
       drawDust(t);
       drawLamps(t, now);
       drawCeremony(t, now);
-      drawPrayWave(now);
       drawParticles(dt);
       drawLabel(now);
     }
@@ -1911,7 +1926,7 @@ textarea { min-height: 68px; resize: none; }
   function glowForLamp(L) {
     if (openId) closeSheet();
     const go = () => {
-      state.prayAt = performance.now();
+      state.prayAt = performance.now(); waveOut();
       flare();
       const pool = $('#pool');
       pool.classList.remove('bursting');
@@ -1929,7 +1944,7 @@ textarea { min-height: 68px; resize: none; }
   async function prayForSelf() {
     const mine = state.my.map((m) => state.byId.get(m.id)).find(Boolean);
     const go = () => {
-      state.prayAt = performance.now();
+      state.prayAt = performance.now(); waveOut();
       flare();
       const pool = $('#pool');
       pool.classList.remove('bursting');
@@ -1966,7 +1981,7 @@ textarea { min-height: 68px; resize: none; }
 
   async function pray() {
     const now = Date.now();
-    state.prayAt = performance.now();
+    state.prayAt = performance.now(); waveOut();
     flare();
     const pool = $('#pool');
     pool.classList.remove('bursting');
