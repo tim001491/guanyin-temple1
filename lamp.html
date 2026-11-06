@@ -286,14 +286,32 @@ button { font-family: inherit; }
 }
 
 .wave { position: absolute; left: 50%; top: calc(var(--s) * 0.5); width: calc(var(--s) * 0.84); height: calc(var(--s) * 0.84); transform: translate(-50%, -50%); pointer-events: none; z-index: 3; }
-.wave i { position: absolute; inset: 0; border-radius: 50%; opacity: 0; border: 2px solid rgba(255, 240, 205, 0.9); box-shadow: 0 0 18px rgba(255, 214, 140, 0.6), inset 0 0 18px rgba(255, 214, 140, 0.45); }
-.wave.go i { animation: wave-out 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards; }
-.wave.go i:nth-child(2) { animation-delay: 0.9s; }
+.wave i {
+  /* 柔和的金色光帶：中間一道亮光、內外漸漸淡開，亮度沿著圓周有明有暗，像水面光的漣漪 */
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(closest-side, rgba(255, 226, 160, 0) 80%, rgba(255, 220, 150, 0.22) 88%, rgba(255, 244, 214, 0.85) 94.5%, rgba(255, 252, 240, 1) 96%, rgba(255, 214, 140, 0.35) 98.2%, rgba(255, 214, 140, 0) 100%);
+  -webkit-mask-image: conic-gradient(from 20deg, #000, rgba(0, 0, 0, 0.45) 16%, #000 33%, rgba(0, 0, 0, 0.6) 52%, #000 68%, rgba(0, 0, 0, 0.4) 84%, #000);
+  mask-image: conic-gradient(from 20deg, #000, rgba(0, 0, 0, 0.45) 16%, #000 33%, rgba(0, 0, 0, 0.6) 52%, #000 68%, rgba(0, 0, 0, 0.4) 84%, #000);
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px rgba(255, 206, 120, 0.55));
+}
+.wave i:nth-child(2) { -webkit-mask-image: conic-gradient(from 200deg, #000, rgba(0, 0, 0, 0.5) 20%, #000 42%, rgba(0, 0, 0, 0.45) 64%, #000 82%, rgba(0, 0, 0, 0.6)); mask-image: conic-gradient(from 200deg, #000, rgba(0, 0, 0, 0.5) 20%, #000 42%, rgba(0, 0, 0, 0.45) 64%, #000 82%, rgba(0, 0, 0, 0.6)); }
+.wave.go i { animation: wave-out 3.8s cubic-bezier(0.33, 0.1, 0.4, 1) forwards; }
+.wave.go i:nth-child(2) { animation-delay: 1s; animation-name: wave-out-2; }
 @keyframes wave-out {
-  0% { transform: scale(0.95); opacity: 0; }
-  15% { opacity: 0.9; }
-  70% { opacity: 0.45; }
-  100% { transform: scale(2.6); opacity: 0; }
+  0% { transform: scale(0.96) rotate(0deg); opacity: 0; }
+  14% { opacity: 0.95; }
+  65% { opacity: 0.5; }
+  100% { transform: scale(2.5) rotate(28deg); opacity: 0; }
+}
+@keyframes wave-out-2 {
+  0% { transform: scale(0.96) rotate(0deg); opacity: 0; }
+  14% { opacity: 0.7; }
+  65% { opacity: 0.35; }
+  100% { transform: scale(2.3) rotate(-24deg); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .wave.go i { animation-duration: 0.01s; } }
 .float { position: absolute; inset: 0; animation: bob 8s ease-in-out infinite; }
@@ -661,19 +679,61 @@ textarea { min-height: 68px; resize: none; }
   bottom: calc(170px + env(safe-area-inset-bottom));
   max-width: calc(100vw - 32px);
   width: max-content;
-  padding: 11px 18px;
+  padding: 10px 20px;
   border-radius: 999px;
   font-size: 14px;
+  letter-spacing: 0.06em;
   text-align: center;
-  color: var(--ink);
-  background: rgba(22, 24, 66, 0.94);
-  border: 1px solid var(--line);
+  color: #ffe9b8;
+  background: linear-gradient(180deg, rgba(58, 38, 18, 0.62), rgba(34, 22, 12, 0.66));
+  border: 1px solid rgba(242, 197, 109, 0.55);
+  box-shadow: 0 0 22px rgba(255, 200, 110, 0.22), 0 8px 24px rgba(0, 0, 0, 0.22);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   transform: translate(-50%, 16px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s, transform 0.3s;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* 祈福時的祝福語：浮現在光球下方的金色字，慢慢升起再淡去 */
+.bless-msg {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: calc(150px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 24px);
+  padding: 14px 22px;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  background: radial-gradient(closest-side, rgba(30, 18, 8, 0.5), rgba(30, 18, 8, 0));
+}
+.bless-msg .txt {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(16px, 4.6vw, 22px);
+  letter-spacing: 0.14em;
+  background: linear-gradient(180deg, #fffbe8 0%, #f8dc9a 50%, #e2ab55 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 8px rgba(255, 200, 110, 0.65)) drop-shadow(0 1px 1px rgba(40, 20, 0, 0.5));
+}
+.bless-msg .line { flex: none; width: 22px; height: 1px; background: linear-gradient(90deg, rgba(248, 220, 154, 0), #f8dc9a); }
+.bless-msg .line:last-child { background: linear-gradient(90deg, #f8dc9a, rgba(248, 220, 154, 0)); }
+.bless-msg.show { animation: bless-rise 4s ease forwards; }
+@keyframes bless-rise {
+  0% { opacity: 0; transform: translate(-50%, 12px); filter: blur(4px); }
+  16% { opacity: 1; transform: translate(-50%, 0); filter: blur(0); }
+  78% { opacity: 1; transform: translate(-50%, -6px); }
+  100% { opacity: 0; transform: translate(-50%, -18px); }
+}
+@media (prefers-reduced-motion: reduce) { .bless-msg.show { animation: none; opacity: 1; } }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -909,6 +969,7 @@ textarea { min-height: 68px; resize: none; }
 </section>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="bless-msg" id="blessMsg" role="status" aria-live="polite"><span class="line" aria-hidden="true"></span><span class="txt" id="blessTxt"></span><span class="line" aria-hidden="true"></span></div>
 <noscript><p style="position:relative;z-index:2;text-align:center;padding:16px;color:#fff3d1">請開啟瀏覽器的 JavaScript 才能點燈。</p></noscript>
 
 <script>
@@ -1533,17 +1594,23 @@ textarea { min-height: 68px; resize: none; }
     const by = Math.max(4, Math.min(geo.h - bh - 4, ay - bh / 2));
     const lx = Math.max(bx, Math.min(bx + bw, L._sx));
     const ly = Math.max(by, Math.min(by + bh, L._sy));
-    g.strokeStyle = 'rgba(255, 236, 190, 0.8)';
+    g.strokeStyle = 'rgba(242, 197, 109, 0.85)';
     g.lineWidth = 1;
     g.beginPath();
     g.moveTo(L._sx + (lx - L._sx) * 0.25, L._sy + (ly - L._sy) * 0.25);
     g.lineTo(lx, ly);
     g.stroke();
-    g.fillStyle = 'rgba(20, 20, 60, 0.82)';
+    const pill = g.createLinearGradient(0, by, 0, by + bh);
+    pill.addColorStop(0, 'rgba(66, 44, 20, 0.72)');
+    pill.addColorStop(1, 'rgba(36, 24, 12, 0.78)');
+    g.fillStyle = pill;
+    g.shadowColor = 'rgba(255, 200, 110, 0.45)';
+    g.shadowBlur = 14;
     roundRect(g, bx, by, bw, bh, bh / 2);
     g.fill();
+    g.shadowBlur = 0;
     g.stroke();
-    g.fillStyle = '#fff3d1';
+    g.fillStyle = '#ffe6a6';
     g.textBaseline = 'middle';
     g.fillText(text, bx + padX, by + bh / 2 + 1);
     g.beginPath();
@@ -1949,7 +2016,7 @@ textarea { min-height: 68px; resize: none; }
       L.pulse = performance.now();
       burst(L._sx, L._sy, L.color, 30, 1);
       showLabel(L, `${L.name}的光明球燈`, 5000);
-      toast('祝福已送出，願所願皆圓滿');
+      blessMsg('祝福已送出，願所願皆圓滿');
     };
     if (window.scrollY > 10) { window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); setTimeout(go, 600); } else go();
   }
@@ -1971,7 +2038,7 @@ textarea { min-height: 68px; resize: none; }
       } else {
         burst(geo.cx, geo.cy, GOLD, 30, 1.2);
       }
-      toast('願您身心安康、所願皆圓滿');
+      blessMsg('願您身心安康、所願皆圓滿');
     };
     if (window.scrollY > 10) { window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); setTimeout(go, 600); } else go();
     if (mine) {
@@ -2001,7 +2068,7 @@ textarea { min-height: 68px; resize: none; }
     pool.classList.remove('bursting');
     void pool.offsetWidth;
     pool.classList.add('bursting');
-    toast('願一切眾生離苦得樂、平安吉祥');
+    blessMsg('願一切眾生離苦得樂、平安吉祥');
     const last = saved.get('bodhi-last-pray', 0);
     if (now - last < 30000) return;
     saved.set('bodhi-last-pray', now);
@@ -2046,6 +2113,17 @@ textarea { min-height: 68px; resize: none; }
   document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', closeSheet));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
+  let blessTimer = 0;
+  function blessMsg(msg) {
+    const box = $('#blessMsg');
+    $('#blessTxt').textContent = msg;
+    $('#toast').classList.remove('show');
+    box.classList.remove('show');
+    void box.offsetWidth;
+    box.classList.add('show');
+    clearTimeout(blessTimer);
+    blessTimer = setTimeout(() => box.classList.remove('show'), reduceMotion ? 3500 : 4100);
+  }
   let toastTimer = 0;
   function toast(msg) {
     const t = $('#toast');
