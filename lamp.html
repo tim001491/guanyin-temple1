@@ -1456,12 +1456,12 @@ textarea { min-height: 68px; resize: none; }
     g.globalAlpha = 1;
   }
 
-  function burst(x, y, color, n, power) {
+  function burst(x, y, color, n, power, sizeMul) {
     if (x == null || reduceMotion) return;
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const v = geo.R * (0.35 + Math.random() * 0.9) * (power || 1);
-      particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 0.7 + Math.random() * 0.8, s: geo.R * (0.03 + Math.random() * 0.05), color: Math.random() < 0.5 ? color : GOLD });
+      particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 0.7 + Math.random() * 0.8, s: geo.R * (0.03 + Math.random() * 0.05) * (sizeMul || 1), color: Math.random() < 0.5 ? color : GOLD });
     }
   }
   function drawParticles(dt) {
@@ -1796,7 +1796,7 @@ textarea { min-height: 68px; resize: none; }
       if (d < bestD) { bestD = d; best = L; }
     }
     if (best) { openLamp(best); return; }
-    if (Math.hypot(x - geo.cx, y - geo.cy) < geo.R) burst(x, y, GOLD, 8, 0.45);
+    if (Math.hypot(x - geo.cx, y - geo.cy) < geo.R) { burst(x, y, GOLD, 24, 1.2, 1.8); burst(x, y, "#fff3d1", 12, 0.6, 1.5); particles.push({ x, y, vx: 0, vy: 0, life: 0, max: 0.45, s: geo.R * 0.28, color: "#fff8e6" }); }
   });
 
   // ===== 畫面：統計、光語牆、我的燈 =====
