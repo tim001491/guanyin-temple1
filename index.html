@@ -129,16 +129,10 @@
         /* --- 觀瀑一息・一分鐘靜心呼吸短劇 入口 --- */
         #breathe-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
         #breathe-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
-        /* 「氣順了，運就來了。」：金色漸層字，兩側金線與小光球，像一句口訣 */
-        #breathe-hint .breathe-motto { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0.7rem 0 0.2rem; }
-        .breathe-motto .motto-text { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.18em; padding-left: 0.18em; background: linear-gradient(100deg, #9a7038 0%, #d4a24c 35%, #f3d58e 50%, #d4a24c 65%, #9a7038 100%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: mottoShine 6s ease-in-out infinite; }
-        .breathe-motto .motto-line { flex: none; display: flex; align-items: center; gap: 6px; }
-        .breathe-motto .motto-line::before { content: ''; width: 34px; height: 1px; background: linear-gradient(90deg, rgba(201, 163, 90, 0), #c9a35a); }
-        .breathe-motto .motto-line::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 38%, #fffdf3 0 20%, #f3d58e 50%, #d9ab5a 80%); box-shadow: 0 0 8px rgba(212, 175, 55, 0.6); }
-        .breathe-motto .motto-line.r { flex-direction: row-reverse; }
-        .breathe-motto .motto-line.r::before { background: linear-gradient(270deg, rgba(201, 163, 90, 0), #c9a35a); }
-        @keyframes mottoShine { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
-        @media (prefers-reduced-motion: reduce) { .breathe-motto .motto-text { animation: none; } }
+        /* 「氣順了，運就來了」：金色題字，後面蓋一個「觀瀑」小紅印 */
+        #breathe-hint .breathe-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0.7rem 0 0.2rem; }
+        .breathe-motto .motto-text { font-size: 1.45rem; font-weight: 700; letter-spacing: 0.16em; color: #a9823f; }
+        .breathe-motto .motto-seal { writing-mode: vertical-rl; font-size: 0.75rem; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; padding: 3px; border-radius: 2px; }
         .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: #fff; border: 2px solid #a58362; border-radius: 16px; text-decoration: none; text-align: left; transition: all 0.3s ease; }
         .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
         .breathe-card img { flex: none; width: 54px; height: 96px; object-fit: cover; border-radius: 10px; }
@@ -251,7 +245,7 @@
 
             <!-- 觀瀑一息：一分半鐘水墨短劇，靜心呼吸 -->
             <div id="breathe-option">
-                <p id="breathe-hint">遇到不順心的事，先靜心呼吸一下。<span class="breathe-motto"><span class="motto-line" aria-hidden="true"></span><span class="motto-text">氣順了，運就來了</span><span class="motto-line r" aria-hidden="true"></span></span></p>
+                <p id="breathe-hint">遇到不順心的事，先靜心呼吸一下。<span class="breathe-motto"><span class="motto-text">氣順了，運就來了</span><span class="motto-seal" aria-hidden="true">觀瀑</span></span></p>
                 <a class="breathe-card breathe-link" href="breathe.html">
                     <img src="breathe/thumb.jpg" alt="《觀瀑一息》短劇畫面" width="54" height="96" loading="lazy">
                     <span class="breathe-text"><strong>觀瀑一息・靜心呼吸短劇</strong></span>
