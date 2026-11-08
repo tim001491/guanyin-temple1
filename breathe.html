@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>觀瀑一息・一分鐘靜心呼吸｜觀瀑觀音廟</title>
-<meta name="description" content="抽到不如意的籤、遇到不順心的事時，先跟著觀瀑觀音廟住持師父靜心呼吸一分半鐘：鼻吸、鼻吐，把心念安放在鼻頭。心平靜了，安定了，就可以繼續再往前走。">
+<meta name="description" content="一分半鐘水墨短劇：在觀瀑觀音廟的瀑布前靜心呼吸。鼻吸、鼻吐，把心念安放在鼻頭；心平靜了，安定了，就可以繼續再往前走。">
 <meta name="theme-color" content="#f4f1ea">
 <meta property="og:type" content="website">
 <meta property="og:title" content="觀瀑一息・一分鐘靜心呼吸短劇">
-<meta property="og:description" content="抽到不如意的籤、遇到不順心的事，先跟著住持師父靜心呼吸：心平靜了，安定了，就可以繼續再往前走。">
+<meta property="og:description" content="鼻吸、鼻吐，把心念安放在鼻頭。心平靜了，安定了，就可以繼續再往前走。">
 <meta property="og:image" content="https://xn--dett40e76kpzn.online/breathe/og.jpg">
 <meta property="og:url" content="https://xn--dett40e76kpzn.online/breathe.html">
 <link rel="manifest" href="manifest.json">
@@ -28,22 +28,9 @@
     .lead { font-size: 1rem; line-height: 1.8; color: #6c584c; margin-bottom: 1.4rem; }
     /* 直式短片：手機上盡量放大，但不超過一個螢幕高 */
     .player { width: min(100%, 380px, calc((100vh - 150px) * 9 / 16)); min-width: 240px; margin: 0 auto; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #e9e4d8; box-shadow: 0 8px 26px rgba(61, 44, 29, 0.18); }
-    .player { position: relative; }
     .player video { display: block; width: 100%; height: 100%; object-fit: cover; background: #e9e4d8; }
-    /* 影片看完後：告訴他可以繼續往前走 */
-    .after { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1.6rem 1.4rem; background: rgba(244, 241, 234, 0.99); opacity: 0; transition: opacity 0.9s ease; }
-    .after.show { opacity: 1; }
-    .after[hidden] { display: none; }
-    .after-orb { width: 78px; height: 78px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 46%, #d9ab5a 72%, rgba(217, 171, 90, 0) 74%); box-shadow: 0 0 34px rgba(212, 175, 55, 0.5); }
-    .after-main { font-size: 1.45rem; font-weight: 600; line-height: 1.8; color: #3d2c1d; letter-spacing: 0.04em; }
-    .after-sub { font-size: 0.92rem; line-height: 1.7; color: #8a6c4c; }
-    .after-btns { display: flex; flex-direction: column; gap: 0.7rem; width: 100%; max-width: 230px; margin-top: 0.4rem; }
-    .after-btns a, .after-btns button { font-family: inherit; font-size: 1.02rem; font-weight: 600; padding: 11px 10px; border-radius: 50px; border: 2px solid #a58362; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
-    .after-go { color: #fff; background-color: #a58362; }
-    .after-go:hover, .after-go:active { background-color: #8a6c4c; border-color: #8a6c4c; }
-    .after-again { color: #8a6c4c; background-color: #fff; }
-    .after-again:hover, .after-again:active { background-color: #faf6ee; }
     .sound-hint { margin-top: 0.8rem; font-size: 0.85rem; color: #9c897a; }
+    .sound-hint a { font-size: 0.95rem; color: #8a6c4c; text-decoration: none; border-bottom: 1px solid #c9ab86; }
     .steps { margin-top: 2rem; padding: 1.8rem 1.5rem 1.4rem; text-align: left; background: #fff; border: 1px solid #ddd8cf; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); }
     .steps h2 { font-size: 1.35rem; font-weight: 600; color: #b08968; text-align: center; margin-bottom: 1.2rem; }
     .steps ol { list-style: none; counter-reset: step; }
@@ -64,30 +51,21 @@
 <div class="container">
     <a class="back" id="back" href="./">‹ 回首頁</a>
     <h1>觀瀑一息</h1>
-    <p class="lead" id="lead">一分半鐘水墨短劇。觀瀑觀音廟的住持師父，<br>在瀑布前教你把心念安放在鼻頭的呼吸法。</p>
+    <p class="lead">一分半鐘水墨短劇。在觀瀑觀音廟的瀑布前，<br>學習把心念安放在鼻頭的呼吸法。</p>
 
     <div class="player">
         <video id="film" controls playsinline preload="metadata" poster="breathe/poster.jpg" aria-label="《觀瀑一息》一分鐘靜心呼吸短劇">
             <source src="breathe/breathe.mp4" type="video/mp4">
             您的瀏覽器無法播放影片。
         </video>
-        <div class="after" id="after" hidden>
-            <div class="after-orb" aria-hidden="true"></div>
-            <p class="after-main" role="status">心平靜了，安定了，<br>就可以繼續再往前走。</p>
-            <p class="after-sub">遇到不順心的事，隨時回來呼吸一下。</p>
-            <div class="after-btns">
-                <a class="after-go" id="after-go" href="./">回首頁</a>
-                <button class="after-again" id="after-again" type="button">再看一次</button>
-            </div>
-        </div>
     </div>
-    <p class="sound-hint">建議開啟聲音，聽瀑布與頌缽聲。</p>
+    <p class="sound-hint" id="sound-hint">建議開啟聲音，聽瀑布與頌缽聲。</p>
 
     <section class="steps" aria-labelledby="steps-title">
         <h2 id="steps-title">跟著做：心念安放一處</h2>
         <ol>
             <li>坐好，肩膀放鬆。用<strong>鼻子慢慢吸氣</strong>，再用<strong>鼻子慢慢吐氣</strong>。</li>
-            <li>把心念輕輕安放在一個地方：<strong>鼻頭</strong>、心窩或丹田都可以。住持習慣放在鼻頭，想像鼻翼是盤腿而坐的雙腿，安穩地坐在那裡。</li>
+            <li>把心念輕輕安放在一個地方：<strong>鼻頭</strong>、心窩或丹田都可以。若放在鼻頭，可以想像鼻翼是盤腿而坐的雙腿，安穩地坐在那裡。</li>
             <li>不論放在哪裡，<strong>每一次吸、每一次吐，都經過那個位置</strong>。</li>
             <li>吸氣時，像空氣清淨機一樣，把煩惱雜念吸到那裡；想停一下淨化也好，不停也好，順其自然。</li>
             <li>吐氣時只留下乾淨的氣，吐出去的都是清新、清靜的氣息。來回幾次，心自然就平靜下來。</li>
@@ -101,37 +79,14 @@
     </div>
 
     <script>
+        // 從抽籤結果過來：返回鍵帶他回到那支籤，看完後影片下方也有一個返回連結
         (function () {
             var fromLot = false;
             try { fromLot = new URLSearchParams(location.search).get('from') === 'lot'; } catch (e) {}
-            var film = document.getElementById('film'), after = document.getElementById('after');
-            var go = document.getElementById('after-go'), again = document.getElementById('after-again');
-            // 從抽籤結果過來：先安撫，看完帶他回到那支籤
-            if (fromLot) {
-                document.getElementById('lead').innerHTML = '抽到不如意的籤，先別急著擔心。<br>跟著住持師父，靜心呼吸一分半鐘。';
-                document.getElementById('back').textContent = '‹ 回到我的籤詩';
-                go.textContent = '回到我的籤詩';
-            }
-            function markCalm() { try { sessionStorage.setItem('calmDone', '1'); } catch (e) {} }
-            function showAfter() {
-                markCalm();
-                after.hidden = false;
-                requestAnimationFrame(function () { requestAnimationFrame(function () { after.classList.add('show'); }); });
-            }
-            function hideAfter() { after.classList.remove('show'); after.hidden = true; }
-            film.addEventListener('ended', function () {
-                // 全螢幕播放時先退出，才看得到最後這句話
-                try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {}); } catch (e) {}
-                try { if (film.webkitDisplayingFullscreen && film.webkitExitFullscreen) film.webkitExitFullscreen(); } catch (e) {}
-                showAfter();
-            });
-            film.addEventListener('timeupdate', function () { if (film.duration && film.currentTime > film.duration - 6) markCalm(); });
-            film.addEventListener('play', hideAfter);
-            again.addEventListener('click', function () {
-                hideAfter();
-                film.currentTime = 0;
-                var p = film.play();
-                if (p && p.catch) p.catch(function () {});
+            if (!fromLot) return;
+            document.getElementById('back').textContent = '‹ 回到我的籤詩';
+            document.getElementById('film').addEventListener('ended', function () {
+                document.getElementById('sound-hint').innerHTML = '<a href="./">‹ 回到我的籤詩</a>';
             });
         })();
     </script>
