@@ -18,7 +18,48 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .container { width: 100%; max-width: 500px; text-align: center; }
-        #header-image { max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto 1.5rem; border-radius: 8px; }
+        /* --- 觀音聖像・佛光呼吸：佛像本身不動，只有身後的佛光約 8 秒一次緩緩明暗 --- */
+        .gy-stage { position: relative; width: 100%; max-width: 250px; aspect-ratio: 398 / 532; margin: 0 auto 1.5rem; isolation: isolate; }
+        #header-image { position: relative; z-index: 2; width: 100%; height: auto; display: block; border-radius: 8px; }
+        .gy-glow, .gy-aura { position: absolute; pointer-events: none; }
+        /* 以眉間白毫（＝頭光圓心）為中心的暖金色光暈 */
+        .gy-glow { z-index: 0; left: 50%; top: 37.46%; width: 128%; aspect-ratio: 1; border-radius: 50%;
+            background: radial-gradient(closest-side, rgba(255, 226, 150, 0.95), rgba(252, 212, 125, 0.62) 32%, rgba(247, 200, 105, 0.26) 62%, rgba(245, 195, 95, 0.08) 82%, rgba(245, 195, 95, 0));
+            transform: translate(-50%, -50%) scale(0.9); opacity: 0.32; animation: gy-breathe 8s ease-in-out infinite; }
+        /* 同一張圖墊在後面，只露出外圍的金色光邊 */
+        .gy-aura { z-index: 1; inset: 0; width: 100%; height: 100%; opacity: 0.12; animation: gy-aura 8s ease-in-out infinite;
+            filter: drop-shadow(0 0 2px rgba(255, 205, 95, 0.9)) drop-shadow(0 0 9px rgba(245, 185, 70, 0.55));
+            -webkit-mask: radial-gradient(ellipse 78% 62% at 50% 36%, #000 55%, transparent 100%);
+                    mask: radial-gradient(ellipse 78% 62% at 50% 36%, #000 55%, transparent 100%); }
+        @keyframes gy-breathe {
+            0%, 100% { opacity: 0.32; transform: translate(-50%, -50%) scale(0.9); }
+            50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.05); }
+        }
+        @keyframes gy-aura { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.9; } }
+
+        /* --- 蓮瓣飄落：從頁面頂端兩側飄下，落在日期下方那條橫線上，停一下再淡去（橫線以下沒有花瓣） --- */
+        header { position: relative; z-index: 0; }
+        .hd-petals { --fall: 560px; position: absolute; left: -20px; right: -20px; top: -20px; height: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .hd-petals i { position: absolute; top: -40px; left: var(--x); width: var(--w); aspect-ratio: 24 / 34; opacity: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e48f87'/%3E%3Cstop offset='.5' stop-color='%23f3bdb4'/%3E%3Cstop offset='1' stop-color='%23fadcd4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url(%23g)'/%3E%3Cpath d='M12 5v24' stroke='%23e39a92' stroke-opacity='.4' stroke-width='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+            animation: pf-fall var(--d) linear var(--delay) infinite; }
+        @keyframes pf-fall {
+            0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--r0)) rotateX(0deg); }
+            6%   { opacity: var(--o); }
+            20%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.26), 0) rotate(calc(var(--r0) + 40deg)) rotateX(55deg); }
+            40%  { transform: translate3d(calc(var(--sway) * -0.6), calc(var(--fall) * 0.52), 0) rotate(calc(var(--r0) + 90deg)) rotateX(0deg); }
+            60%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.78), 0) rotate(calc(var(--r0) + 130deg)) rotateX(-50deg); animation-timing-function: ease-out; }
+            76%, 90% { opacity: var(--o); transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg); }
+            100% { opacity: 0; transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg); }
+        }
+
+        /* 手機開了「減少動態效果」：不飄花瓣，佛光改為靜態 */
+        @media (prefers-reduced-motion: reduce) {
+            .hd-petals { display: none; }
+            .gy-glow, .gy-aura { animation: none; }
+            .gy-glow { opacity: 0.6; }
+            .gy-aura { opacity: 0.4; }
+        }
         header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; }
         
@@ -208,7 +249,23 @@
 
     <div class="container">
         <header>
-            <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
+            <!-- 蓮瓣飄落：只在橫線以上，花瓣落在日期下方的橫線上 -->
+            <div class="hd-petals" id="hd-petals" aria-hidden="true">
+                <i style="--x:5%;--w:20px;--d:18s;--delay:-2s;--sway:16px;--r0:-30deg;--o:.85;--land:10px;--rest:92deg"></i>
+                <i style="--x:9%;--w:17px;--d:22s;--delay:-9s;--sway:-12px;--r0:140deg;--o:.75;--land:14px;--rest:268deg"></i>
+                <i style="--x:13%;--w:15px;--d:20s;--delay:-15s;--sway:14px;--r0:-45deg;--o:.7;--land:6px;--rest:86deg"></i>
+                <i style="--x:6%;--w:22px;--d:24s;--delay:-20s;--sway:-10px;--r0:150deg;--o:.8;--land:12px;--rest:275deg"></i>
+                <i style="--x:86%;--w:21px;--d:19s;--delay:-6s;--sway:-16px;--r0:-25deg;--o:.85;--land:-10px;--rest:100deg"></i>
+                <i style="--x:90%;--w:17px;--d:23s;--delay:-13s;--sway:12px;--r0:135deg;--o:.75;--land:-14px;--rest:262deg"></i>
+                <i style="--x:82%;--w:15px;--d:21s;--delay:-18s;--sway:-14px;--r0:-50deg;--o:.7;--land:-6px;--rest:84deg"></i>
+                <i style="--x:88%;--w:19px;--d:25s;--delay:-3s;--sway:10px;--r0:145deg;--o:.8;--land:-12px;--rest:272deg"></i>
+            </div>
+            <!-- 觀音聖像・佛光呼吸 -->
+            <div class="gy-stage">
+                <div class="gy-glow" aria-hidden="true"></div>
+                <img class="gy-aura" src="logo.png" alt="" aria-hidden="true">
+                <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
+            </div>
             <h1>觀音靈籤</h1>
             <p>請誠心默念您所求之事，然後按鈕抽籤。</p>
 
@@ -745,6 +802,24 @@
                     });
             });
         }
+    </script>
+
+    <script>
+        // 蓮瓣飄落：量出「頁面頂端 → 日期下方橫線」的距離，花瓣就剛好落在那條線上
+        // （日期、八字填入、字型或圖片載入、旋轉螢幕後都會自動重算）
+        (function () {
+            var box = document.getElementById('hd-petals');
+            var line = document.getElementById('bazi-display');
+            if (!box || !line) return;
+            function fit() {
+                var h = Math.round(line.getBoundingClientRect().top - box.getBoundingClientRect().top);
+                if (h > 0) { box.style.height = h + 'px'; box.style.setProperty('--fall', h + 'px'); }
+            }
+            fit();
+            if (window.ResizeObserver) new ResizeObserver(fit).observe(box.parentNode);
+            window.addEventListener('resize', fit);
+            window.addEventListener('load', fit);
+        })();
     </script>
 </body>
 </html>
