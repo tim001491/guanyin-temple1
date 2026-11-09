@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>般若波羅蜜多心經・經文影片與白話解釋｜觀瀑觀音廟</title>
+<meta name="description" content="《心經》全文二百六十字：經文一字一字亮起的靜心影片，附逐段白話解釋、難讀字注音，以及在生活中怎麼用心經。心無罣礙，無有恐怖。">
+<meta name="theme-color" content="#f4f1ea">
+<meta property="og:type" content="website">
+<meta property="og:title" content="般若波羅蜜多心經・經文影片與白話解釋">
+<meta property="og:description" content="經文一字一字亮起，靜靜讀一遍心經；附逐段白話解釋與難讀字注音。心無罣礙，無有恐怖。">
+<meta property="og:image" content="https://xn--dett40e76kpzn.online/heart-sutra/og.jpg">
+<meta property="og:url" content="https://xn--dett40e76kpzn.online/heart-sutra.html">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/192.png">
+<link rel="apple-touch-icon" href="icons/192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<style>
+    /* 與首頁同一套顏色：宣紙米白、深咖啡字、金棕色按鈕 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; min-height: 100vh; padding: max(18px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom)); }
+    .container { width: 100%; max-width: 500px; text-align: center; }
+    .back { display: inline-block; margin-bottom: 0.6rem; color: #8a6c4c; font-size: 0.95rem; text-decoration: none; padding: 6px 16px; border: 1px solid #ddd8cf; border-radius: 50px; background: rgba(255, 255, 255, 0.6); }
+    .back:hover, .back:active { background: #fff; }
+    h1 { font-size: clamp(1.7rem, 7.4vw, 2.2rem); font-weight: 600; color: #8a6c4c; letter-spacing: 0.1em; margin: 0.6rem 0 0.3rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08); }
+    .lead { font-size: 1rem; line-height: 1.8; color: #6c584c; margin-bottom: 1.4rem; }
+    /* 直式影片：手機上盡量放大，但不超過一個螢幕高 */
+    .player { width: min(100%, 380px, calc((100vh - 150px) * 9 / 16)); min-width: 240px; margin: 0 auto; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #160f0b; box-shadow: 0 8px 26px rgba(61, 44, 29, 0.22); }
+    .player video { display: block; width: 100%; height: 100%; object-fit: cover; background: #160f0b; }
+    .sound-hint { margin-top: 0.8rem; font-size: 0.85rem; color: #9c897a; }
+    .sound-hint a { font-size: 0.95rem; color: #8a6c4c; text-decoration: none; border-bottom: 1px solid #c9ab86; }
+
+    /* 頁內目錄 */
+    .toc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 1.6rem 0 0.4rem; }
+    .toc a { font-size: 0.88rem; color: #8a6c4c; text-decoration: none; padding: 5px 13px; border: 1px solid #c9ab86; border-radius: 50px; background: #fff; }
+    .toc a:hover, .toc a:active { background: #a58362; color: #fff; }
+
+    /* 內容卡片：與呼吸短劇頁的步驟卡同樣式 */
+    .card { margin-top: 1.6rem; padding: 1.8rem 1.4rem 1.5rem; text-align: left; background: #fff; border: 1px solid #ddd8cf; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); scroll-margin-top: 16px; }
+    .card h2 { font-size: 1.35rem; font-weight: 600; color: #b08968; text-align: center; margin-bottom: 1.1rem; letter-spacing: 0.05em; }
+    .card p { font-size: 1.02rem; line-height: 1.95; color: #5a4636; }
+    .card p + p { margin-top: 0.8rem; }
+    .card strong { color: #8a6c4c; font-weight: 600; }
+
+    /* 經文全文 */
+    .sutra-head { text-align: center; margin-bottom: 1rem; }
+    .sutra-head b { display: block; font-size: 1.2rem; font-weight: 700; color: #8a6c4c; letter-spacing: 0.12em; }
+    .sutra-head span { font-size: 0.85rem; color: #9c897a; letter-spacing: 0.08em; }
+    .sutra p { font-size: 1.1rem; line-height: 2.15; color: #3d2c1d; text-align: justify; letter-spacing: 0.04em; }
+    .sutra p + p { margin-top: 0.7rem; }
+    .sutra .mantra { text-align: center; font-weight: 700; color: #8a6c4c; letter-spacing: 0.12em; }
+
+    /* 逐段白話 */
+    .verse { padding: 1.1rem 0 1.2rem; border-top: 1px dashed #e2d6c3; }
+    .verse:first-of-type { border-top: 0; padding-top: 0; }
+    .verse-no { display: inline-flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem; margin-bottom: 0.5rem; border-radius: 50%; font-size: 0.85rem; font-weight: 700; color: #7a5a2e; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 46%, #d9ab5a 74%); box-shadow: 0 0 10px rgba(212, 175, 55, 0.35); }
+    .verse-text { font-size: 1.1rem !important; font-weight: 600; line-height: 1.95 !important; color: #7a5a2e !important; background: #faf6ee; border-left: 3px solid #d9ab5a; border-radius: 0 6px 6px 0; padding: 0.6rem 0.9rem; letter-spacing: 0.03em; }
+    .plain { margin-top: 0.75rem !important; }
+    .label { display: inline-block; margin-right: 0.4rem; padding: 0 0.45rem; font-size: 0.78rem; line-height: 1.6; color: #fff; background: #b08968; border-radius: 3px; vertical-align: 0.12em; }
+    .words { margin-top: 0.7rem; padding: 0.7rem 0.9rem; background: #fbf9f5; border-radius: 6px; }
+    .words p { font-size: 0.93rem !important; line-height: 1.85 !important; color: #6c584c !important; }
+    .words p + p { margin-top: 0.4rem !important; }
+    .words b { color: #8a6c4c; font-weight: 700; }
+    .key { margin: 0.9rem 0 0.2rem; text-align: center; font-size: 1.2rem !important; font-weight: 700; letter-spacing: 0.14em; color: #a9823f !important; }
+
+    /* 難讀字 */
+    .reading { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.4rem; }
+    .reading div { padding: 0.55rem 0.4rem; text-align: center; background: #faf6ee; border: 1px solid #eee3d1; border-radius: 6px; }
+    .reading b { display: block; font-size: 1.12rem; font-weight: 700; color: #7a5a2e; letter-spacing: 0.06em; }
+    .reading span { font-size: 0.98rem; color: #5a4636; letter-spacing: 0.05em; }
+    .reading .wide { grid-column: 1 / -1; }
+    .small { margin-top: 0.8rem; font-size: 0.85rem !important; line-height: 1.7 !important; color: #9c897a !important; text-align: center; }
+
+    /* 生活中的心經：金色圓點編號，與呼吸短劇頁相同 */
+    .card ol { list-style: none; counter-reset: step; margin-top: 0.3rem; }
+    .card li { counter-increment: step; position: relative; padding-left: 2.7rem; margin-bottom: 1rem; font-size: 1.02rem; line-height: 1.85; color: #5a4636; }
+    .card li::before { content: counter(step); position: absolute; left: 0; top: 0.15rem; width: 1.9rem; height: 1.9rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.95rem; font-weight: 700; color: #7a5a2e; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 46%, #d9ab5a 74%); box-shadow: 0 0 10px rgba(212, 175, 55, 0.35); }
+    .card li a { color: #8a6c4c; text-decoration: none; border-bottom: 1px solid #c9ab86; }
+    .card h3 { font-size: 1.08rem; font-weight: 600; color: #b08968; margin: 1.4rem 0 0.8rem; text-align: center; }
+    .motto { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid #eee3d1; text-align: center; font-size: 1.12rem !important; font-weight: 700; line-height: 1.9 !important; letter-spacing: 0.08em; color: #a9823f !important; }
+
+    .note { margin-top: 1.2rem; font-size: 0.85rem; line-height: 1.7; color: #9c897a; text-align: center; }
+    .more { display: flex; justify-content: center; gap: 0.8rem; margin-top: 2rem; }
+    .more a { flex: 1; max-width: 220px; font-size: 1.02rem; font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 11px 10px; border-radius: 50px; text-decoration: none; white-space: nowrap; transition: all 0.3s ease; }
+    .more a:hover, .more a:active { background-color: #a58362; color: #fff; }
+    footer { margin-top: 2.6rem; font-size: 0.9rem; color: #9c897a; }
+    .footer-links { margin: 0.8rem 0; }
+    .footer-links a { color: #9c897a; text-decoration: none; margin: 0 8px; }
+    .footer-links a:hover { color: #8a6c4c; text-decoration: underline; }
+    @media (max-width: 360px) { .card { padding: 1.5rem 1.05rem 1.3rem; } .more a { font-size: 0.95rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+    <a class="back" id="back" href="./">‹ 回首頁</a>
+    <h1>般若波羅蜜多心經</h1>
+    <p class="lead">唐三藏法師玄奘 譯・全文二百六十字<br>看經文一字一字亮起，靜靜跟著讀一遍。</p>
+
+    <div class="player">
+        <video id="film" controls playsinline preload="metadata" poster="heart-sutra/poster.jpg" aria-label="《般若波羅蜜多心經》經文影片">
+            <source src="heart-sutra/heart-sutra.mp4" type="video/mp4">
+            您的瀏覽器無法播放影片。
+        </video>
+    </div>
+    <p class="sound-hint" id="sound-hint">建議開啟聲音，聽著頌缽聲，跟著經文默念。</p>
+
+    <nav class="toc" aria-label="本頁目錄">
+        <a href="#sutra">經文全文</a>
+        <a href="#about">心經在說什麼</a>
+        <a href="#explain">逐段白話</a>
+        <a href="#reading">難讀字</a>
+        <a href="#daily">生活中的心經</a>
+    </nav>
+
+    <!-- 經文全文 -->
+    <section class="card sutra" id="sutra" aria-labelledby="sutra-title">
+        <h2 id="sutra-title">經文全文</h2>
+        <div class="sutra-head"><b>般若波羅蜜多心經</b><span>唐三藏法師玄奘 譯</span></div>
+        <p>觀自在菩薩，行深般若波羅蜜多時，照見五蘊皆空，度一切苦厄。</p>
+        <p>舍利子，色不異空，空不異色，色即是空，空即是色，受想行識，亦復如是。</p>
+        <p>舍利子，是諸法空相，不生不滅，不垢不淨，不增不減。是故空中無色，無受想行識，無眼耳鼻舌身意，無色聲香味觸法，無眼界，乃至無意識界。無無明，亦無無明盡，乃至無老死，亦無老死盡。無苦集滅道，無智亦無得。</p>
+        <p>以無所得故，菩提薩埵，依般若波羅蜜多故，心無罣礙，無罣礙故，無有恐怖，遠離顛倒夢想，究竟涅槃。三世諸佛，依般若波羅蜜多故，得阿耨多羅三藐三菩提。</p>
+        <p>故知般若波羅蜜多，是大神咒，是大明咒，是無上咒，是無等等咒，能除一切苦，真實不虛。</p>
+        <p>故說般若波羅蜜多咒，即說咒曰：</p>
+        <p class="mantra">揭諦揭諦，波羅揭諦，<br>波羅僧揭諦，菩提薩婆訶。</p>
+    </section>
+
+    <!-- 總說 -->
+    <section class="card" id="about" aria-labelledby="about-title">
+        <h2 id="about-title">心經在說什麼</h2>
+        <p><strong>經名的意思：</strong>「般若」是智慧，不是一般的聰明，而是看清事物真實樣子的智慧；「波羅蜜多」是到彼岸，從煩惱的這一岸，渡到自在解脫的那一岸；「心」是核心、精要。合起來就是：<strong>用智慧渡到彼岸的核心經典</strong>。</p>
+        <p>心經全文只有二百六十字，被視為六百卷《大般若經》的精華，是最多人誦讀的佛經之一。現在最通行的版本，是唐朝玄奘大師在西元六四九年譯出的。</p>
+        <p>經中的主角「觀自在菩薩」，就是大家熟悉的<strong>觀世音菩薩</strong>：鳩摩羅什大師譯作「觀世音」，玄奘大師譯作「觀自在」，說的是同一位菩薩，也就是本廟供奉的觀世音菩薩。</p>
+        <p>整部經的重點是一個「<strong>空</strong>」字。空，不是什麼都沒有，而是說：一切事物都是由許多條件（因緣）聚合而成，時時刻刻在變化，沒有一個固定不變的實體。看懂了這一點，心就不再被得失、好壞緊緊綁住。這就是經中說的：</p>
+        <p class="key">心無罣礙，無有恐怖</p>
+    </section>
+
+    <!-- 逐段白話 -->
+    <section class="card" id="explain" aria-labelledby="explain-title">
+        <h2 id="explain-title">逐段白話解釋</h2>
+
+        <article class="verse">
+            <span class="verse-no">一</span>
+            <p class="verse-text">觀自在菩薩，行深般若波羅蜜多時，照見五蘊皆空，度一切苦厄。</p>
+            <p class="plain"><span class="label">白話</span>觀自在菩薩在深入修行般若智慧的時候，清楚照見構成身心的「五蘊」都是空的，因此超越了一切苦難與災厄。</p>
+            <div class="words">
+                <p><b>五蘊</b>：構成一個人的五種要素。色（身體與物質）、受（苦樂等感受）、想（印象與概念）、行（念頭與意志）、識（分辨與認知）。我們平常認為的「我」，就是這五者的組合。</p>
+                <p><b>苦厄</b>：苦惱與災難。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">二</span>
+            <p class="verse-text">舍利子，色不異空，空不異色，色即是空，空即是色，受想行識，亦復如是。</p>
+            <p class="plain"><span class="label">白話</span>舍利子啊！有形的事物和空沒有分別，空也和有形的事物沒有分別；有形的事物就是空，空就是有形的事物。感受、印象、念頭、認知，也都是這樣。</p>
+            <div class="words">
+                <p><b>舍利子</b>：佛陀的弟子舍利弗，被稱為「智慧第一」。這部經就是對他說的。</p>
+                <p><b>怎麼理解</b>：以一朵花為例。花是種子、陽光、水、土壤等許多條件聚合而成，條件散了，花就謝了。花確實在那裡，這是「色」；但沒有一朵永遠不變的花，這是「空」。空不是在花之外另有一個空，而是花本身真實的樣子，所以說「色即是空，空即是色」。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">三</span>
+            <p class="verse-text">舍利子，是諸法空相，不生不滅，不垢不淨，不增不減。</p>
+            <p class="plain"><span class="label">白話</span>舍利子啊！一切事物的真實樣貌都是空的：本來沒有真正的生與滅，沒有髒與淨，也沒有增加與減少。</p>
+            <div class="words">
+                <p><b>怎麼理解</b>：生滅、髒淨、多少，常常是我們比較、分別出來的。就像海浪起起落落，海水並沒有因此多一點或少一點。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">四</span>
+            <p class="verse-text">是故空中無色，無受想行識，無眼耳鼻舌身意，無色聲香味觸法，無眼界，乃至無意識界。</p>
+            <p class="plain"><span class="label">白話</span>所以在空性之中，沒有固定不變的五蘊；沒有固定不變的眼、耳、鼻、舌、身、意，也沒有固定不變的色、聲、香、味、觸、法；從眼界一直到意識界，都是如此。</p>
+            <div class="words">
+                <p><b>六根</b>：眼、耳、鼻、舌、身、意，六種感知的能力。</p>
+                <p><b>六塵</b>：色、聲、香、味、觸、法，六根所接觸的對象（「法」指心裡想到的事物）。</p>
+                <p><b>十八界</b>：六根、六塵，加上由此生起的六種認識（六識），合稱十八界。經文從「眼界」說到「意識界」，就是指這十八界。</p>
+                <p><b>乃至</b>：「從……一直到……」，中間省略不說。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">五</span>
+            <p class="verse-text">無無明，亦無無明盡，乃至無老死，亦無老死盡。</p>
+            <p class="plain"><span class="label">白話</span>沒有無明，也沒有無明的消除；一直到沒有老死，也沒有老死的消除。</p>
+            <div class="words">
+                <p><b>十二因緣</b>：這兩句講的是無明、行、識、名色、六入、觸、受、愛、取、有、生、老死這十二個環節，說明生命如何因為迷惑而不斷流轉。</p>
+                <p><b>無明</b>：對真相的迷惑，是一切煩惱的根源。</p>
+                <p><b>怎麼理解</b>：心經提醒我們，連這套道理本身，以及「一定要把它消除」的念頭，也不要執著成固定不變的東西。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">六</span>
+            <p class="verse-text">無苦集滅道，無智亦無得。</p>
+            <p class="plain"><span class="label">白話</span>沒有苦、集、滅、道；沒有能證悟的智慧，也沒有可以得到的東西。</p>
+            <div class="words">
+                <p><b>四聖諦</b>：苦（人生有苦）、集（苦的原因）、滅（苦可以止息）、道（止息苦的方法），是佛陀最早的教導。</p>
+                <p><b>無智亦無得</b>：連「我有智慧」、「我得到了什麼」的念頭都放下，才是真正的般若智慧。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">七</span>
+            <p class="verse-text">以無所得故，菩提薩埵，依般若波羅蜜多故，心無罣礙，無罣礙故，無有恐怖，遠離顛倒夢想，究竟涅槃。</p>
+            <p class="plain"><span class="label">白話</span>正因為沒有什麼可得，菩薩依靠般若智慧，心裡沒有任何牽掛與障礙；因為沒有牽掛障礙，所以沒有恐懼，遠離一切顛倒的妄想，最後達到徹底的涅槃。</p>
+            <div class="words">
+                <p><b>菩提薩埵</b>：就是「菩薩」，意思是追求覺悟、也幫助眾生覺悟的人。</p>
+                <p><b>罣礙</b>：牽掛、阻礙。</p>
+                <p><b>顛倒夢想</b>：把會變的當成不變、把苦當成樂這一類顛倒的想法，像在作夢一樣。</p>
+                <p><b>涅槃</b>：煩惱完全止息的清涼寂靜。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">八</span>
+            <p class="verse-text">三世諸佛，依般若波羅蜜多故，得阿耨多羅三藐三菩提。</p>
+            <p class="plain"><span class="label">白話</span>過去、現在、未來的一切佛，也都是依靠般若智慧，成就了最高、最圓滿的覺悟。</p>
+            <div class="words">
+                <p><b>三世</b>：過去、現在、未來。</p>
+                <p><b>阿耨多羅三藐三菩提</b>：梵語音譯，意思是「無上正等正覺」，也就是佛陀最圓滿的覺悟。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">九</span>
+            <p class="verse-text">故知般若波羅蜜多，是大神咒，是大明咒，是無上咒，是無等等咒，能除一切苦，真實不虛。</p>
+            <p class="plain"><span class="label">白話</span>所以要知道，般若智慧是威力廣大的咒，是光明破除愚暗的咒，是至高無上的咒，是沒有任何東西能相比的咒，能除去一切苦，真實不虛假。</p>
+            <div class="words">
+                <p><b>怎麼理解</b>：這裡是用「咒」來讚歎般若智慧，說它像真言一樣殊勝有力。</p>
+                <p><b>無等等</b>：沒有能與它相等的。</p>
+            </div>
+        </article>
+
+        <article class="verse">
+            <span class="verse-no">十</span>
+            <p class="verse-text">故說般若波羅蜜多咒，即說咒曰：揭諦揭諦，波羅揭諦，波羅僧揭諦，菩提薩婆訶。</p>
+            <p class="plain"><span class="label">白話</span>因此宣說般若波羅蜜多咒，咒語是：揭諦揭諦，波羅揭諦，波羅僧揭諦，菩提薩婆訶。</p>
+            <div class="words">
+                <p><b>咒語的意思</b>：佛經裡的咒語，傳統上保留原音誦念、不加翻譯，誦念時一心專注就好。若依梵文字面，大意是：「去吧！去吧！到彼岸去吧！大家一起到彼岸去吧！願覺悟圓滿成就！」就像在鼓勵自己和所有人，一起從煩惱渡到自在的彼岸。</p>
+            </div>
+        </article>
+    </section>
+
+    <!-- 難讀字 -->
+    <section class="card" id="reading" aria-labelledby="reading-title">
+        <h2 id="reading-title">難讀字注音</h2>
+        <div class="reading">
+            <div class="wide"><b>般若</b><span>ㄅㄛ ㄖㄜˇ（不唸「ㄅㄢ ㄖㄨㄛˋ」）</span></div>
+            <div><b>蘊</b><span>ㄩㄣˋ</span></div>
+            <div><b>舍利子的「舍」</b><span>ㄕㄜˋ</span></div>
+            <div><b>垢</b><span>ㄍㄡˋ</span></div>
+            <div><b>埵</b><span>ㄉㄨㄛˇ</span></div>
+            <div><b>罣礙</b><span>ㄍㄨㄚˋ ㄞˋ</span></div>
+            <div><b>涅槃</b><span>ㄋㄧㄝˋ ㄆㄢˊ</span></div>
+            <div><b>耨</b><span>ㄋㄡˋ</span></div>
+            <div><b>藐</b><span>ㄇㄧㄠˇ</span></div>
+            <div><b>揭諦</b><span>ㄐㄧㄝ ㄉㄧˋ</span></div>
+            <div><b>薩婆訶</b><span>ㄙㄚˋ ㄆㄛˊ ㄏㄜ</span></div>
+        </div>
+        <p class="small">各道場誦念時的讀音可能略有不同，依自己熟悉的唸法即可。</p>
+    </section>
+
+    <!-- 生活中的心經 -->
+    <section class="card" id="daily" aria-labelledby="daily-title">
+        <h2 id="daily-title">生活中的心經</h2>
+        <p>心經不只是用來唸的，也可以用來過日子。</p>
+        <ol style="margin-top: 1rem;">
+            <li><strong>遇到不順心的事</strong>，想想「色即是空」：眼前的難關，也是許多因緣聚合而成；因緣會變，事情也會轉變。</li>
+            <li><strong>得失放不下的時候</strong>，想想「不增不減」：得失來來去去，就像海浪起落，海水並沒有因此變多或變少，心也不必跟著大起大落。</li>
+            <li><strong>心裡害怕不安時</strong>，想想「心無罣礙，無有恐怖」：把緊抓不放的念頭輕輕放下，恐懼也會跟著鬆開。</li>
+        </ol>
+        <h3>誦讀小建議</h3>
+        <ol>
+            <li>找一個安靜的地方坐好，先慢慢呼吸幾次，讓心靜下來（可以先看<a href="breathe.html">〈觀瀑一息〉靜心呼吸短劇</a>）。</li>
+            <li>一字一句慢慢讀，讀清楚比讀得快重要；一時不懂的地方不用急，多讀幾遍自然就熟悉了。</li>
+            <li>讀完可以在心裡默念：「願一切眾生，離苦得樂。」</li>
+        </ol>
+        <p class="motto">心平靜了，安定了，<br>就可以繼續再往前走。</p>
+    </section>
+
+    <p class="note">以上為方便初學者的白話解說；佛法義理深廣，各家法師的講解深淺不同，有興趣可再延伸閱讀。</p>
+
+    <div class="more">
+        <a href="./">誠心抽一籤</a>
+        <a href="lamp.html">點光明球燈</a>
+    </div>
+
+    <script>
+        // 從抽籤結果過來：返回鍵帶他回到那支籤，看完影片後下方也有一個返回連結
+        (function () {
+            var fromLot = false;
+            try { fromLot = new URLSearchParams(location.search).get('from') === 'lot'; } catch (e) {}
+            if (!fromLot) return;
+            document.getElementById('back').textContent = '‹ 回到我的籤詩';
+            document.getElementById('film').addEventListener('ended', function () {
+                document.getElementById('sound-hint').innerHTML = '<a href="./">‹ 回到我的籤詩</a>';
+            });
+        })();
+    </script>
+
+    <footer>
+        <p>觀瀑觀音廟・僅供參考，心誠則靈</p>
+        <div class="footer-links">
+            <a href="about.html">關於我們</a> |
+            <a href="contact.html">聯絡我們</a> |
+            <a href="privacy.html">隱私權政策</a>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
