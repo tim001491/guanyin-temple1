@@ -185,7 +185,9 @@
         /* 呼吸短劇與心經之間：一條金色細線把上下兩張卡片連起來，中間一句承上啟下的話 */
         .flow-link { display: flex; flex-direction: column; align-items: center; padding: 2px 0 0; }
         .flow-line { width: 0; height: 16px; border-left: 2px dotted #c9ab86; }
-        .flow-link p { margin: 5px 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; color: #a9823f; }
+        /* 字的大小、粗細、字距與上方「氣順了，運就來了」相同；手機上只在逗號後換行 */
+        .flow-link p { margin: 6px 0; font-size: 1.45rem; font-weight: 700; letter-spacing: 0.16em; line-height: 1.6; color: #a9823f; }
+        .flow-link p span { display: inline-block; }
         .flow-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #c9ab86; }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.2rem; }
@@ -316,7 +318,7 @@
                 <!-- 上下連貫：先靜心呼吸，再讀心經 -->
                 <div class="flow-link">
                     <span class="flow-line" aria-hidden="true"></span>
-                    <p>氣順了，再讀一遍心經，心就安了</p>
+                    <p><span>氣順了，</span><span>再讀一遍心經，</span><span>心就安了</span></p>
                     <span class="flow-line" aria-hidden="true"></span>
                     <span class="flow-arrow" aria-hidden="true"></span>
                 </div>
