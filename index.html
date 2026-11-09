@@ -182,6 +182,7 @@
         .breathe-text small { font-size: 0.78rem; line-height: 1.5; color: #9c897a; }
         .breathe-play { position: relative; flex: none; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
         .breathe-play::after { content: ''; position: absolute; left: 15px; top: 12px; border-left: 11px solid #8a6c4c; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+        .sutra-card { margin-top: 0.8rem; }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.2rem; }
         #donate-button { font-family: 'Noto Serif TC', serif; font-size: 0.88rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 6px 16px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
@@ -306,6 +307,12 @@
                 <a class="breathe-card breathe-link" href="breathe.html">
                     <img src="breathe/thumb.jpg" alt="《觀瀑一息》短劇畫面" width="54" height="96" loading="lazy">
                     <span class="breathe-text"><strong>觀瀑一息・靜心呼吸短劇</strong></span>
+                    <span class="breathe-play" aria-hidden="true"></span>
+                </a>
+                <!-- 般若波羅蜜多心經：經文影片＋白話解釋 -->
+                <a class="breathe-card breathe-link sutra-card" href="heart-sutra.html" data-page="heart-sutra.html">
+                    <img src="heart-sutra/thumb.jpg" alt="《心經》影片畫面" width="54" height="96" loading="lazy">
+                    <span class="breathe-text"><strong>般若波羅蜜多心經</strong><small>經文影片・白話解釋</small></span>
                     <span class="breathe-play" aria-hidden="true"></span>
                 </a>
             </div>
@@ -528,13 +535,13 @@
             calmNote.classList.toggle('show', isTroubledLot());
         }
 
-        // 去看呼吸短劇前記住剛抽到的籤，看完回來還在
+        // 去看呼吸短劇或心經前記住剛抽到的籤，看完回來還在
         function setupBreatheLinks() {
             document.querySelectorAll('.breathe-link').forEach(link => {
                 link.addEventListener('click', () => {
                     if (currentPoem.title && currentPoem.title !== '籤頭') {
                         rememberLotForLamp();
-                        link.href = 'breathe.html?from=lot';
+                        link.href = (link.dataset.page || 'breathe.html') + '?from=lot';
                     }
                 });
             });
