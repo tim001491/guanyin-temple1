@@ -172,7 +172,8 @@
         #breathe-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
         /* 「氣順了，運就來了」：金色題字，後面蓋一個「觀瀑」小紅印 */
         #breathe-hint .breathe-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0.7rem 0 0.2rem; }
-        .breathe-motto .motto-text { font-size: 1.45rem; font-weight: 700; letter-spacing: 0.16em; color: #a9823f; }
+        /* 兩句題字同樣大小，手機上各一行：依螢幕寬度縮放，最大 1.45rem */
+        .breathe-motto .motto-text { font-size: min(1.45rem, 4.8vw); font-weight: 700; letter-spacing: 0.06em; white-space: nowrap; color: #a9823f; }
         .breathe-motto .motto-seal { writing-mode: vertical-rl; font-size: 0.75rem; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; padding: 3px; border-radius: 2px; }
         .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: #fff; border: 2px solid #a58362; border-radius: 16px; text-decoration: none; text-align: left; transition: all 0.3s ease; }
         .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
@@ -185,9 +186,8 @@
         /* 呼吸短劇與心經之間：一條金色細線把上下兩張卡片連起來，中間一句承上啟下的話 */
         .flow-link { display: flex; flex-direction: column; align-items: center; padding: 2px 0 0; }
         .flow-line { width: 0; height: 16px; border-left: 2px dotted #c9ab86; }
-        /* 字的大小、粗細、字距與上方「氣順了，運就來了」相同；手機上只在逗號後換行 */
-        .flow-link p { margin: 6px 0; font-size: 1.45rem; font-weight: 700; letter-spacing: 0.16em; line-height: 1.6; color: #a9823f; }
-        .flow-link p span { display: inline-block; }
+        /* 與上方「氣順了，運就來了」同樣大小，後面也蓋「觀瀑」小紅印 */
+        .flow-link .flow-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0; }
         .flow-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #c9ab86; }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.2rem; }
@@ -318,7 +318,7 @@
                 <!-- 上下連貫：先靜心呼吸，再讀心經 -->
                 <div class="flow-link">
                     <span class="flow-line" aria-hidden="true"></span>
-                    <p><span>氣順了，</span><span>再讀一遍心經，</span><span>心就安了</span></p>
+                    <p class="breathe-motto flow-motto"><span class="motto-text">氣順了，再讀一遍心經，心就安了</span><span class="motto-seal" aria-hidden="true">觀瀑</span></p>
                     <span class="flow-line" aria-hidden="true"></span>
                     <span class="flow-arrow" aria-hidden="true"></span>
                 </div>
