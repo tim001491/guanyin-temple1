@@ -205,6 +205,38 @@
         .donate-qr img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
         .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
         #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
+
+        /* --- 搖籤筒動畫：按下抽籤 → 籤筒傾斜搖動 → 一支籤慢慢冒出、跳出 → 放大顯示籤號 → 籤詩出現 --- */
+        #qt-overlay { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(244, 241, 234, 0.94); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.35s ease; }
+        #qt-overlay.show { display: flex; }
+        #qt-overlay.visible { opacity: 1; }
+        .qt-stage { position: relative; width: 240px; height: 330px; }
+        .qt-tube { position: absolute; left: 50%; bottom: 20px; width: 118px; height: 190px; margin-left: -59px; transform-origin: 50% 85%; }
+        .qt-inner { position: absolute; left: 0; right: 0; top: -14px; height: 28px; border-radius: 50%; background: radial-gradient(ellipse at 50% 60%, #3a1612, #5e2219 70%, #7a2c22); }
+        .qt-sticks { position: absolute; left: 10px; right: 10px; top: -70px; height: 240px; }
+        .qt-stick { position: absolute; bottom: 0; width: 7px; height: 220px; margin-left: -3.5px; border-radius: 3px 3px 1px 1px;
+            background: linear-gradient(90deg, #c9a46a, #ecd3a0 45%, #d2b07a); box-shadow: inset 0 0 0 0.5px rgba(120, 85, 40, 0.35); }
+        .qt-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 18px; border-radius: 3px 3px 0 0; background: #b5322a; }
+        .qt-body { position: absolute; inset: 0; border-radius: 0 0 50% 50% / 0 0 14px 14px; overflow: hidden;
+            background: linear-gradient(90deg, #7d241d 0%, #b23a2e 22%, #c8483a 38%, #a8352a 62%, #7a221b 100%); box-shadow: 0 14px 24px rgba(60, 25, 10, 0.25); }
+        .qt-body::before, .qt-body::after { content: ''; position: absolute; left: 0; right: 0; height: 9px; background: linear-gradient(90deg, #a07a2e, #e8c66e 35%, #f3dc95 45%, #c79a43 70%, #8e6a26); }
+        .qt-body::before { top: 10px; }
+        .qt-body::after { bottom: 16px; }
+        .qt-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -46%); writing-mode: vertical-rl; letter-spacing: 0.25em;
+            font-size: 1.5rem; font-weight: 600; color: #f3d98c; text-shadow: 0 1px 0 rgba(80, 30, 10, 0.5); padding: 0.5rem 0.3rem; border: 1px solid rgba(243, 217, 140, 0.55); border-radius: 4px; }
+        .qt-lip { position: absolute; left: 0; right: 0; top: -14px; height: 28px; border-radius: 50%; border: 3px solid #e2bd66; border-top-color: transparent;
+            clip-path: inset(50% 0 0 0); pointer-events: none; }
+        /* 被抽中的那一支籤 */
+        .qt-chosen { position: absolute; left: 50%; bottom: 120px; width: 11px; height: 220px; margin-left: -5.5px; z-index: 5; border-radius: 4px 4px 2px 2px; transform-origin: 50% 50%;
+            background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 6px 18px rgba(80, 50, 20, 0.25); opacity: 0;
+            display: flex; justify-content: center; padding-top: 30px; }
+        .qt-stick.qt-rising { left: 50%; opacity: 0; }
+        .qt-chosen::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 20px; border-radius: 4px 4px 0 0; background: #b5322a; }
+        .qt-chosen span { writing-mode: vertical-rl; font-size: 11px; line-height: 1; letter-spacing: 0.05em; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
+        .qt-text { margin-top: 1.4rem; min-height: 2em; font-size: 1.15rem; letter-spacing: 0.15em; color: #8a6c4c; transition: opacity 0.3s ease; }
+        #poem-card.revealed { animation: qt-reveal 0.7s ease; }
+        @keyframes qt-reveal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
     </style>
 </head>
 <body class="intro-playing">
@@ -334,6 +366,20 @@
             </div>
 
         </main>
+
+    <!-- 搖籤筒動畫（按「誠心抽一籤」時出現） -->
+    <div id="qt-overlay" aria-hidden="true">
+        <div class="qt-stage">
+            <div class="qt-tube" id="qt-tube">
+                <div class="qt-inner"></div>
+                <div class="qt-sticks" id="qt-sticks"></div>
+                <div class="qt-body"><span class="qt-label">觀音靈籤</span></div>
+                <div class="qt-lip"></div>
+            </div>
+            <div class="qt-chosen" id="qt-chosen"><span id="qt-chosen-text"></span></div>
+        </div>
+        <p class="qt-text" id="qt-text"></p>
+    </div>
         
         <footer>
             <p>僅供參考，心誠則靈</p>
@@ -496,18 +542,123 @@
             }
         }
 
-        // --- 抽籤動畫：轉動 → 隨機暫停兩次 → 繼續轉 → 慢慢停下 ---
+        // --- 搖籤筒動畫：籤筒傾斜搖動 → 一支籤慢慢冒出 → 跳出來放大顯示籤號 → 籤詩出現 ---
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         const randomBetween = (min, max) => min + Math.random() * (max - min);
         const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // 以固定速度快速換籤，持續 duration 毫秒
-        async function spin(duration, tick) {
-            const end = Date.now() + duration;
-            while (Date.now() < end) {
-                displayPoem(randomPoemId());
-                await sleep(tick);
-            }
+        const qtOverlay = document.getElementById('qt-overlay');
+        const qtTube = document.getElementById('qt-tube');
+        const qtSticks = document.getElementById('qt-sticks');
+        const qtChosen = document.getElementById('qt-chosen');
+        const qtChosenText = document.getElementById('qt-chosen-text');
+        const qtText = document.getElementById('qt-text');
+
+        // 籤筒裡的籤：高低錯落
+        const STICK_COUNT = 13;
+        const stickEls = [];
+        for (let i = 0; i < STICK_COUNT; i++) {
+            const st = document.createElement('div');
+            st.className = 'qt-stick';
+            st.style.left = (6 + i * (88 / (STICK_COUNT - 1))) + '%';
+            const lift = 8 + Math.random() * 30;
+            st.style.transform = `translateY(${-lift}px) rotate(${(i - 6) * 1.4 + randomBetween(-2, 2)}deg)`;
+            st.dataset.lift = lift;
+            qtSticks.appendChild(st);
+            stickEls.push(st);
+        }
+        // 搖的時候慢慢冒出來的那一支（在籤筒裡面，被筒身擋住下半截）
+        const qtRising = document.createElement('div');
+        qtRising.className = 'qt-stick qt-rising';
+        qtSticks.appendChild(qtRising);
+
+        // 竹籤碰撞的「喀喀」聲（很小聲；手機靜音時不會響）
+        let audioCtx = null;
+        function clack() {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                const t = audioCtx.currentTime;
+                const len = Math.floor(audioCtx.sampleRate * 0.04);
+                const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+                const data = buf.getChannelData(0);
+                for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+                const src = audioCtx.createBufferSource();
+                src.buffer = buf;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = randomBetween(1600, 2600);
+                filter.Q.value = 3;
+                const gain = audioCtx.createGain();
+                gain.gain.value = randomBetween(0.12, 0.22);
+                src.connect(filter).connect(gain).connect(audioCtx.destination);
+                src.start(t);
+            } catch (e) { /* 不支援音效就略過 */ }
+        }
+
+        // 搖籤筒 duration 毫秒：籤筒前傾、來回搖，裡面的籤跟著跳動，被抽中的籤慢慢冒出來
+        async function shakeTube(duration) {
+            const tilt = -22;
+            const anim = qtTube.animate([
+                { transform: 'rotate(0deg)' },
+                { transform: `rotate(${tilt}deg)`, offset: 0.08 },
+                { transform: `rotate(${tilt - 5}deg) translate(-4px, -6px)`, offset: 0.16 },
+                { transform: `rotate(${tilt + 4}deg) translate(3px, 2px)`, offset: 0.24 },
+                { transform: `rotate(${tilt - 5}deg) translate(-4px, -6px)`, offset: 0.32 },
+                { transform: `rotate(${tilt + 4}deg) translate(3px, 2px)`, offset: 0.40 },
+                { transform: `rotate(${tilt - 5}deg) translate(-4px, -6px)`, offset: 0.48 },
+                { transform: `rotate(${tilt + 4}deg) translate(3px, 2px)`, offset: 0.56 },
+                { transform: `rotate(${tilt - 5}deg) translate(-4px, -6px)`, offset: 0.64 },
+                { transform: `rotate(${tilt + 4}deg) translate(3px, 2px)`, offset: 0.72 },
+                { transform: `rotate(${tilt - 5}deg) translate(-4px, -6px)`, offset: 0.80 },
+                { transform: `rotate(${tilt + 2}deg) translate(2px, 0)`, offset: 0.88 },
+                { transform: `rotate(${tilt}deg)` }
+            ], { duration, easing: 'linear', fill: 'forwards' });
+
+            // 籤在筒裡上下跳動
+            const stickAnims = stickEls.map(st => {
+                const base = st.style.transform;
+                const lift = +st.dataset.lift;
+                return st.animate([
+                    { transform: base },
+                    { transform: base.replace(/translateY\([^)]*\)/, `translateY(${-lift - randomBetween(6, 16)}px)`) },
+                    { transform: base }
+                ], { duration: randomBetween(150, 230), iterations: Infinity, delay: randomBetween(0, 150) });
+            });
+
+            // 後半段，被抽中的籤一點一點冒出筒口
+            qtRising.style.opacity = '1';
+            const rise = qtRising.animate([
+                { transform: 'translateY(0)' },
+                { transform: 'translateY(0)', offset: 0.35 },
+                { transform: 'translateY(-30px)', offset: 0.6 },
+                { transform: 'translateY(-45px)', offset: 0.75 },
+                { transform: 'translateY(-80px)' }
+            ], { duration, easing: 'ease-in', fill: 'forwards' });
+
+            const clackTimer = setInterval(() => { clack(); if (Math.random() < 0.5) setTimeout(clack, 40); }, 110);
+            await anim.finished;
+            clearInterval(clackTimer);
+            stickAnims.forEach(a => a.cancel());
+        }
+
+        // 被抽中的籤：從筒口跳出 → 在空中翻轉 → 立正放大到畫面中間，顯示籤號
+        // （起點正好接在筒裡那支冒出 80px 的籤的位置：籤筒以底部 85% 為軸前傾 22 度）
+        async function popChosenStick() {
+            const start = 'translate(-68px, 13px) rotate(-22deg) scale(1)';
+            qtRising.style.opacity = '0';
+            qtChosen.style.opacity = '1';
+            qtChosen.style.transform = start;
+            clack();
+            qtTube.animate([
+                { opacity: 1, transform: 'rotate(-22deg)' },
+                { opacity: 0.1, transform: 'translateY(70px) rotate(0deg) scale(0.8)' }
+            ], { duration: 900, easing: 'ease-in-out', fill: 'forwards' });
+            await qtChosen.animate([
+                { transform: start },
+                { transform: 'translate(-40px, -120px) rotate(-200deg) scale(1.25)', offset: 0.45 },
+                { transform: 'translate(0, -10px) rotate(-360deg) scale(1.5)' }
+            ], { duration: 1000, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' }).finished;
         }
 
         let isDrawing = false;
@@ -517,24 +668,48 @@
             drawButton.disabled = true;
             drawButton.textContent = '抽籤中…';
             aiSection.classList.remove('show');
-            poemCard.classList.add('drawing');
 
-            for (let i = 0; i < 2; i++) {
-                await spin(randomBetween(700, 1200), 90);    // 轉動（每段長短隨機）
-                poemCard.classList.remove('drawing');         // 暫停：停在某一支籤上
-                await sleep(randomBetween(600, 1100));        // 暫停時間也隨機
-                poemCard.classList.add('drawing');            // 繼續轉
+            const finalId = randomPoemId();
+            const finalPoem = poems.find(p => p.id === finalId);
+            const lotName = finalPoem.title.split(' ')[0];   // 例如「第三十一籤」
+            qtChosenText.textContent = lotName;
+
+            // 打開籤筒畫面
+            qtChosen.style.opacity = '0';
+            qtChosen.getAnimations().forEach(a => a.cancel());
+            qtTube.getAnimations().forEach(a => a.cancel());
+            qtRising.getAnimations().forEach(a => a.cancel());
+            qtRising.style.opacity = '0';
+            qtText.textContent = '誠心默禱，搖籤中…';
+            qtOverlay.classList.add('show');
+            await sleep(20);
+            qtOverlay.classList.add('visible');
+            await sleep(350);
+
+            if (reduceMotion) {
+                await sleep(500);
+                qtChosen.style.opacity = '1';
+                qtChosen.style.transform = 'translate(0, -10px) scale(1.5)';
+                qtTube.style.opacity = '0.18';
+            } else {
+                await shakeTube(randomBetween(2200, 2800));
+                await popChosenStick();
             }
-            await spin(randomBetween(700, 1200), 90);
+            qtText.textContent = '得 ' + lotName;
+            await sleep(1300);
 
-            // 最後越轉越慢，再停在最終的籤
-            for (const tick of [140, 190, 250, 320, 400]) {
-                displayPoem(randomPoemId());
-                await sleep(tick);
-            }
-            displayPoem(randomPoemId());
+            // 關掉籤筒畫面，顯示籤詩
+            displayPoem(finalId);
+            qtOverlay.classList.remove('visible');
+            await sleep(350);
+            qtOverlay.classList.remove('show');
+            qtChosen.style.transform = '';
+            qtTube.style.opacity = '';
+            poemCard.classList.remove('revealed');
+            void poemCard.offsetWidth;
+            poemCard.classList.add('revealed');
+            poemCard.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
 
-            poemCard.classList.remove('drawing');
             drawButton.textContent = '誠心抽一籤';
             drawButton.disabled = false;
             isDrawing = false;
