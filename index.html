@@ -119,7 +119,8 @@
         #ai-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
         .ai-link { flex: 0 1 calc(50% - 0.4rem); max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: min(1.1rem, 4.4vw); font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 8px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
         .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
-        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
+        #ai-note { color: #9c897a; font-size: 0.85rem; line-height: 1.6; margin-top: 0.8rem; }
+        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.3rem; min-height: 1.2em; }
         /* --- 開場動畫 --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 1000; background: #f4f1ea; overflow: hidden; transition: opacity 1s ease, visibility 1s ease; }
         #intro-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -293,7 +294,9 @@
                     <a id="google-ai-link" class="ai-link" href="#" target="_blank" rel="noopener">Google AI 解籤</a>
                     <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
                     <a id="perplexity-link" class="ai-link" href="#" target="_blank" rel="noopener">Perplexity 解籤</a>
+                    <a id="claude-link" class="ai-link" href="#" target="_blank" rel="noopener">Claude 解籤</a>
                 </div>
+                <p id="ai-note">Claude 需先登入（可免費註冊）。</p>
                 <p id="ai-copied"></p>
                 <p id="calm-note">心若不安，不妨先<a class="breathe-link" href="breathe.html?from=lot">靜心呼吸一下</a>。</p>
             </div>
@@ -462,6 +465,7 @@
         const googleAiLink = document.getElementById('google-ai-link');
         const chatgptLink = document.getElementById('chatgpt-link');
         const perplexityLink = document.getElementById('perplexity-link');
+        const claudeLink = document.getElementById('claude-link');
         const aiCopiedEl = document.getElementById('ai-copied');
         const dateDisplayEl = document.getElementById('date-display');
         const baziDisplayEl = document.getElementById('bazi-display');
@@ -657,6 +661,8 @@
             const fullPrompt = encodeURIComponent(buildAIPrompt());
             chatgptLink.href = `https://chatgpt.com/?q=${fullPrompt}`;
             perplexityLink.href = `https://www.perplexity.ai/search?q=${fullPrompt}`;
+            // Claude：要先登入（免費），網址帶入完整提問；萬一登入後沒帶入，點按時已複製，可直接貼上
+            claudeLink.href = `https://claude.ai/new?q=${fullPrompt}`;
             aiCopiedEl.textContent = '';
             aiSection.classList.add('show');
         }
