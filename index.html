@@ -206,7 +206,7 @@
         .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
         #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
 
-        /* --- 抽籤動畫：六十支籤在空中旋轉飛舞 → 其中一支飛到中間、立正放大顯示籤號 → 籤詩出現 --- */
+        /* --- 抽籤動畫：六十支籤依序排成一圈整齊旋轉 → 慢慢停下，正前方那支升起放大顯示籤號 → 籤詩出現 --- */
         #qt-overlay { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; align-items: center; justify-content: center;
             background: rgba(244, 241, 234, 0.95); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.35s ease; overflow: hidden; }
         #qt-overlay.show { display: flex; }
@@ -354,7 +354,7 @@
 
         </main>
 
-    <!-- 抽籤動畫：六十支籤旋轉飛舞（按「誠心抽一籤」時出現） -->
+    <!-- 抽籤動畫：六十支籤排成一圈旋轉（按「誠心抽一籤」時出現） -->
     <div id="qt-overlay" aria-hidden="true">
         <div class="qt-stage" id="qt-stage"><div class="qt-glow"></div></div>
         <p class="qt-text" id="qt-text"></p>
@@ -521,7 +521,7 @@
             }
         }
 
-        // --- 抽籤動畫：六十支籤在空中旋轉飛舞 → 其中一支飛到中間放大顯示籤號 → 籤詩出現 ---
+        // --- 抽籤動畫：六十支籤依序排成一圈整齊旋轉 → 慢慢停下 → 正前方那支升起放大顯示籤號 → 籤詩出現 ---
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         const randomBetween = (min, max) => min + Math.random() * (max - min);
         const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
@@ -542,76 +542,64 @@
             qtStage.appendChild(el);
             qtSticks.push({ id, el });
         }
-        const easeInOut = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        const easeOut = t => 1 - Math.pow(1 - t, 3);
 
-        // 每支籤繞著中心轉，一圈一圈像漩渦；前面的大、後面的小又淡，看起來有立體感
+        // 六十支籤依序（第一籤～第六十籤）直立排成一圈，像走馬燈一樣整齊地轉；
+        // 轉到前面的大而清楚，轉到後面的小而淡
+        const RING_R = 135;
         function placeSticks(finalId) {
-            const heights = [...Array(60).keys()].sort(() => Math.random() - 0.5);
             qtSticks.forEach((st, i) => {
-                st.theta = randomBetween(0, Math.PI * 2);                               // 散在一圈上的位置
-                st.r = randomBetween(50, 140);                                          // 離中心遠近
-                st.h = (heights[i] / 59 - 0.5) * 230 + randomBetween(-4, 4);            // 高低錯落、平均分布
-                st.speed = 1.35 - (st.r - 50) / 90 * 0.65;                              // 像漩渦：越靠內圈轉越快
-                st.spin = randomBetween(1.5, 3.5) * (Math.random() < 0.5 ? -1 : 1);     // 自己翻轉的速度
-                st.rot0 = randomBetween(0, 360);
+                st.theta = (i / 60) * Math.PI * 2;
                 st.el.classList.toggle('chosen', st.id === finalId);
             });
         }
+        // 先慢慢起轉、中間轉快、最後慢慢停下
+        const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
         function runDance(finalId, danceMs, gatherMs) {
             return new Promise(resolve => {
-                const t0 = performance.now();
-                let phase = 0;          // 累積旋轉角度
-                let last = t0;
                 const chosen = qtSticks.find(s => s.id === finalId);
-                let gatherFrom = null;
+                // 算好總共要轉多少，讓抽中的那支剛好停在正前方（轉約三圈）
+                const front = Math.PI / 2;
+                let total = front - chosen.theta;
+                total = ((total % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) + Math.PI * 2 * 3;
+                const t0 = performance.now();
 
                 function frame(now) {
                     const t = now - t0;
-                    const dt = (now - last) / 1000;
-                    last = now;
-                    // 速度：0.8 秒內加速，之後保持，最後一段稍微放慢
-                    const speedUp = Math.min(1, t / 800);
-                    const slow = t > danceMs ? Math.max(0.25, 1 - (t - danceMs) / gatherMs) : 1;
-                    phase += dt * 3.6 * speedUp * slow;
-                    const spread = Math.min(1, t / 600);   // 一開始從中間散開
-                    const g = t > danceMs ? Math.min(1, (t - danceMs) / gatherMs) : 0;   // 收尾進度
+                    const p = Math.min(1, t / danceMs);
+                    const phase = total * easeInOutCubic(p);
+                    const appear = Math.min(1, t / 500);                                  // 一開始從中間展開成圈
+                    const g = t > danceMs ? Math.min(1, (t - danceMs) / gatherMs) : 0;    // 收尾進度
 
                     qtSticks.forEach(st => {
-                        const a = st.theta + phase * st.speed;
-                        const depth = Math.sin(a);                 // -1 在後面，1 在前面
-                        let x = Math.cos(a) * st.r * spread;
-                        let y = st.h * spread + depth * 18;
-                        let scale = 0.72 + depth * 0.22;
-                        let rot = st.rot0 + phase * st.spin * 57.3;
-                        let opacity = 0.55 + depth * 0.4;
+                        const a = st.theta + phase;
+                        const depth = Math.sin(a);                   // -1 在後面，1 在正前方
+                        let x = Math.cos(a) * RING_R * appear;
+                        let y = depth * 60 * appear + 10;
+                        let scale = (0.6 + depth * 0.28) * (0.6 + 0.4 * appear);
+                        let opacity = (0.3 + (depth + 1) * 0.35) * appear;
                         let z = Math.round((depth + 1) * 50);
 
-                        if (st === chosen && g > 0) {
-                            // 被抽中的籤：從漩渦裡飛到正中間，轉正、放大
-                            if (!gatherFrom) gatherFrom = { x, y, scale, rot: ((rot % 360) + 360) % 360, opacity };
-                            const k = easeInOut(g);
-                            x = gatherFrom.x * (1 - k);
-                            y = gatherFrom.y * (1 - k) - 10 * k;
-                            scale = gatherFrom.scale + (1.9 - gatherFrom.scale) * k;
-                            const target = gatherFrom.rot > 180 ? 720 : 360;   // 多轉一圈再立正
-                            rot = gatherFrom.rot + (target - gatherFrom.rot) * easeOut(g);
-                            opacity = 1;
-                            z = 300;
-                        } else if (g > 0) {
-                            // 其他的籤往外散開、淡去
-                            const k = easeOut(g);
-                            x *= 1 + k * 1.2;
-                            y *= 1 + k * 0.6;
-                            opacity *= 1 - k;
+                        if (g > 0) {
+                            const k = easeInOutCubic(g);
+                            if (st === chosen) {
+                                // 抽中的籤：從圈的正前方往上升到中間、放大
+                                y = y + (-10 - y) * k;
+                                x = x * (1 - k);
+                                scale = scale + (1.9 - scale) * k;
+                                opacity = 1;
+                                z = 300;
+                            } else {
+                                opacity *= 1 - k;                    // 其他的籤淡去
+                                scale *= 1 - 0.2 * k;
+                            }
                         }
-                        st.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+                        st.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
                         st.el.style.opacity = opacity.toFixed(3);
                         st.el.style.zIndex = z;
                     });
 
-                    if (g < 1) requestAnimationFrame(frame);
+                    if (t < danceMs + gatherMs) requestAnimationFrame(frame);
                     else resolve();
                 }
                 requestAnimationFrame(frame);
@@ -643,7 +631,7 @@
                 chosen.el.style.opacity = '1';
                 await sleep(500);
             } else {
-                await runDance(finalId, randomBetween(2600, 3200), 1300);
+                await runDance(finalId, randomBetween(3800, 4400), 1000);
             }
             qtText.textContent = '得 ' + lotName;
             await sleep(1300);
