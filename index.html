@@ -174,9 +174,9 @@
         /* 兩句題字同樣大小，手機上各一行：依螢幕寬度縮放，最大 1.3rem */
         .breathe-motto .motto-text { font-size: min(1.3rem, 4.4vw); font-weight: 700; letter-spacing: 0.06em; white-space: nowrap; color: #a9823f; }
         /* 標題左邊的紅色「觀瀑」印章，和呼吸短劇、心經標語旁的印章同款 */
-        /* 「觀音靈籤」四字置中；印章掛在左側，不影響標題置中 */
+        /* 「觀音靈籤」四字置中；印章掛在左側，上下緣由程式對齊「觀」字筆畫 */
         .title-wrap { position: relative; display: inline-block; }
-        .title-seal { position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 0.7em; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; writing-mode: vertical-rl; font-size: 0.4em; height: 2.5em; width: 1.6em; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; border-radius: 3px; text-shadow: none; }
+        .title-seal { position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 0.7em; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; writing-mode: vertical-rl; font-size: 0.4em; height: 2.5em; width: 1.85em; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; border-radius: 3px; text-shadow: none; }
         .breathe-motto .motto-seal { writing-mode: vertical-rl; font-size: 0.75rem; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; padding: 3px; border-radius: 2px; }
         .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: #fff; border: 2px solid #a58362; border-radius: 16px; text-decoration: none; text-align: left; transition: all 0.3s ease; }
         .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
@@ -834,6 +834,45 @@
             if (window.ResizeObserver) new ResizeObserver(fit).observe(box.parentNode);
             window.addEventListener('resize', fit);
             window.addEventListener('load', fit);
+        })();
+    </script>
+    <script>
+        // 讓印章上下緣與「觀」字筆畫的頂端、底端切齊（依手機實際字型量測）
+        (function () {
+            const wrap = document.querySelector('.title-wrap');
+            const seal = document.querySelector('.title-seal');
+            if (!wrap || !seal) return;
+            function align() {
+                const cs = getComputedStyle(wrap);
+                const size = parseFloat(cs.fontSize);
+                // 1) 用畫布畫出「觀」，掃描像素找出筆畫上下緣（相對於基線）
+                const W = Math.ceil(size * 2), H = Math.ceil(size * 3), base = Math.round(size * 2);
+                const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+                const ctx = cv.getContext('2d');
+                ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillText('觀', size * 0.2, base);
+                const data = ctx.getImageData(0, 0, W, H).data;
+                let top = -1, bottom = -1;
+                for (let y = 0; y < H; y++) {
+                    for (let x = 0; x < W; x++) {
+                        if (data[(y * W + x) * 4 + 3] > 60) { if (top < 0) top = y; bottom = y; break; }
+                    }
+                }
+                if (top < 0) return;
+                // 2) 找出標題文字基線在畫面上的位置
+                const probe = document.createElement('span');
+                probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline;';
+                wrap.appendChild(probe);
+                const baselineY = probe.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+                probe.remove();
+                seal.style.top = (baselineY - (base - top)) + 'px';
+                seal.style.height = (bottom - top + 1) + 'px';
+                seal.style.transform = 'none';
+            }
+            align();
+            if (document.fonts) document.fonts.ready.then(align);
+            window.addEventListener('resize', align);
         })();
     </script>
 </body>
