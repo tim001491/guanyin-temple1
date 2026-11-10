@@ -206,41 +206,22 @@
         .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
         #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
 
-        /* --- 搖籤筒動畫：按下抽籤 → 籤筒傾斜搖動 → 一支籤慢慢冒出、跳出 → 放大顯示籤號 → 籤詩出現 --- */
+        /* --- 抽籤動畫：六十支籤在空中旋轉飛舞 → 其中一支飛到中間、立正放大顯示籤號 → 籤詩出現 --- */
         #qt-overlay { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(244, 241, 234, 0.94); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.35s ease; }
+            background: rgba(244, 241, 234, 0.95); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.35s ease; overflow: hidden; }
         #qt-overlay.show { display: flex; }
         #qt-overlay.visible { opacity: 1; }
-        .qt-stage { position: relative; width: 240px; height: 330px; }
-        .qt-tube { position: absolute; left: 50%; bottom: 20px; width: 118px; height: 190px; margin-left: -59px; transform-origin: 50% 85%; }
-        .qt-inner { position: absolute; left: 0; right: 0; top: -14px; height: 28px; border-radius: 50%; background: radial-gradient(ellipse at 50% 60%, #3a1612, #5e2219 70%, #7a2c22); }
-        .qt-sticks { position: absolute; left: 10px; right: 10px; top: -70px; height: 240px; }
-        .qt-stick { position: absolute; bottom: 0; width: 7px; height: 220px; margin-left: -3.5px; border-radius: 3px 3px 1px 1px;
-            background: linear-gradient(90deg, #c9a46a, #ecd3a0 45%, #d2b07a); box-shadow: inset 0 0 0 0.5px rgba(120, 85, 40, 0.35); }
-        .qt-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 18px; border-radius: 3px 3px 0 0; background: #b5322a; }
-        .qt-body { position: absolute; inset: 0; border-radius: 0 0 50% 50% / 0 0 14px 14px; overflow: hidden;
-            background: #b23a2e; box-shadow: 0 14px 24px rgba(60, 25, 10, 0.25); }
-        .qt-body::before, .qt-body::after { content: ''; position: absolute; z-index: 2; left: 0; right: 0; height: 9px; background: linear-gradient(90deg, #a07a2e, #e8c66e 35%, #f3dc95 45%, #c79a43 70%, #8e6a26); }
-        .qt-body::before { top: 10px; }
-        .qt-body::after { bottom: 16px; }
-        /* 筒身上的字貼在一條會繞圈的帶子上：帶子左右移動 + 兩側陰影 = 籤筒自己在轉 */
-        .qt-strip { position: absolute; top: 0; bottom: 0; left: 0; width: 400px; z-index: 1; }
-        .qt-label { position: absolute; top: 50%; transform: translate(-50%, -46%); writing-mode: vertical-rl; letter-spacing: 0.25em;
-            font-size: 1.5rem; font-weight: 600; color: #f3d98c; text-shadow: 0 1px 0 rgba(80, 30, 10, 0.5); padding: 0.5rem 0.3rem; border: 1px solid rgba(243, 217, 140, 0.55); border-radius: 4px; }
-        .qt-label:nth-child(1) { left: 59px; }
-        .qt-label:nth-child(2) { left: 259px; }
-        .qt-shade { position: absolute; inset: 0; z-index: 3; pointer-events: none;
-            background: linear-gradient(90deg, rgba(40, 8, 4, 0.55) 0%, rgba(40, 8, 4, 0.12) 20%, rgba(255, 220, 190, 0.12) 36%, rgba(0, 0, 0, 0) 55%, rgba(40, 8, 4, 0.18) 78%, rgba(40, 8, 4, 0.6) 100%); }
-        .qt-lip { position: absolute; left: 0; right: 0; top: -14px; height: 28px; border-radius: 50%; border: 3px solid #e2bd66; border-top-color: transparent;
-            clip-path: inset(50% 0 0 0); pointer-events: none; }
-        /* 被抽中的那一支籤 */
-        .qt-chosen { position: absolute; left: 50%; bottom: 120px; width: 11px; height: 220px; margin-left: -5.5px; z-index: 5; border-radius: 4px 4px 2px 2px; transform-origin: 50% 50%;
-            background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 6px 18px rgba(80, 50, 20, 0.25); opacity: 0;
-            display: flex; justify-content: center; padding-top: 30px; }
-        .qt-stick.qt-rising { left: 50%; opacity: 0; }
-        .qt-chosen::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 20px; border-radius: 4px 4px 0 0; background: #b5322a; }
-        .qt-chosen span { writing-mode: vertical-rl; font-size: 11px; line-height: 1; letter-spacing: 0.05em; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
-        .qt-text { margin-top: 1.4rem; min-height: 2em; font-size: 1.15rem; letter-spacing: 0.15em; color: #8a6c4c; transition: opacity 0.3s ease; }
+        .qt-stage { position: relative; width: 320px; height: 380px; }
+        .qt-glow { position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; pointer-events: none;
+            background: radial-gradient(closest-side, rgba(255, 222, 150, 0.55), rgba(255, 222, 150, 0.18) 60%, rgba(255, 222, 150, 0)); }
+        .qt-stick { position: absolute; left: 50%; top: 50%; width: 8px; height: 150px; margin: -75px 0 0 -4px; border-radius: 4px 4px 2px 2px; will-change: transform, opacity;
+            background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 3px 8px rgba(80, 50, 20, 0.18);
+            display: flex; justify-content: center; padding-top: 22px; }
+        .qt-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 14px; border-radius: 4px 4px 0 0; background: #b5322a; }
+        .qt-stick span { writing-mode: vertical-rl; font-size: 7px; line-height: 1; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
+        .qt-stick.chosen { width: 12px; margin-left: -6px; height: 160px; margin-top: -80px; padding-top: 26px; }
+        .qt-stick.chosen span { font-size: 10px; }
+        .qt-text { margin-top: 0.6rem; min-height: 2em; font-size: 1.15rem; letter-spacing: 0.15em; color: #8a6c4c; }
         #poem-card.revealed { animation: qt-reveal 0.7s ease; }
         @keyframes qt-reveal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
     </style>
@@ -373,17 +354,9 @@
 
         </main>
 
-    <!-- 搖籤筒動畫（按「誠心抽一籤」時出現） -->
+    <!-- 抽籤動畫：六十支籤旋轉飛舞（按「誠心抽一籤」時出現） -->
     <div id="qt-overlay" aria-hidden="true">
-        <div class="qt-stage">
-            <div class="qt-tube" id="qt-tube">
-                <div class="qt-inner"></div>
-                <div class="qt-sticks" id="qt-sticks"></div>
-                <div class="qt-body"><div class="qt-strip" id="qt-strip"><span class="qt-label">觀音靈籤</span><span class="qt-label">觀音靈籤</span></div><div class="qt-shade"></div></div>
-                <div class="qt-lip"></div>
-            </div>
-            <div class="qt-chosen" id="qt-chosen"><span id="qt-chosen-text"></span></div>
-        </div>
+        <div class="qt-stage" id="qt-stage"><div class="qt-glow"></div></div>
         <p class="qt-text" id="qt-text"></p>
     </div>
         
@@ -548,134 +521,101 @@
             }
         }
 
-        // --- 搖籤筒動畫：籤筒傾斜搖動 → 一支籤慢慢冒出 → 跳出來放大顯示籤號 → 籤詩出現 ---
+        // --- 抽籤動畫：六十支籤在空中旋轉飛舞 → 其中一支飛到中間放大顯示籤號 → 籤詩出現 ---
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         const randomBetween = (min, max) => min + Math.random() * (max - min);
         const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         const qtOverlay = document.getElementById('qt-overlay');
-        const qtTube = document.getElementById('qt-tube');
-        const qtSticks = document.getElementById('qt-sticks');
-        const qtChosen = document.getElementById('qt-chosen');
-        const qtChosenText = document.getElementById('qt-chosen-text');
+        const qtStage = document.getElementById('qt-stage');
         const qtText = document.getElementById('qt-text');
-        const qtStrip = document.getElementById('qt-strip');
 
-        // 籤筒裡的籤：高低錯落
-        const STICK_COUNT = 13;
-        const stickEls = [];
-        for (let i = 0; i < STICK_COUNT; i++) {
-            const st = document.createElement('div');
-            st.className = 'qt-stick';
-            st.style.left = (6 + i * (88 / (STICK_COUNT - 1))) + '%';
-            const lift = 8 + Math.random() * 30;
-            st.style.transform = `translateY(${-lift}px) rotate(${(i - 6) * 1.4 + randomBetween(-2, 2)}deg)`;
-            st.dataset.lift = lift;
-            qtSticks.appendChild(st);
-            stickEls.push(st);
+        // 第一籤～第六十籤，每支籤上寫著籤號
+        const qtSticks = [];
+        for (let id = 1; id <= 60; id++) {
+            const el = document.createElement('div');
+            el.className = 'qt-stick';
+            const label = document.createElement('span');
+            label.textContent = poems.find(p => p.id === id).title.split(' ')[0];
+            el.appendChild(label);
+            qtStage.appendChild(el);
+            qtSticks.push({ id, el });
         }
-        // 搖的時候慢慢冒出來的那一支（在籤筒裡面，被筒身擋住下半截）
-        const qtRising = document.createElement('div');
-        qtRising.className = 'qt-stick qt-rising';
-        qtSticks.appendChild(qtRising);
+        const easeInOut = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const easeOut = t => 1 - Math.pow(1 - t, 3);
 
-        // 竹籤碰撞的「喀喀」聲（很小聲；手機靜音時不會響）
-        let audioCtx = null;
-        function clack() {
-            try {
-                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-                const t = audioCtx.currentTime;
-                const len = Math.floor(audioCtx.sampleRate * 0.04);
-                const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
-                const data = buf.getChannelData(0);
-                for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
-                const src = audioCtx.createBufferSource();
-                src.buffer = buf;
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = randomBetween(1600, 2600);
-                filter.Q.value = 3;
-                const gain = audioCtx.createGain();
-                gain.gain.value = randomBetween(0.12, 0.22);
-                src.connect(filter).connect(gain).connect(audioCtx.destination);
-                src.start(t);
-            } catch (e) { /* 不支援音效就略過 */ }
-        }
-
-        // 搖籤筒 duration 毫秒：籤筒前傾、來回搖，裡面的籤跟著跳動，被抽中的籤慢慢冒出來
-        async function shakeTube(duration) {
-            // 籤筒直立，在原地一邊自轉、一邊上下輕輕顛動（不再斜著搖）
-            const frames = [];
-            const steps = 40, bounces = Math.max(8, Math.round(duration / 220));
-            for (let k = 0; k <= steps; k++) {
-                const a = (k / steps) * bounces * Math.PI * 2;
-                const fade = k < 3 ? k / 3 : (k > steps - 4 ? (steps - k) / 4 : 1);   // 開頭漸強、最後慢慢收住
-                frames.push({
-                    transform: `translateY(${(-Math.abs(Math.sin(a)) * 10 * fade).toFixed(1)}px) rotate(${(Math.sin(a * 0.5) * 2.5 * fade).toFixed(1)}deg)`,
-                    offset: k / steps
-                });
-            }
-            const anim = qtTube.animate(frames, { duration, easing: 'linear', fill: 'forwards' });
-            // 籤筒自己轉：筒身上的字繞到後面再轉回來（搖籤期間轉 5 圈）
-            const spinAnim = qtStrip.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-200px)' }
-            ], { duration: duration / 5, iterations: 5, easing: 'linear' });
-
-            // 籤在筒裡上下跳動
-            const stickAnims = stickEls.map(st => {
-                const base = st.style.transform;
-                const lift = +st.dataset.lift;
-                return st.animate([
-                    { transform: base },
-                    { transform: base.replace(/translateY\([^)]*\)/, `translateY(${-lift - randomBetween(6, 16)}px)`) },
-                    { transform: base }
-                ], { duration: randomBetween(150, 230), iterations: Infinity, delay: randomBetween(0, 150) });
+        // 每支籤繞著中心轉，一圈一圈像漩渦；前面的大、後面的小又淡，看起來有立體感
+        function placeSticks(finalId) {
+            const heights = [...Array(60).keys()].sort(() => Math.random() - 0.5);
+            qtSticks.forEach((st, i) => {
+                st.theta = randomBetween(0, Math.PI * 2);                               // 散在一圈上的位置
+                st.r = randomBetween(50, 140);                                          // 離中心遠近
+                st.h = (heights[i] / 59 - 0.5) * 230 + randomBetween(-4, 4);            // 高低錯落、平均分布
+                st.speed = 1.35 - (st.r - 50) / 90 * 0.65;                              // 像漩渦：越靠內圈轉越快
+                st.spin = randomBetween(1.5, 3.5) * (Math.random() < 0.5 ? -1 : 1);     // 自己翻轉的速度
+                st.rot0 = randomBetween(0, 360);
+                st.el.classList.toggle('chosen', st.id === finalId);
             });
-
-            // 後半段，被抽中的籤一點一點冒出筒口
-            qtRising.style.opacity = '1';
-            const rise = qtRising.animate([
-                { transform: 'translateY(0)' },
-                { transform: 'translateY(0)', offset: 0.35 },
-                { transform: 'translateY(-30px)', offset: 0.6 },
-                { transform: 'translateY(-45px)', offset: 0.75 },
-                { transform: 'translateY(-80px)' }
-            ], { duration, easing: 'ease-in', fill: 'forwards' });
-
-            const clackTimer = setInterval(() => { clack(); if (Math.random() < 0.5) setTimeout(clack, 40); }, 110);
-            await anim.finished;
-            clearInterval(clackTimer);
-            spinAnim.cancel();
-            stickAnims.forEach(a => a.cancel());
         }
 
-        // 被抽中的籤：從筒口跳出 → 在空中翻轉 → 立正放大到畫面中間，顯示籤號
-        // （起點正好接在筒裡那支冒出 80px 的籤的位置：籤筒直立，所以正好在正中間）
-        async function popChosenStick() {
-            // 筒裡那支先「咻」地整支抽出筒口，再換成外面這支來翻轉，才不會擋在筒身前面
-            qtRising.getAnimations().forEach(a => a.cancel());
-            await qtRising.animate([
-                { transform: 'translateY(-80px)' },
-                { transform: 'translateY(-175px)' }
-            ], { duration: 260, easing: 'ease-in', fill: 'forwards' }).finished;
-            const start = 'translate(0, -95px) rotate(0deg) scale(1)';
-            qtRising.getAnimations().forEach(a => a.cancel());
-            qtRising.style.opacity = '0';
-            qtChosen.style.opacity = '1';
-            qtChosen.style.transform = start;
-            clack();
-            qtTube.animate([
-                { opacity: 1, transform: 'none' },
-                { opacity: 0.1, transform: 'translateY(70px) scale(0.8)' }
-            ], { duration: 900, easing: 'ease-in-out', fill: 'forwards' });
-            await qtChosen.animate([
-                { transform: start },
-                { transform: 'translate(0, -140px) rotate(0deg) scale(1.1)', offset: 0.25 },
-                { transform: 'translate(0, -120px) rotate(360deg) scale(1.3)', offset: 0.6 },
-                { transform: 'translate(0, -10px) rotate(720deg) scale(1.5)' }
-            ], { duration: 1000, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' }).finished;
+        function runDance(finalId, danceMs, gatherMs) {
+            return new Promise(resolve => {
+                const t0 = performance.now();
+                let phase = 0;          // 累積旋轉角度
+                let last = t0;
+                const chosen = qtSticks.find(s => s.id === finalId);
+                let gatherFrom = null;
+
+                function frame(now) {
+                    const t = now - t0;
+                    const dt = (now - last) / 1000;
+                    last = now;
+                    // 速度：0.8 秒內加速，之後保持，最後一段稍微放慢
+                    const speedUp = Math.min(1, t / 800);
+                    const slow = t > danceMs ? Math.max(0.25, 1 - (t - danceMs) / gatherMs) : 1;
+                    phase += dt * 3.6 * speedUp * slow;
+                    const spread = Math.min(1, t / 600);   // 一開始從中間散開
+                    const g = t > danceMs ? Math.min(1, (t - danceMs) / gatherMs) : 0;   // 收尾進度
+
+                    qtSticks.forEach(st => {
+                        const a = st.theta + phase * st.speed;
+                        const depth = Math.sin(a);                 // -1 在後面，1 在前面
+                        let x = Math.cos(a) * st.r * spread;
+                        let y = st.h * spread + depth * 18;
+                        let scale = 0.72 + depth * 0.22;
+                        let rot = st.rot0 + phase * st.spin * 57.3;
+                        let opacity = 0.55 + depth * 0.4;
+                        let z = Math.round((depth + 1) * 50);
+
+                        if (st === chosen && g > 0) {
+                            // 被抽中的籤：從漩渦裡飛到正中間，轉正、放大
+                            if (!gatherFrom) gatherFrom = { x, y, scale, rot: ((rot % 360) + 360) % 360, opacity };
+                            const k = easeInOut(g);
+                            x = gatherFrom.x * (1 - k);
+                            y = gatherFrom.y * (1 - k) - 10 * k;
+                            scale = gatherFrom.scale + (1.9 - gatherFrom.scale) * k;
+                            const target = gatherFrom.rot > 180 ? 720 : 360;   // 多轉一圈再立正
+                            rot = gatherFrom.rot + (target - gatherFrom.rot) * easeOut(g);
+                            opacity = 1;
+                            z = 300;
+                        } else if (g > 0) {
+                            // 其他的籤往外散開、淡去
+                            const k = easeOut(g);
+                            x *= 1 + k * 1.2;
+                            y *= 1 + k * 0.6;
+                            opacity *= 1 - k;
+                        }
+                        st.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+                        st.el.style.opacity = opacity.toFixed(3);
+                        st.el.style.zIndex = z;
+                    });
+
+                    if (g < 1) requestAnimationFrame(frame);
+                    else resolve();
+                }
+                requestAnimationFrame(frame);
+            });
         }
 
         let isDrawing = false;
@@ -687,41 +627,32 @@
             aiSection.classList.remove('show');
 
             const finalId = randomPoemId();
-            const finalPoem = poems.find(p => p.id === finalId);
-            const lotName = finalPoem.title.split(' ')[0];   // 例如「第三十一籤」
-            qtChosenText.textContent = lotName;
+            const lotName = poems.find(p => p.id === finalId).title.split(' ')[0];   // 例如「第三十一籤」
 
-            // 打開籤筒畫面
-            qtChosen.style.opacity = '0';
-            qtChosen.getAnimations().forEach(a => a.cancel());
-            qtTube.getAnimations().forEach(a => a.cancel());
-            qtRising.getAnimations().forEach(a => a.cancel());
-            qtRising.style.opacity = '0';
-            qtText.textContent = '誠心默禱，搖籤中…';
+            placeSticks(finalId);
+            qtSticks.forEach(st => { st.el.style.transform = 'scale(0.3)'; st.el.style.opacity = '0'; });
+            qtText.textContent = '誠心默禱，請籤中…';
             qtOverlay.classList.add('show');
             await sleep(20);
             qtOverlay.classList.add('visible');
-            await sleep(350);
+            await sleep(250);
 
             if (reduceMotion) {
+                const chosen = qtSticks.find(s => s.id === finalId);
+                chosen.el.style.transform = 'translateY(-10px) scale(1.9)';
+                chosen.el.style.opacity = '1';
                 await sleep(500);
-                qtChosen.style.opacity = '1';
-                qtChosen.style.transform = 'translate(0, -10px) scale(1.5)';
-                qtTube.style.opacity = '0.18';
             } else {
-                await shakeTube(randomBetween(2200, 2800));
-                await popChosenStick();
+                await runDance(finalId, randomBetween(2600, 3200), 1300);
             }
             qtText.textContent = '得 ' + lotName;
             await sleep(1300);
 
-            // 關掉籤筒畫面，顯示籤詩
+            // 關掉動畫畫面，顯示籤詩
             displayPoem(finalId);
             qtOverlay.classList.remove('visible');
             await sleep(350);
             qtOverlay.classList.remove('show');
-            qtChosen.style.transform = '';
-            qtTube.style.opacity = '';
             poemCard.classList.remove('revealed');
             void poemCard.offsetWidth;
             poemCard.classList.add('revealed');
