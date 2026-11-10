@@ -115,12 +115,11 @@
         #ai-section.show { display: block; animation: fadeIn 0.6s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         #ai-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1.2rem; }
-        /* 每排兩個按鈕；按鈕是單數時，最後一個置中 */
+        /* 每排兩個按鈕（四個 AI 排成兩排），按鈕同寬 */
         #ai-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
         .ai-link { flex: 0 1 calc(50% - 0.4rem); max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: min(1.1rem, 4.4vw); font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 8px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
         .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
-        #ai-note { color: #9c897a; font-size: 0.85rem; line-height: 1.7; margin-top: 0.9rem; }
-        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.4rem; min-height: 1.2em; }
+        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
         /* --- 開場動畫 --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 1000; background: #f4f1ea; overflow: hidden; transition: opacity 1s ease, visibility 1s ease; }
         #intro-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -293,11 +292,9 @@
                 <div id="ai-buttons">
                     <a id="google-ai-link" class="ai-link" href="#" target="_blank" rel="noopener">Google AI 解籤</a>
                     <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
-                    <a id="deepseek-link" class="ai-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener">DeepSeek 解籤</a>
-                    <a id="grok-link" class="ai-link" href="#" target="_blank" rel="noopener">Grok 解籤</a>
+                    <a id="copilot-link" class="ai-link" href="#" target="_blank" rel="noopener">Copilot 解籤</a>
                     <a id="perplexity-link" class="ai-link" href="#" target="_blank" rel="noopener">Perplexity 解籤</a>
                 </div>
-                <p id="ai-note">DeepSeek、Grok 需先登入（免費）。DeepSeek 不會自動帶入，打開後在輸入框長按「貼上」即可。</p>
                 <p id="ai-copied"></p>
                 <p id="calm-note">心若不安，不妨先<a class="breathe-link" href="breathe.html?from=lot">靜心呼吸一下</a>。</p>
             </div>
@@ -465,7 +462,7 @@
         const calmNote = document.getElementById('calm-note');
         const googleAiLink = document.getElementById('google-ai-link');
         const chatgptLink = document.getElementById('chatgpt-link');
-        const grokLink = document.getElementById('grok-link');
+        const copilotLink = document.getElementById('copilot-link');
         const perplexityLink = document.getElementById('perplexity-link');
         const aiCopiedEl = document.getElementById('ai-copied');
         const dateDisplayEl = document.getElementById('date-display');
@@ -656,14 +653,14 @@
             const timePart = b.yearPillar ? ` 求籤時間 ${b.yearPillar}年${b.monthPillar}月${b.dayPillar}日${b.hourPillar}時` : '';
             const code = getLotCode();
             const codePart = code ? ` 籤序${code}只是編號 不論籤序的五行屬性季節方位` : '';
-            const googleQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照${codePart} 白話解籤 推算一個月內或三個月內何時撥雲見日`;
-            googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(googleQuery)}`;
-            // ChatGPT、Grok、Perplexity：網址可自動帶入，送完整提問
+            const searchQuery = `觀音靈籤 籤詩「${getPoemText()}」${timePart} 籤詩內容與年月日時干支五行互相參照${codePart} 白話解籤 推算一個月內或三個月內何時撥雲見日`;
+            googleAiLink.href = `https://www.google.com/search?udm=50&q=${encodeURIComponent(searchQuery)}`;
+            // Microsoft Copilot 搜尋（Bing）：免登入，和 Google 一樣送簡短查詢
+            copilotLink.href = `https://www.bing.com/copilotsearch?q=${encodeURIComponent(searchQuery)}`;
+            // ChatGPT、Perplexity：免登入，網址自動帶入完整提問
             const fullPrompt = encodeURIComponent(buildAIPrompt());
             chatgptLink.href = `https://chatgpt.com/?q=${fullPrompt}`;
-            grokLink.href = `https://grok.com/?q=${fullPrompt}`;
             perplexityLink.href = `https://www.perplexity.ai/search?q=${fullPrompt}`;
-            // DeepSeek 網址無法帶入提問：按鈕直接開 DeepSeek，點按時已複製提問，訪客貼上即可
             aiCopiedEl.textContent = '';
             aiSection.classList.add('show');
         }
