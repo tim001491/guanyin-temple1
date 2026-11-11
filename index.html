@@ -777,9 +777,10 @@
         function animateToss(cell, flats) {
             const [a, b] = cell.querySelectorAll('.jiao');
             const dur = reduceMotion ? 300 : 1050;
+            // 落地的位置和方向都隨機（兩個不會疊在一起）
             const land = [
-                { x: -19 + randomBetween(-3, 3), y: 6, r: -14 + randomBetween(-8, 8) },
-                { x: 19 + randomBetween(-3, 3), y: 10, r: 12 + randomBetween(-8, 8) }
+                { x: randomBetween(-23, -14), y: randomBetween(-4, 12), r: randomBetween(-180, 180) },
+                { x: randomBetween(14, 23), y: randomBetween(-4, 12), r: randomBetween(-180, 180) }
             ];
             const anims = [a, b].map((el, k) => {
                 const dir = k === 0 ? -1 : 1;
