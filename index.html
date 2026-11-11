@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>觀音靈籤</title>
+    <title>觀音靈籤｜觀瀑觀音禪寺線上靈籤</title>
+    <meta name="description" content="觀瀑觀音禪寺線上靈籤：轉動六十支觀音靈籤，連擲三個聖筊求得籤詩，並可一鍵請 AI 白話解籤。免費使用，也可線上點一盞光明球燈。">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="觀音靈籤｜觀瀑觀音禪寺線上靈籤">
+    <meta property="og:description" content="轉動六十支觀音靈籤，連擲三個聖筊求得籤詩，並可一鍵請 AI 白話解籤。">
+    <meta property="og:url" content="https://xn--dett40e76kpzn.online/">
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4f1ea">
@@ -11,7 +16,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.8/lunar.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
@@ -253,6 +258,7 @@
 
         #poem-card.revealed { animation: qt-reveal 0.7s ease; }
         @keyframes qt-reveal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+        .footer-disclaimer { font-size: 0.78rem; color: #9c897a; margin-top: 0.3rem; }
     </style>
 </head>
 <body class="intro-playing">
@@ -401,6 +407,7 @@
 
         <footer>
             <p>僅供參考，心誠則靈</p>
+            <p class="footer-disclaimer">籤詩與 AI 解籤僅供心靈參考，不能取代醫療、法律、投資等專業意見。</p>
             
             <div class="footer-links">
                 <a href="about.html">關於我們</a> |
@@ -518,7 +525,7 @@
             { "id": 57, "title": "第五十七籤 癸巳", "poem": "勸君把定心莫虛，前途清吉得運時。\n到底中間無大事，又遇神仙守安居。", "interpretation": "上吉。堅定心志，時來運轉，無災無難，神仙守護。" },
             { "id": 58, "title": "第五十八籤 癸未", "poem": "蛇身意欲變成龍，只恐命內運未通。\n久病且作寬心坐，言語雖多不可從。", "interpretation": "中平。有心轉變，時運未到，耐心等待，莫聽閒言。" },
             { "id": 59, "title": "第五十九籤 癸酉", "poem": "有心作福莫遲疑，求名清吉正當時。\n此事必能成會合，財寶自然喜相隨。", "interpretation": "大吉。行善勿疑，求名當時，諸事可成，財寶自來。" },
-            { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，当官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
+            { "id": 60, "title": "第六十籤 癸亥", "poem": "月出光輝本清吉，浮雲總是蔽陰色。\n戶內用心再作福，當官分理便有益。", "interpretation": "中吉。月被雲遮，光明未全，用心作福，便有益處。" }
         ];
 
         // --- DOM ELEMENTS ---
@@ -1126,7 +1133,9 @@
                 const lunar = Lunar.fromDate(today);
 
                 const gregorianStr = `${today.getFullYear()}年 ${today.getMonth() + 1}月 ${today.getDate()}日`;
-                const lunarStr = `農曆 ${lunar.getYearInGanZhi()}(${lunar.getYearShengXiao()})年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`;
+                // 農曆程式回傳的是簡體字（例如「马」「腊」「闰」），轉成繁體
+                const toTrad = str => str.replace(/[马龙鸡猪腊闰]/g, c => ({ '马': '馬', '龙': '龍', '鸡': '雞', '猪': '豬', '腊': '臘', '闰': '閏' })[c]);
+                const lunarStr = toTrad(`農曆 ${lunar.getYearInGanZhi()}(${lunar.getYearShengXiao()})年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`);
                 
                 // 【修改處】使用 innerHTML 和 <br> 來換行
                 dateDisplayEl.innerHTML = `今天是：${gregorianStr}<br>（${lunarStr}）`;

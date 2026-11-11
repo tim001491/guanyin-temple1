@@ -1,12 +1,12 @@
 // Service Worker for PWA
 
-const CACHE_NAME = 'guanyin-fortune-cache-v2';
+const CACHE_NAME = 'guanyin-fortune-cache-v3';
 // List of files to cache.
 const urlsToCache = [
   '/',
   'index.html',
   'manifest.json',
-  'https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js',
+  'https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.8/lunar.min.js',
   'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap',
   'icons/icon-192x192.png',
   'icons/icon-512x512.png'
