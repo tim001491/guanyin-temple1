@@ -132,7 +132,7 @@
         .wheel-glow { position: absolute; left: 50%; top: 50%; width: 300px; height: 170px; margin: -85px 0 0 -150px; border-radius: 50%; pointer-events: none;
             background: radial-gradient(closest-side, rgba(255, 222, 150, 0.5), rgba(255, 222, 150, 0.15) 60%, rgba(255, 222, 150, 0)); }
         .wheel-marker { position: absolute; left: 50%; bottom: 3px; margin-left: -7px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 9px solid #c9a25a; pointer-events: none; }
-        .wheel-hint { margin: 0.35rem 0 0; font-size: 0.85rem; letter-spacing: 0.12em; color: #a58362; text-align: center; }
+        .wheel-hint { margin: 0.5rem 0 -0.4rem; position: relative; z-index: 1; font-size: 0.85rem; letter-spacing: 0.12em; color: #a58362; text-align: center; }
         .wh-arrow { display: inline-block; margin: 0 0.5em; color: #c9a25a; font-weight: 700; }
         .wh-left { animation: wh-left 1.8s ease-in-out infinite; }
         .wh-right { animation: wh-right 1.8s ease-in-out infinite; }
@@ -342,11 +342,11 @@
                     </svg>
                     <div class="jiao-row" id="jiao-row"></div>
                     <p id="draw-status"></p>
+                    <p class="wheel-hint" aria-hidden="true"><span class="wh-arrow wh-left">‹‹</span>籤可用手左右滑動<span class="wh-arrow wh-right">››</span></p>
                     <div class="stick-wheel" id="stick-wheel" aria-label="六十支籤，可左右滑動轉動">
                         <div class="wheel-glow"></div>
                         <div class="wheel-marker"></div>
                     </div>
-                    <p class="wheel-hint" aria-hidden="true"><span class="wh-arrow wh-left">‹‹</span>籤可用手左右滑動<span class="wh-arrow wh-right">››</span></p>
                 </div>
                 <h2 id="poem-title"></h2>
                 <p id="poem-content"></p>
