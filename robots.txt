@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xn--dett40e76kpzn.online/sitemap.xml
