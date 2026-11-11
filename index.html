@@ -108,7 +108,8 @@
         .jiao-cell { position: relative; font-family: inherit; color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.3rem;
             min-height: 108px; padding: 0.5rem 0.2rem 0.55rem; background: #faf6ef; border: 1px solid #e6dccb; border-radius: 10px; cursor: pointer;
             transition: opacity 0.3s, border-color 0.3s, background-color 0.3s; -webkit-tap-highlight-color: transparent; }
-        .jiao-cell:disabled { cursor: default; opacity: 0.55; }
+        .jiao-cell:disabled { cursor: default; }
+        .jiao-cell:disabled:not(.ok):not(.bad):not(.tossing) .jiao-label { color: #c2b3a2; }
         .jiao-cell.active { opacity: 1; border-color: #c9a25a; animation: jiao-pulse 1.6s ease-in-out infinite; }
         @keyframes jiao-pulse { 0%, 100% { box-shadow: 0 0 0 2px rgba(214, 178, 100, 0.25); } 50% { box-shadow: 0 0 0 6px rgba(214, 178, 100, 0.12); } }
         .jiao-cell.tossing { opacity: 1; z-index: 5; }
@@ -329,8 +330,8 @@
                 <div id="draw-ui">
                     <svg width="0" height="0" aria-hidden="true" style="position:absolute">
                         <defs>
-                            <radialGradient id="jiao-round-grad" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#e2634f"/><stop offset=".5" stop-color="#b8362b"/><stop offset="1" stop-color="#7a1f18"/></radialGradient>
-                            <linearGradient id="jiao-flat-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0aa70"/><stop offset="1" stop-color="#b07a45"/></linearGradient>
+                            <radialGradient id="jiao-round-grad" cx="40%" cy="30%" r="85%"><stop offset="0" stop-color="#ff7a78"/><stop offset=".45" stop-color="#ee2f3b"/><stop offset="1" stop-color="#b3121f"/></radialGradient>
+                            <linearGradient id="jiao-flat-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a6e"/><stop offset="1" stop-color="#f05a3c"/></linearGradient>
                         </defs>
                     </svg>
                     <div class="jiao-row" id="jiao-row"></div>
@@ -729,17 +730,17 @@
         // 一個筊杯（月牙形）：凸面是紅色亮面，平面是木色平面
         const JIAO_PATH = 'M-34 10 C-34 -26 34 -26 34 10 C22 4 -22 4 -34 10 Z';
         const JIAO_SVG = `<svg viewBox="-36 -22 72 36" aria-hidden="true">
-            <g class="face-round"><path d="${JIAO_PATH}" fill="url(#jiao-round-grad)"/><path d="M-20 -8 C-10 -15 6 -16 15 -11" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/></g>
-            <g class="face-flat"><path d="${JIAO_PATH}" fill="#8f2a20"/><path d="M-30 7 C-29 -19 29 -19 30 7 C19 1 -19 1 -30 7 Z" fill="url(#jiao-flat-grad)"/></g></svg>`;
+            <g class="face-round"><path d="${JIAO_PATH}" fill="url(#jiao-round-grad)"/><path d="M-20 -8 C-10 -15 6 -16 15 -11" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3.5" stroke-linecap="round"/></g>
+            <g class="face-flat"><path d="${JIAO_PATH}" fill="#c4161f"/><path d="M-30 7 C-29 -19 29 -19 30 7 C19 1 -19 1 -30 7 Z" fill="url(#jiao-flat-grad)"/></g></svg>`;
         const JIAO_NAMES = ['第一筊', '第二筊', '第三筊'];
         const RESULT = {
             sheng: { name: '聖筊', desc: '一平一凸' },
             xiao: { name: '笑筊', desc: '兩個平面朝上' },
             yin: { name: '陰筊', desc: '兩個凸面朝上' }
         };
-        // 還沒擲時，一對筊杯並排放著（凸面朝上）
-        const IDLE_A = 'translate(-20px, 5px) rotate(-3deg) scaleY(1)';
-        const IDLE_B = 'translate(20px, 9px) rotate(7deg) scaleY(1)';
+        // 準備擲筊時：一對筊杯直立、平面相對，像 ( ) 的樣子
+        const IDLE_A = 'translate(-13px, 0px) rotate(-90deg) scaleY(1.1)';
+        const IDLE_B = 'translate(13px, 0px) rotate(90deg) scaleY(1.1)';
 
         jiaoRow.innerHTML = JIAO_NAMES.map((name, n) => `
             <button type="button" class="jiao-cell" data-n="${n}" disabled aria-label="擲${name}">
