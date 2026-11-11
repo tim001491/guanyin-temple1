@@ -640,6 +640,7 @@
 
         // 轉盤停下：正前方那支就是選中的籤
         function onWheelStopped() {
+            buttonSpinning = false;
             phase = nearestSlot(phase);
             selectedIdx = frontIndex();
             wSticks[selectedIdx].classList.add('selected');
@@ -657,8 +658,29 @@
             resetJiao();
         }
 
-        // 按鈕：轉三圈多後自然停在隨機一支籤
+        // 目前轉速（弧度／秒），由轉動曲線 ease-out 算出
+        function glideVelocity() {
+            if (!glide) return 0;
+            const p = Math.min(1, (performance.now() - glide.start) / glide.duration);
+            return 3 * Math.pow(1 - p, 2) * (glide.to - glide.from) / (glide.duration / 1000);
+        }
+        // 轉動中再按一次按鈕：順著目前的速度，很快地自然停下
+        function stopSpin() {
+            const v = glideVelocity();
+            if (Math.abs(v) < 0.5) return;
+            const dir = Math.sign(v);
+            let target = nearestSlot(phase + v * 0.35);
+            if ((target - phase) * dir <= 0) target += dir * STEP;
+            const duration = Math.min(2500, Math.max(500, 3000 * Math.abs(target - phase) / Math.abs(v)));
+            drawButton.disabled = true;
+            drawButton.textContent = '停籤中…';
+            glideTo(target, duration, onWheelStopped);
+        }
+
+        // 按鈕：轉三圈多後自然停在隨機一支籤；轉動中再按一次就停
+        let buttonSpinning = false;
         function drawLot() {
+            if (buttonSpinning && glide) { buttonSpinning = false; stopSpin(); return; }
             if (tossing || revealing || glide) return;
             if (!poemCard.classList.contains('welcome')) {          // 已在看籤詩 → 回到抽籤畫面
                 displayPoem(0);
@@ -669,9 +691,10 @@
             let target = FRONT + idx * STEP;
             const minTravel = reduceMotion ? STEP : Math.PI * 2 * 3;
             while (target < phase + minTravel) target += Math.PI * 2;
-            drawButton.disabled = true;
-            drawButton.textContent = '轉籤中…';
+            drawButton.disabled = false;
+            drawButton.textContent = '按一下停籤';
             setStatus('誠心默禱，轉籤中…');
+            buttonSpinning = true;
             glideTo(target, reduceMotion ? 600 : randomBetween(4000, 4600), onWheelStopped);
         }
 
@@ -681,7 +704,8 @@
             if (tossing || revealing || !poemCard.classList.contains('welcome')) return;
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             const wasMoving = !!glide;
-            stopGlide();                                            // 轉動中按住 → 抓住停下
+            stopGlide();
+            if (buttonSpinning) { buttonSpinning = false; drawButton.disabled = true; drawButton.textContent = '轉籤中…'; }                                            // 轉動中按住 → 抓住停下
             drag = { id: e.pointerId, startX: e.clientX, lastX: e.clientX, moved: false, wasMoving, samples: [{ t: e.timeStamp, x: e.clientX }] };
         });
         wheel.addEventListener('pointermove', e => {
