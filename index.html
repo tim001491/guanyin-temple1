@@ -98,14 +98,44 @@
 
         #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
         #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
-        /* 尚未抽籤時：籤卡上顯示籤筒與筊杯 */
-        #poem-welcome { display: none; width: 100%; }
-        #poem-card.welcome #poem-welcome { display: block; }
+        /* --- 籤卡（還沒求到籤時）：上半部三格筊杯、下半部可滑動旋轉的六十支籤 --- */
+        #draw-ui { display: none; width: 100%; transition: opacity 0.3s ease; }
+        #draw-ui.fade-out { opacity: 0; }
+        #poem-card.welcome { padding: 1.3rem 0.8rem 0.9rem; }
+        #poem-card.welcome #draw-ui { display: block; }
         #poem-card.welcome #poem-title, #poem-card.welcome #poem-content { display: none; }
-        #poem-welcome svg { display: block; width: 100%; max-width: 300px; margin: 0 auto; }
-        .qtw-glow { animation: qtw-breathe 6s ease-in-out infinite; transform-origin: 140px 105px; }
-        @keyframes qtw-breathe { 0%, 100% { opacity: .55; transform: scale(.95); } 50% { opacity: 1; transform: scale(1.04); } }
-        .qtw-caption { margin-top: 1rem; font-size: 1rem; letter-spacing: 0.15em; color: #a58362; }
+        .jiao-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .jiao-cell { position: relative; font-family: inherit; color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.3rem;
+            min-height: 108px; padding: 0.5rem 0.2rem 0.55rem; background: #faf6ef; border: 1px solid #e6dccb; border-radius: 10px; cursor: pointer;
+            transition: opacity 0.3s, border-color 0.3s, background-color 0.3s; -webkit-tap-highlight-color: transparent; }
+        .jiao-cell:disabled { cursor: default; opacity: 0.55; }
+        .jiao-cell.active { opacity: 1; border-color: #c9a25a; animation: jiao-pulse 1.6s ease-in-out infinite; }
+        @keyframes jiao-pulse { 0%, 100% { box-shadow: 0 0 0 2px rgba(214, 178, 100, 0.25); } 50% { box-shadow: 0 0 0 6px rgba(214, 178, 100, 0.12); } }
+        .jiao-cell.tossing { opacity: 1; z-index: 5; }
+        .jiao-cell.ok { opacity: 1; background: #fff7ea; border-color: #d9b46e; }
+        .jiao-cell.bad { opacity: 1; background: #f3f0eb; border-color: #d8d0c4; }
+        .jiao-pair { position: relative; width: 84px; height: 54px; pointer-events: none; }
+        .jiao { position: absolute; left: 50%; top: 50%; width: 40px; height: 20px; margin: -10px 0 0 -20px; }
+        .jiao svg { display: block; width: 100%; height: 100%; overflow: visible; }
+        .jiao .face-flat, .jiao.flat .face-round { display: none; }
+        .jiao.flat .face-flat { display: inline; }
+        .jiao-label { font-size: 0.85rem; letter-spacing: 0.08em; color: #8a6c4c; white-space: nowrap; }
+        .jiao-cell.ok .jiao-label { color: #b5322a; font-weight: 600; }
+        .jiao-cell.bad .jiao-label { color: #8f8578; font-weight: 600; }
+        #draw-status { display: flex; align-items: center; justify-content: center; min-height: 3.4em; margin: 0.7rem 0 0; text-align: center;
+            font-size: 0.98rem; line-height: 1.6; letter-spacing: 0.05em; color: #7a604a; }
+        #draw-status b { color: #b5322a; font-size: 1.1rem; margin: 0 0.15em; }
+        .stick-wheel { position: relative; height: 200px; margin: 0 -0.8rem; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+        .stick-wheel.dragging { cursor: grabbing; }
+        .stick-wheel.locked { cursor: default; }
+        .wheel-glow { position: absolute; left: 50%; top: 50%; width: 300px; height: 170px; margin: -85px 0 0 -150px; border-radius: 50%; pointer-events: none;
+            background: radial-gradient(closest-side, rgba(255, 222, 150, 0.5), rgba(255, 222, 150, 0.15) 60%, rgba(255, 222, 150, 0)); }
+        .wheel-marker { position: absolute; left: 50%; bottom: 3px; margin-left: -7px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 9px solid #c9a25a; pointer-events: none; }
+        .w-stick { position: absolute; left: 50%; top: 50%; width: 7px; height: 112px; margin: -56px 0 0 -3.5px; border-radius: 3px 3px 2px 2px; pointer-events: none;
+            background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 2px 6px rgba(80, 50, 20, 0.16); display: flex; justify-content: center; padding-top: 16px; }
+        .w-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 11px; border-radius: 3px 3px 0 0; background: #b5322a; }
+        .w-stick span { writing-mode: vertical-rl; font-size: 6.5px; line-height: 1; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
+        .w-stick.selected { box-shadow: 0 0 0 1.5px #e3bd62, 0 0 14px 4px rgba(240, 196, 90, 0.6); }
         #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
         
         #poem-content { 
@@ -214,22 +244,6 @@
         .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
         #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
 
-        /* --- 抽籤動畫：六十支籤依序排成一圈整齊旋轉 → 慢慢停下，正前方那支升起放大顯示籤號 → 籤詩出現 --- */
-        #qt-overlay { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(244, 241, 234, 0.95); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.35s ease; overflow: hidden; }
-        #qt-overlay.show { display: flex; }
-        #qt-overlay.visible { opacity: 1; }
-        .qt-stage { position: relative; width: 320px; height: 380px; }
-        .qt-glow { position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; pointer-events: none;
-            background: radial-gradient(closest-side, rgba(255, 222, 150, 0.55), rgba(255, 222, 150, 0.18) 60%, rgba(255, 222, 150, 0)); }
-        .qt-stick { position: absolute; left: 50%; top: 50%; width: 8px; height: 150px; margin: -75px 0 0 -4px; border-radius: 4px 4px 2px 2px; will-change: transform, opacity;
-            background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 3px 8px rgba(80, 50, 20, 0.18);
-            display: flex; justify-content: center; padding-top: 22px; }
-        .qt-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 14px; border-radius: 4px 4px 0 0; background: #b5322a; }
-        .qt-stick span { writing-mode: vertical-rl; font-size: 7px; line-height: 1; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
-        .qt-stick.chosen { width: 12px; margin-left: -6px; height: 160px; margin-top: -80px; padding-top: 26px; }
-        .qt-stick.chosen span { font-size: 10px; }
-        .qt-text { margin-top: 0.6rem; min-height: 2em; font-size: 1.15rem; letter-spacing: 0.15em; color: #8a6c4c; }
         #poem-card.revealed { animation: qt-reveal 0.7s ease; }
         @keyframes qt-reveal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
     </style>
@@ -311,44 +325,20 @@
         
         <main>
             <div id="poem-card" class="welcome">
-                <!-- 首頁初始畫面：籤筒與筊杯 -->
-                <div id="poem-welcome" aria-label="籤筒與筊杯">
-                    <svg viewBox="0 -8 280 218" role="img" xmlns="http://www.w3.org/2000/svg">
+                <!-- 還沒求到籤時：上半部三格筊杯，下半部可滑動旋轉的六十支籤 -->
+                <div id="draw-ui">
+                    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
                         <defs>
-                            <radialGradient id="qtw-glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe29a" stop-opacity=".7"/><stop offset="1" stop-color="#ffe29a" stop-opacity="0"/></radialGradient>
-                            <linearGradient id="qtw-bamboo" x1="0" x2="1"><stop offset="0" stop-color="#c9a46a"/><stop offset=".45" stop-color="#f0d9a8"/><stop offset="1" stop-color="#d2b07a"/></linearGradient>
-                            <linearGradient id="qtw-red" x1="0" x2="1"><stop offset="0" stop-color="#7a221b"/><stop offset=".25" stop-color="#b23a2e"/><stop offset=".42" stop-color="#cd5040"/><stop offset=".7" stop-color="#a8352a"/><stop offset="1" stop-color="#6e1e18"/></linearGradient>
-                            <linearGradient id="qtw-gold" x1="0" x2="1"><stop offset="0" stop-color="#8e6a26"/><stop offset=".4" stop-color="#f3dc95"/><stop offset=".7" stop-color="#c79a43"/><stop offset="1" stop-color="#8e6a26"/></linearGradient>
-                            <radialGradient id="qtw-cup-round" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#e2634f"/><stop offset=".5" stop-color="#b8362b"/><stop offset="1" stop-color="#7a1f18"/></radialGradient>
-                            <linearGradient id="qtw-cup-flat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a066"/><stop offset="1" stop-color="#b07a45"/></linearGradient>
+                            <radialGradient id="jiao-round-grad" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#e2634f"/><stop offset=".5" stop-color="#b8362b"/><stop offset="1" stop-color="#7a1f18"/></radialGradient>
+                            <linearGradient id="jiao-flat-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0aa70"/><stop offset="1" stop-color="#b07a45"/></linearGradient>
                         </defs>
-                        <ellipse class="qtw-glow" cx="140" cy="105" rx="130" ry="95" fill="url(#qtw-glow)"/>
-                        <ellipse cx="140" cy="196" rx="120" ry="9" fill="#5a3a20" opacity=".12"/>
-                        <!-- 籤筒 -->
-                        <g transform="translate(-6 0)">
-                            <ellipse cx="114" cy="78" rx="42" ry="10" fill="#4a1a14"/>
-                            <g transform="translate(0 -22)"><g transform="rotate(-8.0 86 120)"><rect x="83" y="24" width="6" height="96" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="83" y="24" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(-6.7 93 120)"><rect x="90" y="26" width="6" height="94" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="90" y="26" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(-3.6 100 120)"><rect x="97" y="16" width="6" height="104" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="97" y="16" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(-3.0 107 120)"><rect x="104" y="17" width="6" height="103" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="104" y="17" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(1.6 114 120)"><rect x="111" y="15" width="6" height="105" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="111" y="15" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(0.6 121 120)"><rect x="118" y="20" width="6" height="100" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="118" y="20" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(4.6 128 120)"><rect x="125" y="27" width="6" height="93" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="125" y="27" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(5.7 135 120)"><rect x="132" y="21" width="6" height="99" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="132" y="21" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(8.0 142 120)"><rect x="139" y="27" width="6" height="93" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="139" y="27" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(-7.5 97 120)"><rect x="94" y="32" width="6" height="88" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="94" y="32" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(-0.5 111 120)"><rect x="108" y="21" width="6" height="99" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="108" y="21" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(5.6 125 120)"><rect x="122" y="32" width="6" height="88" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="122" y="32" width="6" height="11" rx="2.5" fill="#b5322a"/></g><g transform="rotate(9.1 139 120)"><rect x="136" y="32" width="6" height="88" rx="2.5" fill="url(#qtw-bamboo)"/><rect x="136" y="32" width="6" height="11" rx="2.5" fill="#b5322a"/></g></g>
-                            <path d="M72 78 V184 A42 10 0 0 0 156 184 V78 A42 10 0 0 1 72 78 Z" fill="url(#qtw-red)"/>
-                            <path d="M72 88 A42 10 0 0 0 156 88 V95 A42 10 0 0 1 72 95 Z" fill="url(#qtw-gold)"/>
-                            <path d="M72 168 A42 10 0 0 0 156 168 V175 A42 10 0 0 1 72 175 Z" fill="url(#qtw-gold)"/>
-                            <path d="M72 78 A42 10 0 0 0 156 78" fill="none" stroke="#e2bd66" stroke-width="3"/>
-                            <rect x="101" y="108" width="26" height="56" rx="3" fill="none" stroke="#f3d98c" stroke-opacity=".6"/>
-                            <text x="114" y="136" fill="#f3d98c" font-size="12.5" font-weight="600" text-anchor="middle" writing-mode="tb" letter-spacing="1.5" style="font-family:'Noto Serif TC',serif">觀音靈籤</text>
-                        </g>
-                        <!-- 筊杯一對：一個凸面朝上、一個平面朝上（聖筊） -->
-                        <g transform="translate(190 176) rotate(-8)">
-                            <ellipse cx="0" cy="13" rx="34" ry="4" fill="#5a3a20" opacity=".15"/>
-                            <path d="M-36 10 C-36 -26 36 -26 36 10 C22 4 -22 4 -36 10 Z" fill="url(#qtw-cup-round)"/>
-                            <path d="M-22 -8 C-12 -16 6 -17 16 -12" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>
-                        </g>
-                        <g transform="translate(240 190) rotate(10)">
-                            <ellipse cx="0" cy="8" rx="30" ry="3.5" fill="#5a3a20" opacity=".15"/>
-                            <path d="M-32 6 C-30 -14 30 -14 32 6 C20 1 -20 1 -32 6 Z" fill="#8f2a20"/>
-                            <path d="M-28 3 C-25 -10 25 -10 28 3 C18 -1 -18 -1 -28 3 Z" fill="url(#qtw-cup-flat)"/>
-                            <path d="M-18 -4 C-8 -7 8 -7 18 -4" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.5" stroke-linecap="round"/>
-                        </g>
                     </svg>
-                    <p class="qtw-caption">誠心默禱・擲筊請示・恭請靈籤</p>
+                    <div class="jiao-row" id="jiao-row"></div>
+                    <p id="draw-status"></p>
+                    <div class="stick-wheel" id="stick-wheel" aria-label="六十支籤，可左右滑動轉動">
+                        <div class="wheel-glow"></div>
+                        <div class="wheel-marker"></div>
+                    </div>
                 </div>
                 <h2 id="poem-title"></h2>
                 <p id="poem-content"></p>
@@ -401,12 +391,6 @@
 
         </main>
 
-    <!-- 抽籤動畫：六十支籤排成一圈旋轉（按「誠心抽一籤」時出現） -->
-    <div id="qt-overlay" aria-hidden="true">
-        <div class="qt-stage" id="qt-stage"><div class="qt-glow"></div></div>
-        <p class="qt-text" id="qt-text"></p>
-    </div>
-        
         <footer>
             <p>僅供參考，心誠則靈</p>
             
@@ -564,141 +548,338 @@
                 }
                 
                 poemContentEl.innerHTML = formattedPoem;
-                poemCard.classList.toggle('welcome', poem.id === 0);   // 籤頭時顯示籤筒與筊杯
+                poemCard.classList.toggle('welcome', poem.id === 0);   // 籤頭時顯示擲筊與轉籤的畫面
                 currentPoem = { title: poem.title, text: poem.poem, interpretation: poem.interpretation };
             }
         }
 
-        // --- 抽籤動畫：六十支籤依序排成一圈整齊旋轉 → 慢慢停下 → 正前方那支升起放大顯示籤號 → 籤詩出現 ---
+        // --- 抽籤：下半部六十支籤排成一圈，可用手指左右滑動、放開後自己慢慢停下，或按「誠心抽一籤」讓它轉動後自然停下；
+        //     停下時正前方那支就是選中的籤。再依序點上半部三個筊杯，連得三個聖筊（一平一凸），這支籤才算數 ---
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         const randomBetween = (min, max) => min + Math.random() * (max - min);
-        const randomPoemId = () => Math.floor(Math.random() * 60) + 1;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const lotNameOf = id => poems.find(p => p.id === id).title.split(' ')[0];   // 例如「第三十一籤」
 
-        const qtOverlay = document.getElementById('qt-overlay');
-        const qtStage = document.getElementById('qt-stage');
-        const qtText = document.getElementById('qt-text');
+        const drawUI = document.getElementById('draw-ui');
+        const drawStatus = document.getElementById('draw-status');
+        const jiaoRow = document.getElementById('jiao-row');
+        const wheel = document.getElementById('stick-wheel');
+        const setStatus = html => { drawStatus.innerHTML = `<span>${html}</span>`; };
+        const START_HINT = '左右滑動下方的籤，或按「誠心抽一籤」轉動';
 
-        // 第一籤～第六十籤，每支籤上寫著籤號
-        const qtSticks = [];
-        for (let id = 1; id <= 60; id++) {
+        // ===== 下半部：六十支籤的轉盤 =====
+        const STICK_N = 60, STEP = Math.PI * 2 / STICK_N, FRONT = Math.PI / 2;
+        const wSticks = [];
+        for (let i = 0; i < STICK_N; i++) {
             const el = document.createElement('div');
-            el.className = 'qt-stick';
+            el.className = 'w-stick';
             const label = document.createElement('span');
-            label.textContent = poems.find(p => p.id === id).title.split(' ')[0];
+            label.textContent = lotNameOf(i + 1);
             el.appendChild(label);
-            qtStage.appendChild(el);
-            qtSticks.push({ id, el });
+            wheel.appendChild(el);
+            wSticks.push(el);
         }
+        let phase = FRONT;          // 轉盤目前轉到的角度（第 i 支籤的位置 = phase − i × STEP）
+        let ringR = 130;            // 圈的半徑，依畫面寬度調整
+        let selectedIdx = -1;       // 選中的籤（0～59），-1 表示還沒選
+        let lift = 0;               // 選中的籤往上浮起的程度 0～1
+        let glide = null, glideRaf = 0;
+        let tossing = false, revealing = false;
 
-        // 六十支籤依序（第一籤～第六十籤）直立排成一圈，像走馬燈一樣整齊地轉；
-        // 轉到前面的大而清楚，轉到後面的小而淡
-        const RING_R = 135;
-        function placeSticks(finalId) {
-            qtSticks.forEach((st, i) => {
-                st.theta = (i / 60) * Math.PI * 2;
-                st.el.classList.toggle('chosen', st.id === finalId);
-            });
-        }
-        // 先慢慢起轉、中間轉快、最後慢慢停下
-        const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-        function runDance(finalId, danceMs, gatherMs) {
-            return new Promise(resolve => {
-                const chosen = qtSticks.find(s => s.id === finalId);
-                // 算好總共要轉多少，讓抽中的那支剛好停在正前方（轉約三圈）
-                const front = Math.PI / 2;
-                let total = front - chosen.theta;
-                total = ((total % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) + Math.PI * 2 * 3;
-                const t0 = performance.now();
-
-                function frame(now) {
-                    const t = now - t0;
-                    const p = Math.min(1, t / danceMs);
-                    const phase = total * easeInOutCubic(p);
-                    const appear = Math.min(1, t / 500);                                  // 一開始從中間展開成圈
-                    const g = t > danceMs ? Math.min(1, (t - danceMs) / gatherMs) : 0;    // 收尾進度
-
-                    qtSticks.forEach(st => {
-                        const a = st.theta + phase;
-                        const depth = Math.sin(a);                   // -1 在後面，1 在正前方
-                        let x = Math.cos(a) * RING_R * appear;
-                        let y = depth * 60 * appear + 10;
-                        let scale = (0.6 + depth * 0.28) * (0.6 + 0.4 * appear);
-                        let opacity = (0.3 + (depth + 1) * 0.35) * appear;
-                        let z = Math.round((depth + 1) * 50);
-
-                        if (g > 0) {
-                            const k = easeInOutCubic(g);
-                            if (st === chosen) {
-                                // 抽中的籤：從圈的正前方往上升到中間、放大
-                                y = y + (-10 - y) * k;
-                                x = x * (1 - k);
-                                scale = scale + (1.9 - scale) * k;
-                                opacity = 1;
-                                z = 300;
-                            } else {
-                                opacity *= 1 - k;                    // 其他的籤淡去
-                                scale *= 1 - 0.2 * k;
-                            }
-                        }
-                        st.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
-                        st.el.style.opacity = opacity.toFixed(3);
-                        st.el.style.zIndex = z;
-                    });
-
-                    if (t < danceMs + gatherMs) requestAnimationFrame(frame);
-                    else resolve();
-                }
-                requestAnimationFrame(frame);
-            });
-        }
-
-        let isDrawing = false;
-        async function drawLot() {
-            if (isDrawing) return;
-            isDrawing = true;
-            drawButton.disabled = true;
-            drawButton.textContent = '抽籤中…';
-            aiSection.classList.remove('show');
-
-            const finalId = randomPoemId();
-            const lotName = poems.find(p => p.id === finalId).title.split(' ')[0];   // 例如「第三十一籤」
-
-            placeSticks(finalId);
-            qtSticks.forEach(st => { st.el.style.transform = 'scale(0.3)'; st.el.style.opacity = '0'; });
-            qtText.textContent = '誠心默禱，請籤中…';
-            qtOverlay.classList.add('show');
-            await sleep(20);
-            qtOverlay.classList.add('visible');
-            await sleep(250);
-
-            if (reduceMotion) {
-                const chosen = qtSticks.find(s => s.id === finalId);
-                chosen.el.style.transform = 'translateY(-10px) scale(1.9)';
-                chosen.el.style.opacity = '1';
-                await sleep(500);
-            } else {
-                await runDance(finalId, randomBetween(3800, 4400), 1000);
+        function renderWheel() {
+            for (let i = 0; i < STICK_N; i++) {
+                const a = phase - i * STEP;
+                const depth = Math.sin(a);                 // 1 在正前方，-1 在最後面
+                let y = depth * 34 - 8;
+                let scale = 0.6 + depth * 0.32;
+                if (i === selectedIdx) { y -= 16 * lift; scale += 0.08 * lift; }
+                const el = wSticks[i];
+                el.style.transform = `translate(${(Math.cos(a) * ringR).toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+                el.style.opacity = (0.28 + (depth + 1) * 0.36).toFixed(3);
+                el.style.zIndex = Math.round((depth + 1) * 50);
             }
-            qtText.textContent = '得 ' + lotName;
-            await sleep(1300);
+        }
+        function measureRing() {
+            if (wheel.clientWidth) ringR = Math.max(90, Math.min(140, wheel.clientWidth / 2 - 16));
+            renderWheel();
+        }
+        if ('ResizeObserver' in window) new ResizeObserver(measureRing).observe(wheel);
+        else window.addEventListener('resize', measureRing);
 
-            // 關掉動畫畫面，顯示籤詩
-            displayPoem(finalId);
-            qtOverlay.classList.remove('visible');
-            await sleep(350);
-            qtOverlay.classList.remove('show');
+        const nearestSlot = p => FRONT + Math.round((p - FRONT) / STEP) * STEP;          // 讓某支籤剛好停在正前方的角度
+        const frontIndex = () => ((Math.round((phase - FRONT) / STEP) % STICK_N) + STICK_N) % STICK_N;
+
+        function stopGlide() { cancelAnimationFrame(glideRaf); glide = null; }
+        // 從目前角度滑到 target，開始時快、最後慢慢停下（ease-out）
+        function glideTo(target, duration, onDone) {
+            stopGlide();
+            glide = { from: phase, to: target, start: performance.now(), duration, onDone };
+            const tick = now => {
+                if (!glide) return;
+                const p = Math.min(1, (now - glide.start) / glide.duration);
+                phase = glide.from + (glide.to - glide.from) * (1 - Math.pow(1 - p, 3));
+                renderWheel();
+                if (p < 1) { glideRaf = requestAnimationFrame(tick); return; }
+                const done = glide.onDone;
+                glide = null;
+                if (done) done();
+            };
+            glideRaf = requestAnimationFrame(tick);
+        }
+        function tweenLift(to) {
+            const from = lift, t0 = performance.now();
+            const tick = now => {
+                const p = Math.min(1, (now - t0) / 280);
+                lift = from + (to - from) * p;
+                renderWheel();
+                if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        }
+
+        // 轉盤停下：正前方那支就是選中的籤
+        function onWheelStopped() {
+            phase = nearestSlot(phase);
+            selectedIdx = frontIndex();
+            wSticks[selectedIdx].classList.add('selected');
+            tweenLift(1);
+            drawButton.disabled = false;
+            drawButton.textContent = '誠心抽一籤';
+            setStatus(`選中 <b>${lotNameOf(selectedIdx + 1)}</b><br>請依序點筊杯擲筊，連得三個聖筊即為此籤`);
+            startJiao();
+        }
+        // 重新轉籤前：取消選中、筊杯歸位
+        function clearSelection() {
+            if (selectedIdx >= 0) wSticks[selectedIdx].classList.remove('selected');
+            selectedIdx = -1;
+            lift = 0;
+            resetJiao();
+        }
+
+        // 按鈕：轉三圈多後自然停在隨機一支籤
+        function drawLot() {
+            if (tossing || revealing || glide) return;
+            if (!poemCard.classList.contains('welcome')) {          // 已在看籤詩 → 回到抽籤畫面
+                displayPoem(0);
+                aiSection.classList.remove('show');
+            }
+            clearSelection();
+            const idx = Math.floor(Math.random() * STICK_N);
+            let target = FRONT + idx * STEP;
+            const minTravel = reduceMotion ? STEP : Math.PI * 2 * 3;
+            while (target < phase + minTravel) target += Math.PI * 2;
+            drawButton.disabled = true;
+            drawButton.textContent = '轉籤中…';
+            setStatus('誠心默禱，轉籤中…');
+            glideTo(target, reduceMotion ? 600 : randomBetween(4000, 4600), onWheelStopped);
+        }
+
+        // 手指（或滑鼠）左右滑動轉盤；放開後依甩動的速度繼續轉，再自己慢慢停下
+        let drag = null;
+        wheel.addEventListener('pointerdown', e => {
+            if (tossing || revealing || !poemCard.classList.contains('welcome')) return;
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const wasMoving = !!glide;
+            stopGlide();                                            // 轉動中按住 → 抓住停下
+            drag = { id: e.pointerId, startX: e.clientX, lastX: e.clientX, moved: false, wasMoving, samples: [{ t: e.timeStamp, x: e.clientX }] };
+        });
+        wheel.addEventListener('pointermove', e => {
+            if (!drag || e.pointerId !== drag.id) return;
+            if (!drag.moved) {
+                if (Math.abs(e.clientX - drag.startX) < 6) return;
+                drag.moved = true;
+                wheel.classList.add('dragging');
+                try { wheel.setPointerCapture(e.pointerId); } catch (err) {}
+                clearSelection();
+                setStatus('誠心默禱，轉籤中…');
+            }
+            phase -= (e.clientX - drag.lastX) / ringR;
+            drag.lastX = e.clientX;
+            drag.samples.push({ t: e.timeStamp, x: e.clientX });
+            if (drag.samples.length > 8) drag.samples.shift();
+            renderWheel();
+        });
+        function endDrag(e) {
+            if (!drag || e.pointerId !== drag.id) return;
+            const d = drag;
+            drag = null;
+            wheel.classList.remove('dragging');
+            if (!d.moved && !d.wasMoving) return;                   // 只是點一下，不動作
+            let v = 0;                                              // 放開時的轉速（弧度／秒）
+            if (e.type === 'pointerup' && d.moved) {
+                const recent = d.samples.filter(s => e.timeStamp - s.t < 100);
+                if (recent.length >= 2) {
+                    const dt = (recent[recent.length - 1].t - recent[0].t) / 1000;
+                    if (dt > 0) v = -((recent[recent.length - 1].x - recent[0].x) / dt) / ringR;
+                }
+            }
+            if (Math.abs(v) < 0.6) {                                // 慢慢放開 → 對齊最近的一支
+                glideTo(nearestSlot(phase), 350, onWheelStopped);
+                return;
+            }
+            v = Math.max(-25, Math.min(25, v));
+            const target = nearestSlot(phase + v * 0.8);            // 依甩的力道決定滑多遠
+            const duration = Math.min(4500, Math.max(400, 3000 * Math.abs(target - phase) / Math.abs(v)));
+            glideTo(target, duration, onWheelStopped);
+        }
+        wheel.addEventListener('pointerup', endDrag);
+        wheel.addEventListener('pointercancel', endDrag);
+
+        // ===== 上半部：三格筊杯 =====
+        // 一個筊杯（月牙形）：凸面是紅色亮面，平面是木色平面
+        const JIAO_PATH = 'M-34 10 C-34 -26 34 -26 34 10 C22 4 -22 4 -34 10 Z';
+        const JIAO_SVG = `<svg viewBox="-36 -22 72 36" aria-hidden="true">
+            <g class="face-round"><path d="${JIAO_PATH}" fill="url(#jiao-round-grad)"/><path d="M-20 -8 C-10 -15 6 -16 15 -11" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="face-flat"><path d="${JIAO_PATH}" fill="#8f2a20"/><path d="M-30 7 C-29 -19 29 -19 30 7 C19 1 -19 1 -30 7 Z" fill="url(#jiao-flat-grad)"/></g></svg>`;
+        const JIAO_NAMES = ['第一筊', '第二筊', '第三筊'];
+        const RESULT = {
+            sheng: { name: '聖筊', desc: '一平一凸' },
+            xiao: { name: '笑筊', desc: '兩個平面朝上' },
+            yin: { name: '陰筊', desc: '兩個凸面朝上' }
+        };
+        // 還沒擲時，一對筊杯並排放著（凸面朝上）
+        const IDLE_A = 'translate(-20px, 5px) rotate(-3deg) scaleY(1)';
+        const IDLE_B = 'translate(20px, 9px) rotate(7deg) scaleY(1)';
+
+        jiaoRow.innerHTML = JIAO_NAMES.map((name, n) => `
+            <button type="button" class="jiao-cell" data-n="${n}" disabled aria-label="擲${name}">
+                <span class="jiao-pair"><span class="jiao jiao-a">${JIAO_SVG}</span><span class="jiao jiao-b">${JIAO_SVG}</span></span>
+                <span class="jiao-label">${name}</span>
+            </button>`).join('');
+        const jiaoCells = [...jiaoRow.querySelectorAll('.jiao-cell')];
+        let jiaoStep = -1;           // 下一個要擲的格子（0～2），-1 表示現在不能擲
+
+        function resetJiao() {
+            jiaoStep = -1;
+            jiaoCells.forEach((cell, n) => {
+                cell.disabled = true;
+                cell.classList.remove('active', 'ok', 'bad', 'tossing');
+                cell.querySelector('.jiao-label').textContent = JIAO_NAMES[n];
+                const [a, b] = cell.querySelectorAll('.jiao');
+                a.getAnimations().forEach(x => x.cancel());
+                b.getAnimations().forEach(x => x.cancel());
+                a.classList.remove('flat'); b.classList.remove('flat');
+                a.style.transform = IDLE_A; b.style.transform = IDLE_B;
+            });
+        }
+        function activateJiao(n) {
+            jiaoStep = n;
+            jiaoCells.forEach((cell, i) => {
+                if (cell.classList.contains('ok')) return;
+                cell.disabled = i !== n;
+                cell.classList.toggle('active', i === n);
+            });
+        }
+        function startJiao() { resetJiao(); activateJiao(0); }
+
+        // 擲筊動畫：兩個筊杯往上拋、翻轉，落地後彈一下，停在結果的那一面
+        function animateToss(cell, flats) {
+            const [a, b] = cell.querySelectorAll('.jiao');
+            const dur = reduceMotion ? 300 : 1050;
+            const land = [
+                { x: -19 + randomBetween(-3, 3), y: 6, r: -14 + randomBetween(-8, 8) },
+                { x: 19 + randomBetween(-3, 3), y: 10, r: 12 + randomBetween(-8, 8) }
+            ];
+            const anims = [a, b].map((el, k) => {
+                const dir = k === 0 ? -1 : 1;
+                const L = land[k];
+                const spin = dir * 360;
+                return el.animate([
+                    { transform: k === 0 ? IDLE_A : IDLE_B, easing: 'ease-out' },
+                    { transform: `translate(${dir * 8}px, -48px) rotate(${dir * 200}deg) scaleY(-1)`, offset: 0.45, easing: 'ease-in' },
+                    { transform: `translate(${L.x}px, ${L.y}px) rotate(${L.r + spin}deg) scaleY(1)`, offset: 0.78, easing: 'ease-out' },
+                    { transform: `translate(${L.x - dir}px, ${L.y - 6}px) rotate(${L.r + spin + dir * 3}deg) scaleY(1)`, offset: 0.89, easing: 'ease-in' },
+                    { transform: `translate(${L.x}px, ${L.y}px) rotate(${L.r + spin}deg) scaleY(1)` }
+                ], { duration: dur, fill: 'forwards' });
+            });
+            // 空中翻轉時兩面交替閃現，落地時定在結果
+            let flip = 0;
+            const flicker = setInterval(() => { flip++; a.classList.toggle('flat', flip % 2 === 0); b.classList.toggle('flat', flip % 2 === 1); }, 95);
+            setTimeout(() => {
+                clearInterval(flicker);
+                a.classList.toggle('flat', flats[0]);
+                b.classList.toggle('flat', flats[1]);
+            }, dur * 0.76);
+            return Promise.all(anims.map(x => x.finished)).then(() => {
+                [a, b].forEach((el, k) => {
+                    el.style.transform = `translate(${land[k].x}px, ${land[k].y}px) rotate(${land[k].r}deg) scaleY(1)`;
+                    el.getAnimations().forEach(x => x.cancel());
+                });
+            });
+        }
+
+        async function tossJiao(n) {
+            if (tossing || revealing || n !== jiaoStep || selectedIdx < 0) return;
+            tossing = true;
+            wheel.classList.add('locked');
+            drawButton.disabled = true;
+            const cell = jiaoCells[n];
+            cell.classList.remove('active');
+            cell.classList.add('tossing');
+            cell.disabled = true;
+            setStatus(`誠心請示，擲${JIAO_NAMES[n]}…`);
+
+            // 跟真的擲筊一樣：聖筊約一半機會，笑筊、陰筊各約四分之一
+            const r = Math.random();
+            const result = r < 0.5 ? 'sheng' : (r < 0.75 ? 'xiao' : 'yin');
+            const flats = result === 'sheng' ? (Math.random() < 0.5 ? [true, false] : [false, true])
+                        : result === 'xiao' ? [true, true] : [false, false];
+            await animateToss(cell, flats);
+
+            cell.classList.remove('tossing');
+            const info = RESULT[result];
+            cell.querySelector('.jiao-label').textContent = result === 'sheng' ? '聖筊 ✓' : info.name;
+            tossing = false;
+            wheel.classList.remove('locked');
+
+            if (result === 'sheng') {
+                cell.classList.add('ok');
+                if (n === 2) { revealLot(); return; }
+                activateJiao(n + 1);
+                setStatus(`<b>聖筊</b>（${info.desc}）<br>請點「${JIAO_NAMES[n + 1]}」繼續擲筊`);
+                drawButton.disabled = false;
+            } else {
+                cell.classList.add('bad');
+                jiaoStep = -1;
+                wSticks[selectedIdx].classList.remove('selected');
+                tweenLift(0);
+                selectedIdx = -1;
+                setStatus(`<b>${info.name}</b>（${info.desc}）<br>此籤未獲應允，請重新轉籤再求`);
+                drawButton.disabled = false;
+            }
+        }
+        jiaoCells.forEach((cell, n) => cell.addEventListener('click', () => tossJiao(n)));
+
+        // 連得三個聖筊：這支籤就是您的籤，換成籤詩
+        async function revealLot() {
+            revealing = true;
+            drawButton.disabled = true;
+            const id = selectedIdx + 1;
+            setStatus(`連得三個聖筊，菩薩應允<br>您求得 <b>${lotNameOf(id)}</b>`);
+            await sleep(reduceMotion ? 600 : 1800);
+            drawUI.classList.add('fade-out');
+            await sleep(300);
+            displayPoem(id);
+            drawUI.classList.remove('fade-out');
             poemCard.classList.remove('revealed');
             void poemCard.offsetWidth;
             poemCard.classList.add('revealed');
             poemCard.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-
-            drawButton.textContent = '誠心抽一籤';
             drawButton.disabled = false;
-            isDrawing = false;
+            drawButton.textContent = '誠心抽一籤';
+            revealing = false;
             showAILinks();
         }
+
+        function resetDrawUI() {
+            stopGlide();
+            clearSelection();
+            setStatus(START_HINT);
+            drawButton.disabled = false;
+            drawButton.textContent = '誠心抽一籤';
+        }
+        resetDrawUI();
+        renderWheel();
 
         // 去看呼吸短劇或心經前記住剛抽到的籤，看完回來還在
         function setupBreatheLinks() {
