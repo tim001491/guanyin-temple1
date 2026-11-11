@@ -132,6 +132,12 @@
         .wheel-glow { position: absolute; left: 50%; top: 50%; width: 300px; height: 170px; margin: -85px 0 0 -150px; border-radius: 50%; pointer-events: none;
             background: radial-gradient(closest-side, rgba(255, 222, 150, 0.5), rgba(255, 222, 150, 0.15) 60%, rgba(255, 222, 150, 0)); }
         .wheel-marker { position: absolute; left: 50%; bottom: 3px; margin-left: -7px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 9px solid #c9a25a; pointer-events: none; }
+        .wheel-hint { margin: 0.35rem 0 0; font-size: 0.85rem; letter-spacing: 0.12em; color: #a58362; text-align: center; }
+        .wh-arrow { display: inline-block; margin: 0 0.5em; color: #c9a25a; font-weight: 700; }
+        .wh-left { animation: wh-left 1.8s ease-in-out infinite; }
+        .wh-right { animation: wh-right 1.8s ease-in-out infinite; }
+        @keyframes wh-left { 0%, 100% { transform: translateX(0); opacity: .6; } 50% { transform: translateX(-5px); opacity: 1; } }
+        @keyframes wh-right { 0%, 100% { transform: translateX(0); opacity: .6; } 50% { transform: translateX(5px); opacity: 1; } }
         .w-stick { position: absolute; left: 50%; top: 50%; width: 7px; height: 112px; margin: -56px 0 0 -3.5px; border-radius: 3px 3px 2px 2px; pointer-events: none;
             background: linear-gradient(90deg, #c9a46a, #f0d9a8 45%, #d4b27c); box-shadow: 0 2px 6px rgba(80, 50, 20, 0.16); display: flex; justify-content: center; padding-top: 16px; }
         .w-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 11px; border-radius: 3px 3px 0 0; background: #b5322a; }
@@ -340,6 +346,7 @@
                         <div class="wheel-glow"></div>
                         <div class="wheel-marker"></div>
                     </div>
+                    <p class="wheel-hint" aria-hidden="true"><span class="wh-arrow wh-left">‹‹</span>籤可用手左右滑動<span class="wh-arrow wh-right">››</span></p>
                 </div>
                 <h2 id="poem-title"></h2>
                 <p id="poem-content"></p>
@@ -566,7 +573,7 @@
         const jiaoRow = document.getElementById('jiao-row');
         const wheel = document.getElementById('stick-wheel');
         const setStatus = html => { drawStatus.innerHTML = `<span>${html}</span>`; };
-        const START_HINT = '左右滑動下方的籤，或按「誠心抽一籤」轉動';
+        const START_HINT = '誠心默禱後，轉動下方的籤<br>停在正前方的那支即為選中';
 
         // ===== 下半部：六十支籤的轉盤 =====
         const STICK_N = 60, STEP = Math.PI * 2 / STICK_N, FRONT = Math.PI / 2;
