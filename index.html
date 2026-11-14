@@ -61,8 +61,8 @@
             .container { max-width: 500px; }
         }
         /* --- 觀音聖像・佛光呼吸：佛像本身不動，只有身後的佛光約 8 秒一次緩緩明暗 --- */
-        .gy-stage { position: relative; width: 100%; max-width: 184px; aspect-ratio: 398 / 532; margin: 0 auto 0.85rem; isolation: isolate; }
-        @media (min-width: 760px) { .gy-stage { max-width: 220px; } }
+        .gy-stage { position: relative; width: 100%; max-width: 228px; aspect-ratio: 398 / 532; margin: 0 auto 0.85rem; isolation: isolate; }
+        @media (min-width: 760px) { .gy-stage { max-width: 260px; } }
         #header-image { position: relative; z-index: 2; width: 100%; height: auto; display: block; }
         .gy-glow, .gy-aura { position: absolute; pointer-events: none; }
         /* 以眉間白毫（＝頭光圓心）為中心的暖金色光暈 */
@@ -82,23 +82,40 @@
 
         /* --- 蓮瓣飄落：從頁面頂端兩側飄下，落在日期下方那條橫線上，停一下再淡去（橫線以下沒有花瓣） --- */
         header { position: relative; z-index: 0; }
-        .hd-petals { --fall: 560px; position: absolute; left: -20px; right: -20px; top: -20px; height: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .hd-petals { --fall: 560px; position: absolute; left: -18px; right: -18px; top: -20px; height: 0; z-index: -1; overflow: hidden; pointer-events: none; }
         .hd-petals i { position: absolute; top: -40px; left: var(--x); width: var(--w); aspect-ratio: 24 / 34; opacity: 0;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e48f87'/%3E%3Cstop offset='.5' stop-color='%23f3bdb4'/%3E%3Cstop offset='1' stop-color='%23fadcd4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url(%23g)'/%3E%3Cpath d='M12 5v24' stroke='%23e39a92' stroke-opacity='.4' stroke-width='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e07a86'/%3E%3Cstop offset='.45' stop-color='%23f4bcc0'/%3E%3Cstop offset='1' stop-color='%23fdeee8'/%3E%3C/linearGradient%3E%3CradialGradient id='h' cx='.35' cy='.55' r='.5'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url%28%23g%29'/%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url%28%23h%29'/%3E%3Cpath d='M12 4.5C12.6 13 12.4 22 12 29.5' fill='none' stroke='%23d98a8f' stroke-opacity='.45' stroke-width='.7'/%3E%3Cpath d='M7.6 11.5C6.6 16 7 21 9 25' fill='none' stroke='%23fff' stroke-opacity='.6' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+            filter: drop-shadow(0 1px 1.5px rgba(190, 110, 110, 0.18));
             animation: pf-fall var(--d) linear var(--delay) infinite; }
+        .hd-petals i.pale { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23eba3aa'/%3E%3Cstop offset='.45' stop-color='%23fadcd9'/%3E%3Cstop offset='1' stop-color='%23fffaf4'/%3E%3C/linearGradient%3E%3CradialGradient id='h' cx='.35' cy='.55' r='.5'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url%28%23g%29'/%3E%3Cpath d='M12 .5C20 9 21.5 22 12 33.5 2.5 22 4 9 12 .5Z' fill='url%28%23h%29'/%3E%3Cpath d='M12 4.5C12.6 13 12.4 22 12 29.5' fill='none' stroke='%23e2a4a6' stroke-opacity='.45' stroke-width='.7'/%3E%3Cpath d='M7.6 11.5C6.6 16 7 21 9 25' fill='none' stroke='%23fff' stroke-opacity='.6' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+        /* 遠處的花瓣：小一點、淡一點、微微失焦、落得慢，畫面多了前後層次 */
+        .hd-petals i.far { filter: blur(0.6px); }
+        /* 飄落時左右擺盪、翻面，像真的花瓣在風裡轉 */
         @keyframes pf-fall {
-            0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--r0)) rotateX(0deg); }
+            0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--r0)) rotateX(0deg) rotateY(0deg); }
             6%   { opacity: var(--o); }
-            20%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.26), 0) rotate(calc(var(--r0) + 40deg)) rotateX(55deg); }
-            40%  { transform: translate3d(calc(var(--sway) * -0.6), calc(var(--fall) * 0.52), 0) rotate(calc(var(--r0) + 90deg)) rotateX(0deg); }
-            60%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.78), 0) rotate(calc(var(--r0) + 130deg)) rotateX(-50deg); animation-timing-function: ease-out; }
-            76%, 90% { opacity: var(--o); transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg); }
-            100% { opacity: 0; transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg); }
+            18%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.22), 0) rotate(calc(var(--r0) + 35deg)) rotateX(50deg) rotateY(30deg); }
+            36%  { transform: translate3d(calc(var(--sway) * -0.7), calc(var(--fall) * 0.46), 0) rotate(calc(var(--r0) + 80deg)) rotateX(-20deg) rotateY(160deg); }
+            54%  { transform: translate3d(var(--sway), calc(var(--fall) * 0.70), 0) rotate(calc(var(--r0) + 120deg)) rotateX(45deg) rotateY(200deg); }
+            68%  { transform: translate3d(calc(var(--sway) * -0.3 + var(--land) * 0.5), calc(var(--fall) * 0.90), 0) rotate(calc(var(--rest) - 20deg)) rotateX(10deg) rotateY(320deg); animation-timing-function: ease-out; }
+            76%, 90% { opacity: var(--o); transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg) rotateY(360deg); }
+            100% { opacity: 0; transform: translate3d(var(--land), calc(var(--fall) + 40px - var(--w) * 1.21), 0) rotate(var(--rest)) rotateX(20deg) rotateY(360deg); }
+        }
+        /* 佛光裡緩緩上升的金色光點 */
+        .gy-motes { position: absolute; inset: -6% -14% 0; z-index: 3; pointer-events: none; }
+        .gy-motes span { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); border-radius: 50%; opacity: 0;
+            background: radial-gradient(circle, #fffbe8 0 22%, rgba(255, 216, 120, 0.85) 45%, rgba(255, 200, 90, 0) 72%);
+            animation: gy-mote var(--d) ease-in-out var(--delay) infinite; }
+        @keyframes gy-mote {
+            0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+            25%  { opacity: 0.9; }
+            60%  { opacity: 0.7; transform: translate(var(--dx), -38px) scale(1); }
+            100% { opacity: 0; transform: translate(calc(var(--dx) * -0.5), -76px) scale(0.5); }
         }
 
         /* 手機開了「減少動態效果」：不飄花瓣，佛光改為靜態 */
         @media (prefers-reduced-motion: reduce) {
-            .hd-petals { display: none; }
+            .hd-petals, .gy-motes { display: none; }
             .gy-glow, .gy-aura { animation: none; }
             .gy-glow { opacity: 0.6; }
             .gy-aura { opacity: 0.4; }
@@ -376,18 +393,33 @@
         <header>
             <!-- 蓮瓣飄落：只在橫線以上，花瓣落在日期下方的橫線上 -->
             <div class="hd-petals" id="hd-petals" aria-hidden="true">
-                <i style="--x:5%;--w:20px;--d:18s;--delay:-2s;--sway:16px;--r0:-30deg;--o:.85;--land:10px;--rest:92deg"></i>
-                <i style="--x:9%;--w:17px;--d:22s;--delay:-9s;--sway:-12px;--r0:140deg;--o:.75;--land:14px;--rest:268deg"></i>
-                <i style="--x:13%;--w:15px;--d:20s;--delay:-15s;--sway:14px;--r0:-45deg;--o:.7;--land:6px;--rest:86deg"></i>
-                <i style="--x:6%;--w:22px;--d:24s;--delay:-20s;--sway:-10px;--r0:150deg;--o:.8;--land:12px;--rest:275deg"></i>
-                <i style="--x:86%;--w:21px;--d:19s;--delay:-6s;--sway:-16px;--r0:-25deg;--o:.85;--land:-10px;--rest:100deg"></i>
-                <i style="--x:90%;--w:17px;--d:23s;--delay:-13s;--sway:12px;--r0:135deg;--o:.75;--land:-14px;--rest:262deg"></i>
-                <i style="--x:82%;--w:15px;--d:21s;--delay:-18s;--sway:-14px;--r0:-50deg;--o:.7;--land:-6px;--rest:84deg"></i>
-                <i style="--x:88%;--w:19px;--d:25s;--delay:-3s;--sway:10px;--r0:145deg;--o:.8;--land:-12px;--rest:272deg"></i>
+                <i style="--x:5%;--w:21px;--d:18s;--delay:-2s;--sway:16px;--r0:-30deg;--o:0.9;--land:10px;--rest:92deg"></i>
+                <i class="pale" style="--x:10%;--w:18px;--d:22s;--delay:-9s;--sway:-12px;--r0:140deg;--o:0.85;--land:14px;--rest:268deg"></i>
+                <i style="--x:15%;--w:16px;--d:20s;--delay:-15s;--sway:14px;--r0:-45deg;--o:0.8;--land:6px;--rest:86deg"></i>
+                <i class="pale" style="--x:3%;--w:23px;--d:24s;--delay:-20s;--sway:-10px;--r0:150deg;--o:0.9;--land:12px;--rest:275deg"></i>
+                <i style="--x:86%;--w:22px;--d:19s;--delay:-6s;--sway:-16px;--r0:-25deg;--o:0.9;--land:-10px;--rest:100deg"></i>
+                <i class="pale" style="--x:91%;--w:18px;--d:23s;--delay:-13s;--sway:12px;--r0:135deg;--o:0.85;--land:-14px;--rest:262deg"></i>
+                <i style="--x:81%;--w:16px;--d:21s;--delay:-18s;--sway:-14px;--r0:-50deg;--o:0.8;--land:-6px;--rest:84deg"></i>
+                <i class="pale" style="--x:94%;--w:20px;--d:25s;--delay:-3s;--sway:10px;--r0:145deg;--o:0.9;--land:-12px;--rest:272deg"></i>
+                <i class="far" style="--x:21%;--w:12px;--d:28s;--delay:-5s;--sway:10px;--r0:20deg;--o:0.5;--land:4px;--rest:70deg"></i>
+                <i class="far pale" style="--x:26%;--w:10px;--d:31s;--delay:-17s;--sway:-8px;--r0:200deg;--o:0.45;--land:-4px;--rest:250deg"></i>
+                <i class="far" style="--x:74%;--w:11px;--d:29s;--delay:-11s;--sway:-10px;--r0:-60deg;--o:0.5;--land:6px;--rest:110deg"></i>
+                <i class="far pale" style="--x:79%;--w:12px;--d:32s;--delay:-24s;--sway:8px;--r0:160deg;--o:0.45;--land:-2px;--rest:290deg"></i>
+                <i class="far pale" style="--x:17%;--w:10px;--d:30s;--delay:-27s;--sway:6px;--r0:90deg;--o:0.4;--land:2px;--rest:180deg"></i>
+                <i class="far" style="--x:84%;--w:10px;--d:27s;--delay:-1s;--sway:-6px;--r0:-120deg;--o:0.4;--land:-4px;--rest:60deg"></i>
             </div>
             <!-- 觀音聖像・佛光呼吸 -->
             <div class="gy-stage">
                 <div class="gy-glow" aria-hidden="true"></div>
+                <div class="gy-motes" aria-hidden="true">
+                    <span style="--x:22%;--y:30%;--s:5px;--d:7s;--delay:-1s;--dx:8px"></span>
+                    <span style="--x:74%;--y:26%;--s:4px;--d:8s;--delay:-3.5s;--dx:-10px"></span>
+                    <span style="--x:16%;--y:52%;--s:4px;--d:9s;--delay:-6s;--dx:6px"></span>
+                    <span style="--x:82%;--y:48%;--s:5px;--d:7.5s;--delay:-2s;--dx:-6px"></span>
+                    <span style="--x:34%;--y:18%;--s:3px;--d:8.5s;--delay:-5s;--dx:4px"></span>
+                    <span style="--x:64%;--y:40%;--s:3px;--d:9.5s;--delay:-7.5s;--dx:-4px"></span>
+                    <span style="--x:48%;--y:8%;--s:4px;--d:10s;--delay:-4.5s;--dx:6px"></span>
+                </div>
                 <img class="gy-aura" src="logo.svg" alt="" aria-hidden="true" width="398" height="532">
                 <img src="logo.svg" alt="觀音聖像" id="header-image" width="398" height="532" onerror="this.onerror=null;this.src='logo.png';">
             </div>
