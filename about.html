@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>關於我們 - 觀瀑觀音禪寺線上靈籤</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap">
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
         /* 這裡使用與主頁相似的風格，以保持一致性 */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
         body { 
             font-family: 'Noto Serif TC', serif; 
             background-color: #f4f1ea; 
@@ -80,6 +83,12 @@
         a:hover {
             background-color: #a58362;
             color: #fff;
+        }
+        /* 手機：左右留白縮小，內文不再擠成窄窄一條 */
+        @media (max-width: 600px) {
+            body { padding: 14px 12px 24px; }
+            .container { padding: 2rem 1.35rem; }
+            h1 { font-size: 1.65rem; }
         }
     </style>
 </head>

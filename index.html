@@ -9,23 +9,61 @@
     <meta property="og:title" content="觀音靈籤｜觀瀑觀音禪寺線上靈籤">
     <meta property="og:description" content="轉動六十支觀音靈籤，連擲三個聖筊求得籤詩，並可一鍵請 AI 白話解籤。">
     <meta property="og:url" content="https://xn--dett40e76kpzn.online/">
+    <meta property="og:image" content="https://xn--dett40e76kpzn.online/og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4f1ea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icons/192.png">
-    
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.8/lunar.min.js"></script>
+    <link rel="apple-touch-icon" href="icons/180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap">
+    <!-- 農曆／干支：defer 讓它不擋住畫面先顯示（頁面程式在 DOMContentLoaded 之後才用到） -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.8/lunar.min.js" defer></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap');
+        /* ===== 全站色彩與字級：改顏色或字大小，只要改這裡 ===== */
+        :root {
+            --paper: #f4f1ea;      /* 頁面底色（米色宣紙） */
+            --paper-2: #faf7f0;    /* 淺一階的底（筊杯格子） */
+            --card: #fffdf8;       /* 卡片、按鈕的白底 */
+            --line: #e4dacb;       /* 細分隔線 */
+            --line-2: #d3c2a5;     /* 卡片、按鈕的框線 */
+            --ink: #3d2c1d;        /* 主要文字（籤詩） */
+            --ink-2: #5e4a3a;      /* 次要文字 */
+            --ink-3: #7c6756;      /* 說明、註解等小字 */
+            --brown: #7b5d3f;      /* 標題 */
+            --accent: #a58362;     /* 按下時的底色 */
+            --gold: #b8913f;       /* 金色線條 */
+            --gold-2: #a07a32;     /* 金色題字 */
+            --cinnabar: #b0433a;   /* 朱紅：印章、八字、籤號、主要按鈕 */
+            --fs-xs: 0.8125rem;    /* 註解 */
+            --fs-sm: 0.9rem;       /* 說明文字 */
+            --fs-md: 1rem;         /* 內文 */
+            --fs-lg: 1.125rem;     /* 區塊標題 */
+            --fs-xl: 1.3rem;       /* 籤詩、題字 */
+            --shadow: 0 12px 30px -14px rgba(104, 74, 38, 0.35), 0 2px 6px -2px rgba(104, 74, 38, 0.12);
+            --shadow-sm: 0 3px 10px -5px rgba(104, 74, 38, 0.35);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Serif TC', serif; background-color: #f4f1ea; color: #3d2c1d; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { width: 100%; max-width: 500px; text-align: center; }
+        body { font-family: 'Noto Serif TC', serif; color: var(--ink); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 14px 18px 32px;
+            background: radial-gradient(1100px 620px at 50% -8%, #fcf8ef 0%, rgba(252, 248, 239, 0) 72%), var(--paper); }
+        .container { width: 100%; max-width: 480px; text-align: center; }
+        /* 電腦等寬螢幕：中間一道柔和的金光，兩側不顯得空 */
+        @media (min-width: 760px) {
+            body { padding-top: 28px; background: radial-gradient(1100px 620px at 50% -8%, #fcf8ef 0%, rgba(252, 248, 239, 0) 72%), radial-gradient(760px 1100px at 50% 32%, rgba(234, 211, 158, 0.24), rgba(234, 211, 158, 0) 70%), var(--paper); }
+            .container { max-width: 500px; }
+        }
         /* --- 觀音聖像・佛光呼吸：佛像本身不動，只有身後的佛光約 8 秒一次緩緩明暗 --- */
-        .gy-stage { position: relative; width: 100%; max-width: 250px; aspect-ratio: 398 / 532; margin: 0 auto 1.5rem; isolation: isolate; }
-        #header-image { position: relative; z-index: 2; width: 100%; height: auto; display: block; border-radius: 8px; }
+        .gy-stage { position: relative; width: 100%; max-width: 184px; aspect-ratio: 398 / 532; margin: 0 auto 0.85rem; isolation: isolate; }
+        @media (min-width: 760px) { .gy-stage { max-width: 220px; } }
+        #header-image { position: relative; z-index: 2; width: 100%; height: auto; display: block; }
         .gy-glow, .gy-aura { position: absolute; pointer-events: none; }
         /* 以眉間白毫（＝頭光圓心）為中心的暖金色光暈 */
         .gy-glow { z-index: 0; left: 50%; top: 37.46%; width: 128%; aspect-ratio: 1; border-radius: 50%;
@@ -65,43 +103,46 @@
             .gy-glow { opacity: 0.6; }
             .gy-aura { opacity: 0.4; }
         }
-        header h1 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; color: #8a6c4c; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        header p { font-size: 1rem; color: #6c584c; margin-bottom: 1rem; }
-        
-        #date-display { 
-            font-size: 0.95rem; 
-            color: #8a6c4c; 
-            margin-bottom: 1.5rem; 
-            line-height: 1.6; /* 調整行高讓換行更美觀 */
+        header h1 { font-size: 2.3rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 0.45rem; color: var(--brown); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7); }
+        header p { font-size: var(--fs-md); letter-spacing: 0.05em; color: var(--ink-2); margin-bottom: 0.7rem; }
+
+        #date-display {
+            font-size: var(--fs-sm);
+            color: var(--ink-3);
+            margin-bottom: 1rem;
+            line-height: 1.65; /* 調整行高讓換行更美觀 */
         }
-        #bazi-display { 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 1rem 0; 
-            border-top: 1px solid #ddd8cf; 
-            border-bottom: 1px solid #ddd8cf; 
-            margin-bottom: 2rem; 
+        #bazi-display {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.7rem 0 0.6rem;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 1.4rem;
             user-select: none;
         }
-        .bazi-column { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        .bazi-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 25%;
         }
-        .bazi-char { 
-            font-size: 1.8rem;
-            font-weight: 600; 
-            line-height: 1.1; 
-            color: #ff4b37; 
+        .bazi-char {
+            font-size: 1.55rem;
+            font-weight: 600;
+            line-height: 1.12;
+            color: var(--cinnabar);
         }
-        .bazi-label { 
-            font-size: 1rem; 
-            color: #9c897a; 
-            margin-top: 0.4rem; 
+        .bazi-label {
+            font-size: var(--fs-xs);
+            letter-spacing: 0.1em;
+            color: var(--ink-3);
+            margin-top: 0.3rem;
         }
 
-        #poem-card { background-color: #fff; border: 1px solid #ddd8cf; border-radius: 8px; padding: 2.5rem 2rem; min-height: 250px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
+        #poem-card { background-color: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 2.2rem 1.6rem 2rem; min-height: 250px; box-shadow: var(--shadow); margin-bottom: 1.25rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.3s ease; }
+        /* 求到籤之後：卡片內多一圈金色細框，像一張籤紙 */
+        #poem-card:not(.welcome) { box-shadow: var(--shadow), inset 0 0 0 7px var(--card), inset 0 0 0 8px #e8d6b0; }
         #poem-card.drawing { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         /* --- 籤卡（還沒求到籤時）：上半部三格筊杯、下半部可滑動旋轉的六十支籤 --- */
         #draw-ui { display: none; width: 100%; transition: opacity 0.3s ease; }
@@ -111,7 +152,7 @@
         #poem-card.welcome #poem-title, #poem-card.welcome #poem-content { display: none; }
         .jiao-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
         .jiao-cell { position: relative; font-family: inherit; color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.3rem;
-            min-height: 108px; padding: 0.5rem 0.2rem 0.55rem; background: #faf6ef; border: 1px solid #e6dccb; border-radius: 10px; cursor: pointer;
+            min-height: 108px; padding: 0.5rem 0.2rem 0.55rem; background: var(--paper-2); border: 1px solid var(--line); border-radius: 12px; cursor: pointer;
             transition: opacity 0.3s, border-color 0.3s, background-color 0.3s; -webkit-tap-highlight-color: transparent; }
         .jiao-cell:disabled { cursor: default; }
         .jiao-cell:disabled:not(.ok):not(.bad):not(.tossing) .jiao-label { color: #c2b3a2; }
@@ -125,11 +166,11 @@
         .jiao svg { display: block; width: 100%; height: 100%; overflow: visible; }
         .jiao .face-flat, .jiao.flat .face-round { display: none; }
         .jiao.flat .face-flat { display: inline; }
-        .jiao-label { font-size: 0.85rem; letter-spacing: 0.08em; color: #8a6c4c; white-space: nowrap; }
+        .jiao-label { font-size: 0.85rem; letter-spacing: 0.08em; color: var(--brown); white-space: nowrap; }
         .jiao-cell.ok .jiao-label { color: #b5322a; font-weight: 600; }
         .jiao-cell.bad .jiao-label { color: #8f8578; font-weight: 600; }
         #draw-status { display: flex; align-items: center; justify-content: center; min-height: 3.4em; margin: 0.7rem 0 0; text-align: center;
-            font-size: 0.98rem; line-height: 1.6; letter-spacing: 0.05em; color: #7a604a; }
+            font-size: 0.98rem; line-height: 1.6; letter-spacing: 0.05em; color: var(--ink-2); }
         #draw-status b { color: #b5322a; font-size: 1.1rem; margin: 0 0.15em; }
         .stick-wheel { position: relative; height: 200px; margin: 0 -0.8rem; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
         .stick-wheel.dragging { cursor: grabbing; }
@@ -137,8 +178,8 @@
         .wheel-glow { position: absolute; left: 50%; top: 50%; width: 300px; height: 170px; margin: -85px 0 0 -150px; border-radius: 50%; pointer-events: none;
             background: radial-gradient(closest-side, rgba(255, 222, 150, 0.5), rgba(255, 222, 150, 0.15) 60%, rgba(255, 222, 150, 0)); }
         .wheel-marker { position: absolute; left: 50%; bottom: 3px; margin-left: -7px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 9px solid #c9a25a; pointer-events: none; }
-        .wheel-hint { margin: 0.5rem 0 -0.4rem; position: relative; z-index: 1; font-size: 0.85rem; letter-spacing: 0.12em; color: #a58362; text-align: center; }
-        .wh-arrow { display: inline-block; margin: 0 0.5em; color: #c9a25a; font-weight: 700; }
+        .wheel-hint { margin: 0.5rem 0 -0.4rem; position: relative; z-index: 1; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--ink-3); text-align: center; }
+        .wh-arrow { display: inline-block; margin: 0 0.5em; color: #c9a25a; font-weight: 600; }
         .wh-left { animation: wh-left 1.8s ease-in-out infinite; }
         .wh-right { animation: wh-right 1.8s ease-in-out infinite; }
         @keyframes wh-left { 0%, 100% { transform: translateX(0); opacity: .6; } 50% { transform: translateX(-5px); opacity: 1; } }
@@ -148,29 +189,51 @@
         .w-stick::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 11px; border-radius: 3px 3px 0 0; background: #b5322a; }
         .w-stick span { writing-mode: vertical-rl; font-size: 6.5px; line-height: 1; font-weight: 600; color: #6b2a1c; white-space: nowrap; }
         .w-stick.selected { box-shadow: 0 0 0 1.5px #e3bd62, 0 0 14px 4px rgba(240, 196, 90, 0.6); }
-        #poem-title { font-size: 1.8rem; font-weight: 600; color: #b08968; margin-bottom: 1.5rem; }
-        
-        #poem-content { 
-            font-size: 1.3rem; 
-            line-height: 2.2; 
-            color: #3d2c1d;
-            text-align: center; 
+        /* 籤號用朱紅，下面一條金色細線 */
+        #poem-title { position: relative; font-size: 1.6rem; font-weight: 600; letter-spacing: 0.06em; color: var(--cinnabar); margin-bottom: 1.3rem; padding-bottom: 0.9rem; }
+        #poem-title::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 64px; height: 1px; margin-left: -32px; background: linear-gradient(90deg, rgba(184, 145, 63, 0), var(--gold), rgba(184, 145, 63, 0)); }
+
+        #poem-content {
+            font-size: var(--fs-xl);
+            line-height: 2.15;
+            letter-spacing: 0.08em;
+            color: var(--ink);
+            text-align: center;
         }
 
-        #draw-button { font-family: 'Noto Serif TC', serif; font-size: 1.2rem; font-weight: 600; color: #fff; background-color: #a58362; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #draw-button:hover { background-color: #8a6c4c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        #draw-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #draw-button:disabled { background-color: #b0a395; cursor: wait; transform: none; }
-        #ai-section { margin-top: 2rem; width: 100%; display: none; }
+        /* 「誠心抽一籤」：朱紅漆底、金色細邊，是整頁最重要的按鈕 */
+        #draw-button { font-family: inherit; font-size: 1.2rem; font-weight: 600; letter-spacing: 0.18em; color: #fff8ea; border: none; border-radius: 999px; padding: 14px 40px 14px calc(40px + 0.18em); cursor: pointer;
+            background: linear-gradient(180deg, #be4c3e 0%, #a53b2f 55%, #8f2f24 100%);
+            box-shadow: inset 0 0 0 1.5px rgba(242, 212, 150, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 18px -8px rgba(146, 47, 37, 0.65);
+            text-shadow: 0 1px 0 rgba(90, 20, 12, 0.35); transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease; }
+        #draw-button:hover { filter: brightness(1.06); transform: translateY(-1px); }
+        #draw-button:active { filter: brightness(0.97); transform: translateY(0); }
+        #draw-button:disabled { background: #bcae9f; box-shadow: none; text-shadow: none; filter: none; transform: none; cursor: wait; }
+        /* 已求到籤：按鈕退為次要（細框），讓視線往下看 AI 解籤 */
+        #poem-card:not(.welcome) + #draw-button { font-size: var(--fs-md); padding: 9px 26px 9px calc(26px + 0.18em); color: var(--cinnabar); background: transparent; box-shadow: inset 0 0 0 1px rgba(176, 67, 58, 0.55); text-shadow: none; }
+        #poem-card:not(.welcome) + #draw-button:hover { background: rgba(176, 67, 58, 0.06); }
+        #poem-card:not(.welcome) + #draw-button:disabled { color: #a99a8b; box-shadow: inset 0 0 0 1px #cdbfb0; }
+
+        /* --- 各區塊標題：兩側金色細線（AI 解籤、光明球燈、靜心） --- */
+        .sec-title { display: flex; align-items: center; justify-content: center; gap: 0.8em; font-size: var(--fs-lg); font-weight: 600; letter-spacing: 0.22em; color: var(--brown); margin-bottom: 0.5rem; }
+        .sec-title span { margin-right: -0.22em; }
+        .sec-title::before, .sec-title::after { content: ''; flex: 0 1 58px; height: 1px; background: linear-gradient(90deg, rgba(184, 145, 63, 0), var(--gold)); }
+        .sec-title::after { background: linear-gradient(90deg, var(--gold), rgba(184, 145, 63, 0)); }
+        .sec-hint { font-size: var(--fs-sm); line-height: 1.7; color: var(--ink-3); margin-bottom: 1rem; }
+        .nb { display: inline-block; }   /* 一句話不在中間斷行，整句換到下一行 */
+
+        #ai-section { margin-top: 2.2rem; width: 100%; display: none; }
         #ai-section.show { display: block; animation: fadeIn 0.6s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-        #ai-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1.2rem; }
-        /* 每排兩個按鈕，按鈕同寬；單數時最後一個置中 */
-        #ai-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
-        .ai-link { flex: 0 1 calc(50% - 0.4rem); max-width: 220px; font-family: 'Noto Serif TC', serif; font-size: min(1.1rem, 4.4vw); font-weight: 600; color: #8a6c4c; background-color: #fff; border: 2px solid #a58362; padding: 12px 8px; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
-        .ai-link:hover, .ai-link:active { background-color: #a58362; color: #fff; }
-        #ai-note { color: #9c897a; font-size: 0.85rem; line-height: 1.6; margin-top: 0.8rem; }
-        #ai-copied { color: #9c897a; font-size: 0.85rem; margin-top: 0.3rem; min-height: 1.2em; }
+        /* 六家 AI 排成三欄兩排；小字註明哪家要登入或貼上 */
+        #ai-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; }
+        .ai-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-height: 56px; padding: 8px 4px; font-family: inherit; font-size: min(1rem, 4vw); font-weight: 600; color: var(--brown); background-color: var(--card); border: 1px solid var(--line-2); border-radius: 12px; text-decoration: none; white-space: nowrap; box-shadow: var(--shadow-sm); transition: all 0.25s ease; }
+        .ai-link small { font-size: 0.7rem; font-weight: 400; letter-spacing: 0.04em; color: var(--ink-3); }
+        .ai-link:hover, .ai-link:active { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        .ai-link:hover small, .ai-link:active small { color: rgba(255, 255, 255, 0.85); }
+        @media (max-width: 340px) { #ai-buttons { grid-template-columns: repeat(2, 1fr); } }
+        #ai-note { color: var(--ink-3); font-size: var(--fs-xs); line-height: 1.7; margin-top: 0.8rem; }
+        #ai-copied { color: var(--ink-3); font-size: var(--fs-xs); margin-top: 0.3rem; min-height: 1.2em; }
         /* --- 開場動畫 --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 1000; background: #f4f1ea; overflow: hidden; transition: opacity 1s ease, visibility 1s ease; }
         #intro-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -182,83 +245,82 @@
             #intro-bg { display: block; }
             #intro-video { object-fit: contain; }
         }
-        #intro-skip { position: absolute; z-index: 2; top: max(20px, env(safe-area-inset-top)); right: 20px; font-family: 'Noto Serif TC', serif; font-size: 0.95rem; color: #8a6c4c; background: rgba(255,255,255,0.7); border: 1px solid #ddd8cf; border-radius: 50px; padding: 6px 18px; cursor: pointer; }
+        #intro-skip { position: absolute; z-index: 2; top: max(20px, env(safe-area-inset-top)); right: 20px; font-family: 'Noto Serif TC', serif; font-size: 0.95rem; color: var(--brown); background: rgba(255,255,255,0.7); border: 1px solid #ddd8cf; border-radius: 50px; padding: 6px 18px; cursor: pointer; }
         body.intro-playing { overflow: hidden; }
-        footer { margin-top: 3rem; font-size: 0.9rem; color: #9c897a; }
-        
+        footer { margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid var(--line); font-size: var(--fs-sm); color: var(--ink-3); }
+        footer > p:first-child { letter-spacing: 0.2em; color: var(--brown); }
+
         .footer-links {
             margin: 0.8rem 0;
         }
         .footer-links a {
-            color: #9c897a;
+            color: var(--ink-3);
             text-decoration: none;
             margin: 0 8px;
             transition: color 0.2s ease;
         }
         .footer-links a:hover {
-            color: #8a6c4c;
+            color: var(--brown);
             text-decoration: underline;
         }
 
         /* --- 菩提光球・線上光明球燈 入口 --- */
-        #lamp-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
-        #lamp-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
-        .lamp-slide { position: relative; max-width: 340px; height: 52px; margin: 0 auto; border-radius: 50px; background-color: #fff; border: 2px solid #a58362; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        #lamp-option { margin-top: 2.4rem; }
+        .lamp-slide { position: relative; max-width: 340px; height: 54px; margin: 0 auto; border-radius: 50px; background-color: var(--card); border: 1px solid var(--gold); box-shadow: var(--shadow-sm); overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
         .lamp-slide-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, rgba(243, 213, 142, 0.35), rgba(165, 131, 98, 0.35)); }
-        .lamp-slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 60px; padding-right: 14px; text-align: left; color: #8a6c4c; pointer-events: none; }
+        .lamp-slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 62px; padding-right: 14px; text-align: left; color: var(--brown); pointer-events: none; }
         .lamp-slide-text strong { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em; }
-        .lamp-slide-text small { font-size: 0.78rem; color: #9c897a; }
-        .lamp-slide-text .go { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 1rem; letter-spacing: -0.1em; color: #c9ab86; }
+        .lamp-slide-text small { font-size: 0.78rem; color: var(--ink-3); }
+        .lamp-slide-text .go { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 1rem; letter-spacing: -0.1em; color: var(--gold); }
         /* 金色光球裡是光明球燈頁那尊發光的蓮座觀世音菩薩；球的下半部有一團亮光，像蓮花在放光；左右光暈對稱 */
-        .lamp-slide-knob { position: absolute; left: 5px; top: 5px; width: 38px; height: 38px; border-radius: 50%; cursor: grab; touch-action: none; background: url(lamp/knob-guanyin.webp) 50% 55% / 86% no-repeat, radial-gradient(ellipse 85% 60% at 50% 92%, rgba(255, 248, 220, 1) 0, rgba(255, 226, 160, 0.85) 30%, rgba(240, 190, 100, 0.35) 65%, rgba(240, 190, 100, 0) 100%), radial-gradient(circle at 50% 36%, #e2b45a 0 10%, #c08e3a 47%, #af7c2b 57%, #8e6020 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45), inset 0 0 0 1px rgba(255, 226, 160, 0.55); }
-        .lamp-slide-knob:focus-visible { outline: 2px solid #8a6c4c; outline-offset: 2px; }
+        .lamp-slide-knob { position: absolute; left: 5px; top: 5px; width: 42px; height: 42px; border-radius: 50%; cursor: grab; touch-action: none; background: url(lamp/knob-guanyin.webp) 50% 55% / 86% no-repeat, radial-gradient(ellipse 85% 60% at 50% 92%, rgba(255, 248, 220, 1) 0, rgba(255, 226, 160, 0.85) 30%, rgba(240, 190, 100, 0.35) 65%, rgba(240, 190, 100, 0) 100%), radial-gradient(circle at 50% 36%, #e2b45a 0 10%, #c08e3a 47%, #af7c2b 57%, #8e6020 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45), inset 0 0 0 1px rgba(255, 226, 160, 0.55); }
+        .lamp-slide-knob:focus-visible { outline: 2px solid var(--brown); outline-offset: 2px; }
         .lamp-slide.back .lamp-slide-knob, .lamp-slide.back .lamp-slide-fill { transition: transform 0.3s ease, width 0.3s ease; }
-        .lamp-slide.done { background-color: #a58362; }
+        .lamp-slide.done { background-color: var(--accent); }
         .lamp-slide.done .lamp-slide-text { color: #fff; }
         .lamp-slide.done .lamp-slide-text small { color: rgba(255, 255, 255, 0.85); }
-        /* --- 觀瀑一息・一分鐘靜心呼吸短劇 入口 --- */
-        #breathe-option { margin-top: 2rem; padding-top: 1.6rem; border-top: 1px solid #ddd8cf; }
-        #breathe-hint { color: #a58362; font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
+        /* --- 觀瀑一息・靜心呼吸短劇 入口 --- */
+        #breathe-option { margin-top: 2.4rem; }
         /* 「氣順了，運就來了」：金色題字，後面蓋一個「觀瀑」小紅印 */
-        #breathe-hint .breathe-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0.7rem 0 0.2rem; }
-        /* 兩句題字同樣大小，手機上各一行：依螢幕寬度縮放，最大 1.3rem */
-        .breathe-motto .motto-text { font-size: min(1.3rem, 4.4vw); font-weight: 700; letter-spacing: 0.06em; white-space: nowrap; color: #a9823f; }
+        #breathe-hint .breathe-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0.6rem 0 0.1rem; }
+        /* 兩句題字同樣大小，手機上各一行：依螢幕寬度縮放，最大 1.25rem */
+        .breathe-motto .motto-text { font-size: min(1.25rem, 4.4vw); font-weight: 600; letter-spacing: 0.06em; white-space: nowrap; color: var(--gold-2); }
         /* 標題左邊的紅色「觀瀑」印章，和呼吸短劇、心經標語旁的印章同款 */
         /* 印章＋「觀音靈籤」整列置中；印章上下緣由程式對齊「觀」字筆畫 */
         .title-wrap { display: inline-flex; align-items: flex-start; }
         .title-seal > span { writing-mode: vertical-rl; }
-        .title-seal { flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; font-size: 0.4em; height: 2.5em; width: 2.3em; margin-right: 0.45em; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; border-radius: 3px; text-shadow: none; }
-        .breathe-motto .motto-seal { writing-mode: vertical-rl; font-size: 0.75rem; font-weight: 700; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: #b0433a; padding: 3px; border-radius: 2px; }
-        .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: #fff; border: 2px solid #a58362; border-radius: 16px; text-decoration: none; text-align: left; transition: all 0.3s ease; }
-        .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+        .title-seal { flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; font-size: 0.4em; height: 2.5em; width: 2.3em; margin-right: 0.45em; font-weight: 600; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: var(--cinnabar); border-radius: 3px; text-shadow: none; }
+        .breathe-motto .motto-seal { writing-mode: vertical-rl; font-size: 0.75rem; font-weight: 600; line-height: 1.05; letter-spacing: 0; color: #fff; background-color: var(--cinnabar); padding: 3px; border-radius: 2px; }
+        .breathe-card { display: flex; align-items: center; gap: 14px; max-width: 340px; margin: 0 auto; padding: 7px 12px 7px 7px; background-color: var(--card); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: var(--shadow-sm); text-decoration: none; text-align: left; transition: all 0.3s ease; }
+        .breathe-card:hover, .breathe-card:active { background-color: #faf6ee; box-shadow: 0 6px 16px -6px rgba(104, 74, 38, 0.35); }
         .breathe-card img { flex: none; width: 54px; height: 96px; object-fit: cover; border-radius: 10px; }
-        .breathe-text { flex: 1; display: flex; flex-direction: column; gap: 4px; color: #8a6c4c; }
+        .breathe-text { flex: 1; display: flex; flex-direction: column; gap: 4px; color: var(--brown); }
         .breathe-text strong { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em; }
-        .breathe-text small { font-size: 0.78rem; line-height: 1.5; color: #9c897a; }
+        .breathe-text small { font-size: 0.78rem; line-height: 1.5; color: var(--ink-3); }
         .breathe-play { position: relative; flex: none; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fffdf3 0 18%, #f3d58e 42%, #d9ab5a 66%, rgba(217, 171, 90, 0) 72%); box-shadow: 0 0 14px rgba(212, 175, 55, 0.45); }
-        .breathe-play::after { content: ''; position: absolute; left: 15px; top: 12px; border-left: 11px solid #8a6c4c; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
-        /* 呼吸短劇與心經之間：一條金色細線把上下兩張卡片連起來，中間一句承上啟下的話 */
+        .breathe-play::after { content: ''; position: absolute; left: 15px; top: 12px; border-left: 11px solid var(--brown); border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+        /* 呼吸短劇與心經之間：一句承上啟下的話，把上下兩張卡片連起來 */
         .flow-link { display: flex; flex-direction: column; align-items: center; padding: 2px 0 0; }
         /* 與上方「氣順了，運就來了」同樣大小，後面也蓋「觀瀑」小紅印 */
-        .flow-link .flow-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 18px 0; }
+        .flow-link .flow-motto { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 16px 0; }
         /* --- 贊助網站維護 --- */
         #donate-option { margin-top: 1.2rem; }
-        #donate-button { font-family: 'Noto Serif TC', serif; font-size: 0.88rem; font-weight: 600; color: #8a6c4c; background-color: transparent; border: 1px solid #a58362; padding: 6px 16px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
-        #donate-button:hover, #donate-button:active { background-color: #a58362; color: #fff; }
-        #donate-note { margin-top: 0.4rem; font-size: 0.78rem; color: #9c897a; }
+        #donate-button { font-family: inherit; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.05em; color: var(--brown); background-color: transparent; border: 1px solid var(--gold); padding: 7px 18px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+        #donate-button:hover, #donate-button:active { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        #donate-note { margin-top: 0.4rem; font-size: var(--fs-xs); color: var(--ink-3); }
         #donate-dialog { position: fixed; inset: 0; z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(61, 44, 29, 0.45); }
         #donate-dialog.show { display: flex; }
-        .donate-card { position: relative; width: 100%; max-width: 360px; padding: 2rem 1.6rem 1.6rem; text-align: center; background: #fff; border: 1px solid #ddd8cf; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
-        .donate-card h2 { font-size: 1.4rem; font-weight: 600; color: #8a6c4c; margin-bottom: 0.6rem; }
-        .donate-card p { font-size: 0.98rem; line-height: 1.8; color: #6c584c; }
-        .donate-qr { display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; margin: 1.2rem auto 0.8rem; border: 1px dashed #c9b49c; border-radius: 10px; color: #9c897a; font-size: 0.95rem; background: #faf7f1; }
+        .donate-card { position: relative; width: 100%; max-width: 360px; padding: 2rem 1.6rem 1.6rem; text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
+        .donate-card h2 { font-size: 1.4rem; font-weight: 600; color: var(--brown); margin-bottom: 0.6rem; }
+        .donate-card p { font-size: 0.98rem; line-height: 1.8; color: var(--ink-2); }
+        .donate-qr { display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; margin: 1.2rem auto 0.8rem; border: 1px dashed #c9b49c; border-radius: 10px; color: var(--ink-3); font-size: 0.95rem; background: #faf7f1; }
         .donate-qr img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
-        .donate-small { font-size: 0.82rem !important; color: #9c897a !important; }
-        #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: #9c897a; cursor: pointer; }
+        .donate-small { font-size: 0.82rem !important; color: var(--ink-3) !important; }
+        #donate-close { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; font-size: 1.5rem; color: var(--ink-3); cursor: pointer; }
 
         #poem-card.revealed { animation: qt-reveal 0.7s ease; }
         @keyframes qt-reveal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
-        .footer-disclaimer { font-size: 0.78rem; color: #9c897a; margin-top: 0.3rem; }
+        .footer-disclaimer { font-size: var(--fs-xs); line-height: 1.6; color: var(--ink-3); margin-top: 0.3rem; }
     </style>
 </head>
 <body class="intro-playing">
@@ -285,7 +347,7 @@
 
             // 手機等直向螢幕用直式裁切版，電腦等橫向螢幕用完整版
             var landscape = window.matchMedia && window.matchMedia('(min-aspect-ratio: 1/1)').matches;
-            video.poster = landscape ? 'intro-poster.jpg' : 'intro-poster-portrait.jpg';
+            video.poster = landscape ? 'intro-poster.webp' : 'intro-poster-portrait.webp';
             video.src = landscape ? 'intro.mp4' : 'intro-portrait.mp4';
             if (landscape) {
                 bgVideo.src = 'intro.mp4';
@@ -326,8 +388,8 @@
             <!-- 觀音聖像・佛光呼吸 -->
             <div class="gy-stage">
                 <div class="gy-glow" aria-hidden="true"></div>
-                <img class="gy-aura" src="logo.png" alt="" aria-hidden="true">
-                <img src="logo.png" alt="觀音聖像" id="header-image" onerror="this.onerror=null;this.src='https://placehold.co/250x250/f4f1ea/8a6c4c?text=圖片載入失敗';">
+                <img class="gy-aura" src="logo.svg" alt="" aria-hidden="true" width="398" height="532">
+                <img src="logo.svg" alt="觀音聖像" id="header-image" width="398" height="532" onerror="this.onerror=null;this.src='logo.png';">
             </div>
             <h1><span class="title-wrap"><span class="title-seal" aria-hidden="true"><span>觀瀑</span></span><span class="title-text">觀音靈籤</span></span></h1>
             <p>請誠心默念您所求之事。</p>
@@ -360,22 +422,24 @@
             <button id="draw-button">誠心抽一籤</button>
 
             <div id="ai-section">
-                <p id="ai-hint">想看這支籤的詳細解釋？點下方按鈕，AI 會直接為您解籤：</p>
+                <h2 class="sec-title"><span>AI 白話解籤</span></h2>
+                <p id="ai-hint" class="sec-hint">想看這支籤的詳細解釋？<span class="nb">點下方按鈕，AI 會直接為您解籤：</span></p>
                 <div id="ai-buttons">
-                    <a id="google-ai-link" class="ai-link" href="#" target="_blank" rel="noopener">Google AI 解籤</a>
-                    <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener">ChatGPT 解籤</a>
-                    <a id="perplexity-link" class="ai-link" href="#" target="_blank" rel="noopener">Perplexity 解籤</a>
-                    <a id="claude-link" class="ai-link" href="#" target="_blank" rel="noopener">Claude 解籤</a>
-                    <a id="deepseek-link" class="ai-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener">DeepSeek 解籤</a>
-                    <a id="qwen-link" class="ai-link" href="https://chat.qwen.ai/" target="_blank" rel="noopener">通義千問 解籤</a>
+                    <a id="google-ai-link" class="ai-link" href="#" target="_blank" rel="noopener" aria-label="Google AI 解籤">Google AI<small>免登入</small></a>
+                    <a id="chatgpt-link" class="ai-link" href="#" target="_blank" rel="noopener" aria-label="ChatGPT 解籤">ChatGPT<small>免登入</small></a>
+                    <a id="perplexity-link" class="ai-link" href="#" target="_blank" rel="noopener" aria-label="Perplexity 解籤">Perplexity<small>免登入</small></a>
+                    <a id="claude-link" class="ai-link" href="#" target="_blank" rel="noopener" aria-label="Claude 解籤（需登入）">Claude<small>需登入</small></a>
+                    <a id="deepseek-link" class="ai-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener" aria-label="DeepSeek 解籤（需登入、貼上）">DeepSeek<small>需登入・貼上</small></a>
+                    <a id="qwen-link" class="ai-link" href="https://chat.qwen.ai/" target="_blank" rel="noopener" aria-label="通義千問 解籤（需貼上）">通義千問<small>需貼上</small></a>
                 </div>
-                <p id="ai-note">Claude、DeepSeek 需先登入（免費）。DeepSeek、通義千問打開後，在輸入框長按「貼上」即可。</p>
+                <p id="ai-note"><span class="nb">Claude、DeepSeek 需先登入（免費）。</span><span class="nb">標示「貼上」的，打開後在輸入框長按「貼上」即可。</span></p>
                 <p id="ai-copied"></p>
             </div>
 
             <!-- 光明球燈：一進首頁就看得到，把金色光球由左往右滑過去就能點燈 -->
             <div id="lamp-option">
-                <p id="lamp-hint">想為所求之事祈福？也可以點一盞光明球燈：</p>
+                <h2 class="sec-title"><span>光明球燈</span></h2>
+                <p id="lamp-hint" class="sec-hint">想為所求之事祈福？也可以點一盞光明球燈：</p>
                 <div class="lamp-slide" id="lamp-slide">
                     <div class="lamp-slide-fill" id="lamp-slide-fill"></div>
                     <div class="lamp-slide-text"><strong>向右滑動，點一盞光明球燈</strong><span class="go" aria-hidden="true">›››</span></div>
@@ -385,9 +449,10 @@
 
             <!-- 觀瀑一息：一分半鐘水墨短劇，靜心呼吸 -->
             <div id="breathe-option">
-                <p id="breathe-hint">遇到不順心的事，先靜心呼吸一下。<span class="breathe-motto"><span class="motto-text">氣順了，運就來了</span><span class="motto-seal" aria-hidden="true">觀瀑</span></span></p>
+                <h2 class="sec-title"><span>靜心</span></h2>
+                <p id="breathe-hint" class="sec-hint">遇到不順心的事，先靜心呼吸一下。<span class="breathe-motto"><span class="motto-text">氣順了，運就來了</span><span class="motto-seal" aria-hidden="true">觀瀑</span></span></p>
                 <a class="breathe-card breathe-link" href="breathe.html">
-                    <img src="breathe/thumb.jpg" alt="《觀瀑一息》短劇畫面" width="54" height="96" loading="lazy">
+                    <img src="breathe/thumb.webp" alt="《觀瀑一息》短劇畫面" width="54" height="96" loading="lazy">
                     <span class="breathe-text"><strong>觀瀑一息・靜心呼吸短劇</strong></span>
                     <span class="breathe-play" aria-hidden="true"></span>
                 </a>
@@ -397,7 +462,7 @@
                 </div>
                 <!-- 般若波羅蜜多心經：經文影片＋白話解釋 -->
                 <a class="breathe-card breathe-link sutra-card" href="heart-sutra.html" data-page="heart-sutra.html">
-                    <img src="heart-sutra/thumb.jpg" alt="《心經》影片畫面" width="54" height="96" loading="lazy">
+                    <img src="heart-sutra/thumb.webp" alt="《心經》影片畫面" width="54" height="96" loading="lazy">
                     <span class="breathe-text"><strong>般若波羅蜜多心經</strong><small>經文影片・白話解釋</small></span>
                     <span class="breathe-play" aria-hidden="true"></span>
                 </a>
@@ -407,7 +472,7 @@
 
         <footer>
             <p>僅供參考，心誠則靈</p>
-            <p class="footer-disclaimer">籤詩與 AI 解籤僅供心靈參考，不能取代醫療、法律、投資等專業意見。</p>
+            <p class="footer-disclaimer">籤詩與 AI 解籤僅供心靈參考，<span class="nb">不能取代醫療、法律、投資等專業意見。</span></p>
             
             <div class="footer-links">
                 <a href="about.html">關於我們</a> |
