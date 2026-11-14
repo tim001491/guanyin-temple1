@@ -24,7 +24,7 @@
   --gold: #f4d08a;
   --glow: #fff3d1;
   --ink: #f5eedf;
-  --muted: #bcb6d6;
+  --muted: #ead9b8;
   --line: rgba(244, 208, 138, 0.28);
   --display: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
   --body: "Noto Serif TC", "Songti TC", "Noto Serif CJK TC", "PMingLiU", serif;
@@ -99,10 +99,10 @@ button { font-family: inherit; }
   gap: 6px;
   font-size: 14px;
   line-height: 1;
-  color: #ddd6ee;
+  color: #f2e4c6;
   text-decoration: none;
   padding: 9px 15px;
-  border: 1px solid rgba(188, 182, 214, 0.28);
+  border: 1px solid rgba(232, 212, 170, 0.28);
   border-radius: 999px;
   background: rgba(96, 66, 34, 0.42);
   -webkit-backdrop-filter: blur(6px);
@@ -170,7 +170,7 @@ button { font-family: inherit; }
   margin-top: 4px;
   font-size: clamp(14px, 3.9vw, 17px);
   letter-spacing: 0.12em;
-  color: #ebe3f7;
+  color: #fbf1dc;
   text-wrap: balance;
 }
 .counter {
@@ -469,7 +469,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 }
 .demo-tag { font-size: 11px; color: #ffe7b0; border: 1px dashed rgba(244, 208, 138, 0.5); border-radius: 6px; padding: 0 5px; }
 .wish-time { margin-left: auto; font-size: 12px; color: var(--muted); }
-.wish-text { font-size: 15px; line-height: 1.75; color: #ece6f7; overflow-wrap: anywhere; }
+.wish-text { font-size: 15px; line-height: 1.75; color: #fbf1dc; overflow-wrap: anywhere; }
 .wish-text.quiet { color: var(--muted); font-size: 14px; }
 .wish-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .mini-btn {
@@ -487,7 +487,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 }
 .mini-btn:hover { background: rgba(244, 208, 138, 0.16); }
 .mini-btn[aria-pressed="true"] { color: var(--glow); background: rgba(244, 208, 138, 0.22); }
-.mini-btn.plain { color: #d9d2ea; border-color: rgba(188, 182, 214, 0.3); background: transparent; }
+.mini-btn.plain { color: #f2e4c6; border-color: rgba(232, 212, 170, 0.3); background: transparent; }
 .mini-btn.danger { color: #ffb9ad; border-color: rgba(255, 185, 173, 0.4); }
 .mini-btn svg { width: 15px; height: 15px; flex: none; }
 .empty { margin-top: 18px; text-align: center; font-size: 15px; color: var(--muted); }
@@ -498,7 +498,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 @media (min-width: 780px) { .about-grid { grid-template-columns: 1fr 1fr 1fr; } }
 .about-grid > div { padding: 18px 18px 16px; border-radius: 16px; background: linear-gradient(180deg, rgba(120, 84, 44, 0.34), rgba(74, 50, 28, 0.42)); border: 1px solid rgba(255, 222, 160, 0.28); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-shadow: 0 1px 3px rgba(40, 24, 8, 0.55); }
 .about h3 { margin-bottom: 8px; font-size: 17px; font-weight: 600; letter-spacing: 0.06em; color: var(--gold); }
-.about p, .about li { font-size: 14.5px; line-height: 1.85; color: #ddd6ee; }
+.about p, .about li { font-size: 14.5px; line-height: 1.85; color: #f2e4c6; }
 .steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
 .steps li { counter-increment: step; display: grid; grid-template-columns: 26px 1fr; gap: 0 10px; }
 .steps li::before {
@@ -520,7 +520,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 
 .footer { position: relative; z-index: 1; padding: 40px 16px calc(28px + env(safe-area-inset-bottom)); text-align: center; font-size: 13px; color: var(--muted); }
 .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-bottom: 8px; }
-.footer-links a { color: #d9d2ea; text-decoration: none; }
+.footer-links a { color: #f2e4c6; text-decoration: none; }
 .footer-links a:hover { color: var(--gold); text-decoration: underline; }
 
 /* 對話框 */
@@ -598,7 +598,7 @@ input[type="text"], input[type="password"], textarea {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 input:focus-visible, textarea:focus-visible { outline: none; }
-input::placeholder, textarea::placeholder { color: rgba(188, 182, 214, 0.6); }
+input::placeholder, textarea::placeholder { color: rgba(232, 212, 170, 0.6); }
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus { border-color: rgba(244, 208, 138, 0.8); box-shadow: 0 0 0 3px rgba(244, 208, 138, 0.18); }
 textarea { min-height: 68px; resize: none; }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: rgba(8, 10, 34, 0.5); border: 1px solid rgba(190, 176, 255, 0.2); }
@@ -618,7 +618,7 @@ textarea { min-height: 68px; resize: none; }
   padding: 10px 2px 8px;
   border-radius: 14px;
   font-size: 14px;
-  color: #ddd6ee;
+  color: #f2e4c6;
   background: rgba(8, 10, 34, 0.45);
   border: 1px solid rgba(190, 176, 255, 0.18);
   cursor: pointer;
@@ -685,7 +685,7 @@ textarea { min-height: 68px; resize: none; }
 .my-title { font-size: 15px; font-weight: 600; }
 .my-sub { font-size: 13px; color: var(--muted); }
 .my-list .wish-actions { grid-column: 2; }
-.confirm-text { margin-top: 10px; font-size: 15px; color: #ddd6ee; }
+.confirm-text { margin-top: 10px; font-size: 15px; color: #f2e4c6; }
 
 .toast {
   position: fixed;
