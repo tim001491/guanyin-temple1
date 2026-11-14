@@ -104,7 +104,9 @@ button { font-family: inherit; }
   padding: 9px 15px;
   border: 1px solid rgba(188, 182, 214, 0.28);
   border-radius: 999px;
-  background: rgba(12, 14, 42, 0.45);
+  background: rgba(96, 66, 34, 0.42);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   cursor: pointer;
 }
 .chip-link:hover { border-color: var(--line); color: var(--glow); }
@@ -398,14 +400,21 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 .actions .btn-primary:hover { color: #fff3d1; background: linear-gradient(180deg, rgba(255, 226, 150, 0.32) 0%, rgba(214, 160, 70, 0.22) 100%); }
 .btn-ghost {
   color: var(--gold);
-  background: rgba(20, 22, 64, 0.55);
-  box-shadow: inset 0 0 0 1px rgba(244, 208, 138, 0.5);
+  background: rgba(96, 66, 34, 0.42);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  text-shadow: 0 1px 3px rgba(40, 24, 8, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(244, 208, 138, 0.55);
 }
-.btn-ghost:hover { background: rgba(40, 40, 96, 0.6); color: var(--glow); }
+.btn-ghost:hover { background: rgba(120, 84, 44, 0.5); color: var(--glow); }
 .btn:disabled { opacity: 0.6; cursor: wait; }
 .btn.wide { width: 100%; }
 .btn.small { font-size: 15px; padding: 12px 22px; }
 .hint { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+/* 亮背景上的文字加柔和陰影，維持清楚 */
+.page .counter, .page .hint, .page .lead, .page .empty { color: #fbeed4; }
+.subtitle, .counter, .hint, .section h2, .lead, .empty, .about h3 { text-shadow: 0 1px 2px rgba(40, 24, 8, 0.7), 0 0 14px rgba(40, 24, 8, 0.45); }
 
 /* 光語牆 */
 .section { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 44px 16px 8px; }
@@ -428,8 +437,12 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
   gap: 0 12px;
   padding: 16px 16px 14px;
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(32, 34, 90, 0.62), rgba(18, 20, 56, 0.62));
-  border: 1px solid rgba(190, 176, 255, 0.16);
+  background: linear-gradient(180deg, rgba(120, 84, 44, 0.34), rgba(74, 50, 28, 0.42));
+  border: 1px solid rgba(255, 222, 160, 0.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  backdrop-filter: blur(10px) saturate(1.15);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.18);
+  text-shadow: 0 1px 3px rgba(40, 24, 8, 0.55);
 }
 .wish-card.mine { border-color: rgba(244, 208, 138, 0.42); }
 .dot {
@@ -483,7 +496,7 @@ canvas.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; p
 /* 關於 */
 .about-grid { display: grid; gap: 14px; margin-top: 22px; }
 @media (min-width: 780px) { .about-grid { grid-template-columns: 1fr 1fr 1fr; } }
-.about-grid > div { padding: 18px 18px 16px; border-radius: 16px; background: rgba(20, 22, 62, 0.45); border: 1px solid rgba(190, 176, 255, 0.14); }
+.about-grid > div { padding: 18px 18px 16px; border-radius: 16px; background: linear-gradient(180deg, rgba(120, 84, 44, 0.34), rgba(74, 50, 28, 0.42)); border: 1px solid rgba(255, 222, 160, 0.28); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-shadow: 0 1px 3px rgba(40, 24, 8, 0.55); }
 .about h3 { margin-bottom: 8px; font-size: 17px; font-weight: 600; letter-spacing: 0.06em; color: var(--gold); }
 .about p, .about li { font-size: 14.5px; line-height: 1.85; color: #ddd6ee; }
 .steps { list-style: none; counter-reset: step; display: grid; gap: 10px; }
