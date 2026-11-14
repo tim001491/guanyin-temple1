@@ -761,6 +761,36 @@ textarea { min-height: 68px; resize: none; }
   .ring.b { opacity: 0; }
   .sheet, .backdrop, .toast { transition: none; }
 }
+
+/* 對話框：明亮香檳金主題（不要暗沉） */
+.backdrop { background: rgba(70, 48, 22, 0.32); }
+.sheet {
+  --ink: #3e2a14; --muted: #7d6141; --gold: #a86f22; --glow: #5a3a14; --line: rgba(190, 140, 60, 0.4);
+  color: var(--ink);
+  background: radial-gradient(120% 60% at 50% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 60%), linear-gradient(180deg, #fffaf0 0%, #fbeccd 100%);
+  border-color: rgba(214, 168, 90, 0.55);
+  box-shadow: 0 -10px 50px rgba(120, 80, 20, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+.sheet.modal { background: radial-gradient(120% 70% at 50% 0%, rgba(255, 236, 190, 0.9), rgba(255, 236, 190, 0) 60%), linear-gradient(180deg, #fffaf0 0%, #fbe9c4 100%); }
+.sheet .close { border-color: rgba(168, 111, 34, 0.35); background: rgba(255, 255, 255, 0.6); }
+.sheet .field > label, .sheet .field legend, .sheet .label-row label, .sheet .suggest-title { color: #5a4126; }
+.sheet input[type="text"], .sheet input[type="password"], .sheet textarea { color: #3e2a14; background: rgba(255, 255, 255, 0.85); border-color: rgba(190, 140, 60, 0.4); }
+.sheet input::placeholder, .sheet textarea::placeholder { color: rgba(125, 97, 65, 0.6); }
+.sheet .seg { background: rgba(214, 168, 90, 0.14); border-color: rgba(190, 140, 60, 0.3); }
+.sheet .seg input:checked + span { color: #4a2f0e; background: linear-gradient(180deg, #fff3d4, #f3d58f); box-shadow: inset 0 0 0 1px rgba(190, 130, 40, 0.6); }
+.sheet .cats span { color: #5a4126; background: rgba(255, 255, 255, 0.7); border-color: rgba(190, 140, 60, 0.3); }
+.sheet .cats input:checked + span { color: #3e2a14; background: #fff; box-shadow: inset 0 0 0 1px var(--c), 0 0 16px -4px var(--c); }
+.sheet .suggest-chip { color: #8a5a1a; background: rgba(255, 255, 255, 0.7); border-color: rgba(190, 140, 60, 0.45); }
+.sheet .suggest-chip:hover { background: #fff; }
+.sheet .form-error, .sheet .text-btn.danger { color: #c0442e; }
+.sheet .cert-wish, .sheet .lamp-wish { color: #3e2a14; }
+.sheet .cert-bless, .sheet .confirm-text { color: #5a4126; }
+.sheet .my-list li { background: rgba(255, 255, 255, 0.65); border-color: rgba(190, 140, 60, 0.3); }
+.sheet .btn-ghost { color: #7a4e14; background: rgba(255, 255, 255, 0.55); text-shadow: none; box-shadow: inset 0 0 0 1px rgba(190, 130, 40, 0.6); }
+.sheet .btn-ghost:hover { background: #fff; color: #5a3a14; }
+.sheet .mini-btn { color: #8a5a1a; background: rgba(255, 255, 255, 0.6); border-color: rgba(190, 140, 60, 0.45); }
+.sheet .mini-btn.plain { color: #5a4126; }
+.sheet .cert-orb { box-shadow: 0 0 46px var(--c), 0 0 14px rgba(255, 255, 255, 0.9); }
 </style>
 </head>
 <body>
